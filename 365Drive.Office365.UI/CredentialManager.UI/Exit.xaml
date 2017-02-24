@@ -1,0 +1,35 @@
+﻿<mui:ModernDialog x:Class="_365Drive.Office365.UI.CredentialManager.UI.Exit"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                  xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
+                  mc:Ignorable="d" 
+                  d:DesignHeight="300" d:DesignWidth="300"
+                  Title="{x:Static p:Globalization.ProductName}" Width="350px" >
+
+    <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
+
+    <Grid Margin="10">
+        <Grid.Resources>
+            <Style TargetType="{x:Type Image}">
+                <Setter Property="Margin" Value="4,4,4,20" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Image Grid.Row="0" Grid.ColumnSpan="2" Width="300" Source="../images/IE-White.png"/>
+        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Width="250px" TextWrapping="WrapWithOverflow" Text="{x:Static p:Globalization.ExitSure}" FontFamily="Lato" FontSize="14" Foreground="Gray">
+        </TextBlock>
+    </Grid>
+    
+</mui:ModernDialog>

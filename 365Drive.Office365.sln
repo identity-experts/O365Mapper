@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.CloudConnector", "365Drive.Office365.GetTenancyURL\365Drive.Office365.CloudConnector.csproj", "{36DFECB8-5EB3-4F2C-9988-DCB8CB417F83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.MutexManager", "365Drive.Office365.MutexManager\365Drive.Office365.MutexManager.csproj", "{BE913E86-A208-4CB7-ABB2-2913B9A4C8FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.Core", "365Drive.Office365.Core\365Drive.Office365.Core.csproj", "{F29AC03F-E4B3-4C5D-B9CE-9D8FD73C317A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.CredentialManager", "365Drive.Office365.CredentialManager\365Drive.Office365.CredentialManager.csproj", "{531F19E9-1E75-49D7-AF25-4C2D4FB75891}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.LogManager", "365Drive.Office365.LogManager\365Drive.Office365.LogManager.csproj", "{6E11FC57-7171-4860-B0D2-9BF5EC4E3D2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.RegistryManager", "365Drive.Office365.RegistryManager\365Drive.Office365.RegistryManager.csproj", "{991255A3-816F-4C88-9D55-21909EA37874}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "365Drive.Office365.Setup", "365Drive.Office365.Setup\365Drive.Office365.Setup.vdproj", "{3F8517C7-F9E8-4E61-A6BB-FEC8ACBC665C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.Constants", "365Drive.Office365.Constants\365Drive.Office365.Constants.csproj", "{B837F0C6-F2C4-4CF0-96A9-05201A234995}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.UpdateManager", "365Drive.Office365.UpdateManager\365Drive.Office365.UpdateManager.csproj", "{C36E35D3-7CA7-48E1-B0DC-B0EFFAD3CEA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.UI", "365Drive.Office365.UI\365Drive.Office365.UI.csproj", "{CAC6B2FD-BA91-4180-9556-5CBB26A0D256}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.NotificationManager", "365Drive.Office365.NotificationManager\365Drive.Office365.NotificationManager.csproj", "{83C619A4-C9E6-4B52-9565-630F08675E8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotifyIconWpf", "wpf-notifyicon\wpf-notifyicon\NotifyIconWpf\NotifyIconWpf.csproj", "{7AC63864-7638-41C4-969C-D3197EF2BED9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.CommunicationManager", "365Drive.Office365.CommunicationManager\365Drive.Office365.CommunicationManager.csproj", "{F34A0FD3-504D-41B8-B3F2-6B388FF4B027}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36DFECB8-5EB3-4F2C-9988-DCB8CB417F83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36DFECB8-5EB3-4F2C-9988-DCB8CB417F83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36DFECB8-5EB3-4F2C-9988-DCB8CB417F83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36DFECB8-5EB3-4F2C-9988-DCB8CB417F83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE913E86-A208-4CB7-ABB2-2913B9A4C8FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE913E86-A208-4CB7-ABB2-2913B9A4C8FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE913E86-A208-4CB7-ABB2-2913B9A4C8FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE913E86-A208-4CB7-ABB2-2913B9A4C8FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F29AC03F-E4B3-4C5D-B9CE-9D8FD73C317A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F29AC03F-E4B3-4C5D-B9CE-9D8FD73C317A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F29AC03F-E4B3-4C5D-B9CE-9D8FD73C317A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F29AC03F-E4B3-4C5D-B9CE-9D8FD73C317A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{531F19E9-1E75-49D7-AF25-4C2D4FB75891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{531F19E9-1E75-49D7-AF25-4C2D4FB75891}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{531F19E9-1E75-49D7-AF25-4C2D4FB75891}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{531F19E9-1E75-49D7-AF25-4C2D4FB75891}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E11FC57-7171-4860-B0D2-9BF5EC4E3D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E11FC57-7171-4860-B0D2-9BF5EC4E3D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E11FC57-7171-4860-B0D2-9BF5EC4E3D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E11FC57-7171-4860-B0D2-9BF5EC4E3D2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{991255A3-816F-4C88-9D55-21909EA37874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{991255A3-816F-4C88-9D55-21909EA37874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{991255A3-816F-4C88-9D55-21909EA37874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{991255A3-816F-4C88-9D55-21909EA37874}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F8517C7-F9E8-4E61-A6BB-FEC8ACBC665C}.Debug|Any CPU.ActiveCfg = Debug
+		{3F8517C7-F9E8-4E61-A6BB-FEC8ACBC665C}.Release|Any CPU.ActiveCfg = Release
+		{B837F0C6-F2C4-4CF0-96A9-05201A234995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B837F0C6-F2C4-4CF0-96A9-05201A234995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B837F0C6-F2C4-4CF0-96A9-05201A234995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B837F0C6-F2C4-4CF0-96A9-05201A234995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C36E35D3-7CA7-48E1-B0DC-B0EFFAD3CEA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C36E35D3-7CA7-48E1-B0DC-B0EFFAD3CEA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C36E35D3-7CA7-48E1-B0DC-B0EFFAD3CEA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C36E35D3-7CA7-48E1-B0DC-B0EFFAD3CEA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAC6B2FD-BA91-4180-9556-5CBB26A0D256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAC6B2FD-BA91-4180-9556-5CBB26A0D256}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAC6B2FD-BA91-4180-9556-5CBB26A0D256}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAC6B2FD-BA91-4180-9556-5CBB26A0D256}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83C619A4-C9E6-4B52-9565-630F08675E8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83C619A4-C9E6-4B52-9565-630F08675E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83C619A4-C9E6-4B52-9565-630F08675E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83C619A4-C9E6-4B52-9565-630F08675E8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AC63864-7638-41C4-969C-D3197EF2BED9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AC63864-7638-41C4-969C-D3197EF2BED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AC63864-7638-41C4-969C-D3197EF2BED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AC63864-7638-41C4-969C-D3197EF2BED9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F34A0FD3-504D-41B8-B3F2-6B388FF4B027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F34A0FD3-504D-41B8-B3F2-6B388FF4B027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F34A0FD3-504D-41B8-B3F2-6B388FF4B027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F34A0FD3-504D-41B8-B3F2-6B388FF4B027}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
