@@ -8,6 +8,7 @@ using System.ServiceModel.Channels;
 using System.IO;
 using System.Xml.Linq;
 using System.IdentityModel.Protocols.WSTrust;
+using System.Reflection;
 
 namespace _365Drive.Office365.CloudConnector
 {
@@ -76,35 +77,27 @@ namespace _365Drive.Office365.CloudConnector
         // Creates or loads cached cookie container
         public CookieContainer getCookieContainer()
         {
-            if (_cachedCookieContainer == null || DateTime.Now > _expires)
+            CookieContainer cc = new CookieContainer();
+            try
             {
+                if (!Utility.ready())
+                    return null;
 
-                // Get the SAML tokens from SPO STS (via MSO STS) using fed auth passive approach
-                MsoCookies cookies = getSamlToken();
-
-                if (!string.IsNullOrEmpty(cookies.FedAuth))
+                if (_cachedCookieContainer == null || DateTime.Now > _expires)
                 {
 
-                    // Create cookie collection with the SAML token                    
-                    _expires = cookies.Expires;
-                    CookieContainer cc = new CookieContainer();
+                    // Get the SAML tokens from SPO STS (via MSO STS) using fed auth passive approach
+                    MsoCookies cookies = getSamlToken();
 
-                    // Set the FedAuth cookie
-                    Cookie samlAuth = new Cookie("FedAuth", cookies.FedAuth)
+                    if (!string.IsNullOrEmpty(cookies.FedAuth))
                     {
-                        Expires = cookies.Expires,
-                        Path = "/",
-                        Secure = cookies.Host.Scheme == "https",
-                        HttpOnly = true,
-                        Domain = cookies.Host.Host
-                    };
-                    cc.Add(samlAuth);
+
+                        // Create cookie collection with the SAML token                    
+                        _expires = cookies.Expires;
 
 
-                    if (_useRtfa)
-                    {
-                        // Set the rtFA (sign-out) cookie, added march 2011
-                        Cookie rtFa = new Cookie("rtFA", cookies.rtFa)
+                        // Set the FedAuth cookie
+                        Cookie samlAuth = new Cookie("FedAuth", cookies.FedAuth)
                         {
                             Expires = cookies.Expires,
                             Path = "/",
@@ -112,12 +105,32 @@ namespace _365Drive.Office365.CloudConnector
                             HttpOnly = true,
                             Domain = cookies.Host.Host
                         };
-                        cc.Add(rtFa);
+                        cc.Add(samlAuth);
+
+
+                        if (_useRtfa)
+                        {
+                            // Set the rtFA (sign-out) cookie, added march 2011
+                            Cookie rtFa = new Cookie("rtFA", cookies.rtFa)
+                            {
+                                Expires = cookies.Expires,
+                                Path = "/",
+                                Secure = cookies.Host.Scheme == "https",
+                                HttpOnly = true,
+                                Domain = cookies.Host.Host
+                            };
+                            cc.Add(rtFa);
+                        }
+                        _cachedCookieContainer = cc;
+                        return cc;
                     }
-                    _cachedCookieContainer = cc;
-                    return cc;
+                    return null;
                 }
-                return null;
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
             return _cachedCookieContainer;
         }
@@ -140,6 +153,9 @@ namespace _365Drive.Office365.CloudConnector
 
             try
             {
+                if (!Utility.ready())
+                    return null;
+
                 var sharepointSite = new
                 {
                     Wctx = office365Login,
@@ -200,8 +216,10 @@ namespace _365Drive.Office365.CloudConnector
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
                 return null;
             }
             return ret;
@@ -209,65 +227,80 @@ namespace _365Drive.Office365.CloudConnector
 
         static HttpWebRequest createRequest(string url)
         {
+            if (!Utility.ready())
+                return null;
+
             HttpWebRequest request = HttpWebRequest.Create(url) as HttpWebRequest;
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.CookieContainer = new CookieContainer();
-            request.AllowAutoRedirect = false; // Do NOT automatically redirect
-            request.UserAgent = userAgent;
+            try
+            {
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.CookieContainer = new CookieContainer();
+                request.AllowAutoRedirect = false; // Do NOT automatically redirect
+                request.UserAgent = userAgent;
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
             return request;
         }
 
         private string getResponse(string stsUrl, string realm)
         {
-
-            //RequestSecurityToken rst = new RequestSecurityToken {
-            //    RequestType = WSTrustFeb2005Constants.RequestTypes.Issue,
-            //    AppliesTo = new EndpointAddress(realm),
-            //    KeyType = WSTrustFeb2005Constants.KeyTypes.Bearer,
-            //    TokenType = Microsoft.IdentityModel.Tokens.SecurityTokenTypes.Saml11TokenProfile11
-            //};
-
-            RequestSecurityToken rst = new RequestSecurityToken
+            string strResponse = string.Empty;
+            try
             {
-                RequestType = RequestTypes.Issue,
-                KeyType = KeyTypes.Bearer,
-                AppliesTo = new EndpointReference(realm)
-            };
-
-            WSTrustFeb2005RequestSerializer trustSerializer = new WSTrustFeb2005RequestSerializer();
-
-            WSHttpBinding binding = new WSHttpBinding();
-
-            binding.Security.Mode = SecurityMode.TransportWithMessageCredential;
-
-            binding.Security.Message.ClientCredentialType = MessageCredentialType.UserName;
-            binding.Security.Message.EstablishSecurityContext = false;
-            binding.Security.Message.NegotiateServiceCredential = false;
-
-            binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.None;
-
-            EndpointAddress address = new EndpointAddress(stsUrl);
-
-            using (WSTrustFeb2005ContractClient trustClient = new WSTrustFeb2005ContractClient(binding, address))
-            {
-                trustClient.ClientCredentials.UserName.UserName = _username;
-                trustClient.ClientCredentials.UserName.Password = _password;
-                Message response = trustClient.EndIssue(
-                    trustClient.BeginIssue(
-                     Message.CreateMessage(
-                                MessageVersion.Default,
-                               "http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue",
-                                new RequestBodyWriter(trustSerializer, rst)
-                        ),
-                        null,
-                        null));
-                trustClient.Close();
-                using (XmlDictionaryReader reader = response.GetReaderAtBodyContents())
+                if (!Utility.ready())
+                    return null;
+                RequestSecurityToken rst = new RequestSecurityToken
                 {
-                    return reader.ReadOuterXml();
+                    RequestType = RequestTypes.Issue,
+                    KeyType = KeyTypes.Bearer,
+                    AppliesTo = new EndpointReference(realm)
+                };
+
+                WSTrustFeb2005RequestSerializer trustSerializer = new WSTrustFeb2005RequestSerializer();
+
+                WSHttpBinding binding = new WSHttpBinding();
+
+                binding.Security.Mode = SecurityMode.TransportWithMessageCredential;
+
+                binding.Security.Message.ClientCredentialType = MessageCredentialType.UserName;
+                binding.Security.Message.EstablishSecurityContext = false;
+                binding.Security.Message.NegotiateServiceCredential = false;
+
+                binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.None;
+
+                EndpointAddress address = new EndpointAddress(stsUrl);
+
+                using (WSTrustFeb2005ContractClient trustClient = new WSTrustFeb2005ContractClient(binding, address))
+                {
+                    trustClient.ClientCredentials.UserName.UserName = _username;
+                    trustClient.ClientCredentials.UserName.Password = _password;
+                    Message response = trustClient.EndIssue(
+                        trustClient.BeginIssue(
+                         Message.CreateMessage(
+                                    MessageVersion.Default,
+                                   "http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue",
+                                    new RequestBodyWriter(trustSerializer, rst)
+                            ),
+                            null,
+                            null));
+                    trustClient.Close();
+                    using (XmlDictionaryReader reader = response.GetReaderAtBodyContents())
+                    {
+                        strResponse = reader.ReadOuterXml();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return strResponse;
         }
 
 

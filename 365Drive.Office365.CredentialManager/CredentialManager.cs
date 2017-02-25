@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,25 +26,43 @@ namespace _365Drive.Office365
         /// <returns></returns>
         public static CredentialState ensureCredentials()
         {
-            if (GetCredential() == null)
+            CredentialState state = CredentialState.Notpresent;
+            try
             {
-                return CredentialState.Notpresent;
+                if (GetCredential() == null)
+                {
+                    state = CredentialState.Notpresent;
+                }
+                else
+                {
+                    state = CredentialState.Present;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return CredentialState.Present;
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
+            return state;
         }
 
 
         public static Cred GetCredential()
         {
             var cm = new Credential { Target = _credentialStoreName };
-            if (!cm.Load())
+            try
             {
-                return null;
+                cm = new Credential { Target = _credentialStoreName };
+                if (!cm.Load())
+                {
+                    return null;
+                }
             }
-
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
             //Cred is just a class with two string properties for user and pass
             return new Cred(cm.Username, cm.Password);
         }
@@ -51,19 +70,40 @@ namespace _365Drive.Office365
         public static bool SetCredentials(
               string username, string password)
         {
+            bool blSetCredentialstate = false;
 
-            return new Credential
+            try
             {
-                Target = _credentialStoreName,
-                Username = username,
-                Password = password,
-                PersistanceType = PersistanceType.LocalComputer
-            }.Save();
+                blSetCredentialstate = new Credential
+                {
+                    Target = _credentialStoreName,
+                    Username = username,
+                    Password = password,
+                    PersistanceType = PersistanceType.LocalComputer
+                }.Save();
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return blSetCredentialstate;
         }
 
         public static bool RemoveCredentials()
         {
-            return new Credential { Target = _credentialStoreName }.Delete();
+            bool blCredDeleted = false;
+
+            try
+            {
+                blCredDeleted = new Credential { Target = _credentialStoreName }.Delete();
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return blCredDeleted;
         }
     }
 

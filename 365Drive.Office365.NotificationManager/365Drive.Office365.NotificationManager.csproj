@@ -38,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,6 +91,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\365Drive.Office365.Utility\365Drive.Office365.Utility.csproj">
+      <Project>{2a55bec8-5690-4ff9-95c0-29ac5c97ce35}</Project>
+      <Name>365Drive.Office365.Utility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\wpf-notifyicon\wpf-notifyicon\NotifyIconWpf\NotifyIconWpf.csproj">
       <Project>{7ac63864-7638-41c4-969c-d3197ef2bed9}</Project>
       <Name>NotifyIconWpf</Name>
@@ -109,10 +114,6 @@
     <ProjectReference Include="..\365Drive.Office365.CommunicationManager\365Drive.Office365.CommunicationManager.csproj">
       <Project>{f34a0fd3-504d-41b8-b3f2-6b388ff4b027}</Project>
       <Name>365Drive.Office365.CommunicationManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\365Drive.Office365.Core\365Drive.Office365.Core.csproj">
-      <Project>{f29ac03f-e4b3-4c5d-b9ce-9d8fd73c317a}</Project>
-      <Name>365Drive.Office365.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\365Drive.Office365.CredentialManager\365Drive.Office365.CredentialManager.csproj">
       <Project>{531f19e9-1e75-49d7-af25-4c2d4fb75891}</Project>

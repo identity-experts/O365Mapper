@@ -34,6 +34,7 @@
         <Label Name="VersionNumber" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
         <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.ColumnSpan="2"
                FontFamily="Lato" FontSize="13" Foreground="Gray" />
+        
     </Grid>
 
 </mui:ModernDialog>

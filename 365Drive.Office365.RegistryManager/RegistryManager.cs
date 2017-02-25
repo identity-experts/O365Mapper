@@ -102,12 +102,13 @@ namespace _365Drive.Office365
         /// </summary>
         public static void SetDevEnvironmnet()
         {
-         
+
             if (IsDev)
             {
                 Set(RegistryKeys.Verbose, "1");
                 Set(RegistryKeys.BalloonNotification, "1");
             }
+
         }
     }
 }

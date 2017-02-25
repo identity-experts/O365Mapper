@@ -12,7 +12,8 @@ namespace _365Drive.Office365.CloudConnector
         Ok = 0,
         Expired = 1,
         Exceeded = 2,
-        LoginFailed = 3
+        LoginFailed = 3,
+        CouldNotVerify = 4
     }
     internal class StringConstants
     {

@@ -195,4 +195,37 @@
   <data name="GettingoneDriveUrl" xml:space="preserve">
     <value>OneDrive for business found to be mapped. Getting its Url</value>
   </data>
+  <data name="DotNetVersion" xml:space="preserve">
+    <value>.NET Version</value>
+  </data>
+  <data name="EnsuringInternet" xml:space="preserve">
+    <value>Ensuring internet access..</value>
+  </data>
+  <data name="EnsuringwebClient" xml:space="preserve">
+    <value>Ensuring webClient service is running or not..</value>
+  </data>
+  <data name="InternetConnection" xml:space="preserve">
+    <value>Internet</value>
+  </data>
+  <data name="LicenseCouldNotVerified" xml:space="preserve">
+    <value>We could not verify the license details, 365Drive will attempt again in few seconds</value>
+  </data>
+  <data name="LicenseExpired" xml:space="preserve">
+    <value>Your license has been expired or limit exceeded, kindly contact your administrator</value>
+  </data>
+  <data name="LicenseValidationFailed" xml:space="preserve">
+    <value>License Validation Failed</value>
+  </data>
+  <data name="Nodotnet45" xml:space="preserve">
+    <value>We need .NET framework 4.5 or higher to proceed.</value>
+  </data>
+  <data name="NoInternet" xml:space="preserve">
+    <value>Oops! looks like you don't have working internet connection, waiting to get back...</value>
+  </data>
+  <data name="webClient" xml:space="preserve">
+    <value>WebClient Service</value>
+  </data>
+  <data name="webClientNotRunning" xml:space="preserve">
+    <value>WebClient service is not running. Please start it.</value>
+  </data>
 </root>

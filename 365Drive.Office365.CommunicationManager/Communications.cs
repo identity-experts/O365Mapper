@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,8 +16,19 @@ namespace _365Drive.Office365.CommunicationManager
         /// </summary>
         public static void updateStatus(string message)
         {
-            if (notifyIcon != null)
-                notifyIcon.ToolTipText = message;
+            try
+            {
+                if (!Utility.ready())
+                    return;
+
+                if (notifyIcon != null)
+                    notifyIcon.ToolTipText = message;
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
         }
 
 

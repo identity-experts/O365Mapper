@@ -151,6 +151,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .NET Version.
+        /// </summary>
+        public static string DotNetVersion {
+            get {
+                return ResourceManager.GetString("DotNetVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Drive details fetched from IE licensing server.
         /// </summary>
         public static string DriveDetailsFound {
@@ -174,6 +183,24 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string EnsuringCredential {
             get {
                 return ResourceManager.GetString("EnsuringCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ensuring internet access...
+        /// </summary>
+        public static string EnsuringInternet {
+            get {
+                return ResourceManager.GetString("EnsuringInternet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ensuring webClient service is running or not...
+        /// </summary>
+        public static string EnsuringwebClient {
+            get {
+                return ResourceManager.GetString("EnsuringwebClient", resourceCulture);
             }
         }
         
@@ -223,11 +250,47 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internet.
+        /// </summary>
+        public static string InternetConnection {
+            get {
+                return ResourceManager.GetString("InternetConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We could not verify the license details, 365Drive will attempt again in few seconds.
+        /// </summary>
+        public static string LicenseCouldNotVerified {
+            get {
+                return ResourceManager.GetString("LicenseCouldNotVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your license has been expired or limit exceeded, kindly contact your administrator.
+        /// </summary>
+        public static string LicenseExpired {
+            get {
+                return ResourceManager.GetString("LicenseExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your license information found OK.
         /// </summary>
         public static string LicenseFoundOK {
             get {
                 return ResourceManager.GetString("LicenseFoundOK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to License Validation Failed.
+        /// </summary>
+        public static string LicenseValidationFailed {
+            get {
+                return ResourceManager.GetString("LicenseValidationFailed", resourceCulture);
             }
         }
         
@@ -255,6 +318,24 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string NocredMessage {
             get {
                 return ResourceManager.GetString("NocredMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We need .NET framework 4.5 or higher to proceed..
+        /// </summary>
+        public static string Nodotnet45 {
+            get {
+                return ResourceManager.GetString("Nodotnet45", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oops! looks like you don&apos;t have working internet connection, waiting to get back....
+        /// </summary>
+        public static string NoInternet {
+            get {
+                return ResourceManager.GetString("NoInternet", resourceCulture);
             }
         }
         
@@ -291,6 +372,24 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string Version {
             get {
                 return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WebClient Service.
+        /// </summary>
+        public static string webClient {
+            get {
+                return ResourceManager.GetString("webClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WebClient service is not running. Please start it..
+        /// </summary>
+        public static string webClientNotRunning {
+            get {
+                return ResourceManager.GetString("webClientNotRunning", resourceCulture);
             }
         }
     }

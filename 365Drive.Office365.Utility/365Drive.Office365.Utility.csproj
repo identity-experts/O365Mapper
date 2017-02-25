@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{531F19E9-1E75-49D7-AF25-4C2D4FB75891}</ProjectGuid>
+    <ProjectGuid>{2A55BEC8-5690-4FF9-95C0-29AC5C97CE35}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>_365Drive.Office365.CredentialManager</RootNamespace>
-    <AssemblyName>365Drive.Office365.CredentialManager</AssemblyName>
+    <RootNamespace>_365Drive.Office365.Utility</RootNamespace>
+    <AssemblyName>365Drive.Office365.Utility</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,12 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CredentialManagement, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CredentialManagement.1.0.2\lib\net35\CredentialManagement.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,20 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CredentialManager.cs" />
+    <Compile Include="Utility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\365Drive.Office365.LogManager\365Drive.Office365.LogManager.csproj">
       <Project>{6e11fc57-7171-4860-b0d2-9bf5ec4e3d2e}</Project>
       <Name>365Drive.Office365.LogManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\365Drive.Office365.Utility\365Drive.Office365.Utility.csproj">
-      <Project>{2a55bec8-5690-4ff9-95c0-29ac5c97ce35}</Project>
-      <Name>365Drive.Office365.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

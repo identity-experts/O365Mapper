@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,21 +22,35 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static LicenseValidationState EnsureLicense(string userName, string password)
         {
-            LogManager.Verbose("ensuring license");
+            var licenseMode = LicenseValidationState.CouldNotVerify;
+            try
+            {
+                if (!Utility.ready())
+                    return LicenseValidationState.CouldNotVerify;
 
-            //get the tenancy name
-            string tenancyName = _365DriveTenancyURL.Get365TenancyName(userName, password);
-            if (!string.IsNullOrEmpty(tenancyName))
-            {
-                LogManager.Verbose("call to license valid");
-                LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName);
-                LogManager.Verbose("license validation result: " + Convert.ToString(state));
-                return state;
+                LogManager.Verbose("ensuring license");
+
+                //get the tenancy name
+                string tenancyName = _365DriveTenancyURL.Get365TenancyName(userName, password);
+                if (!string.IsNullOrEmpty(tenancyName))
+                {
+                    LogManager.Verbose("call to license valid");
+                    LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName);
+                    LogManager.Verbose("license validation result: " + Convert.ToString(state));
+                    licenseMode = state;
+                }
+                else
+                {
+                    licenseMode = LicenseValidationState.LoginFailed;
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                return LicenseValidationState.LoginFailed;
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
+            return licenseMode;
         }
 
 
@@ -47,6 +62,9 @@ namespace _365Drive.Office365.CloudConnector
         {
             try
             {
+                if (!Utility.ready())
+                    return false;
+
                 LogManager.Verbose("Inside ensure access");
                 var responsereceived = true;
                 while (responsereceived)
@@ -99,14 +117,13 @@ namespace _365Drive.Office365.CloudConnector
                         }
                     }
                 }
-
-                return true;
             }
             catch (Exception ex)
             {
-                LogManager.Error("Exception for retrieving the path: " + ex.Message.ToString());
-                return false;
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
+            return true;
         }
 
 
@@ -119,81 +136,92 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static string getOneDriveUrl(string host, CookieContainer authCookies)
         {
-            //get the request digest which will be neeeded to fetch the mysite URL
-            LogManager.Verbose("Retrieving user's onedrive Url");
-
-            string requestDigest = getRequestDigest(host, authCookies);
-            LogManager.Verbose("got request digest:" + requestDigest);
-
-            //get mysite url now
             string oneDriveUrl = string.Empty;
-
-            //initialize Webrequest
-            var oneDriveUrlCall = (HttpWebRequest)WebRequest.Create((host.EndsWith("//") ? host : host + "//") + "_api/SP.UserProfiles.PeopleManager/GetMyProperties/personalURL");
-
-            //Set header info along with digest value
-            oneDriveUrlCall.Accept = "application/json;odata=verbose";
-            oneDriveUrlCall.ContentType = "application/json;odata=verbose";
-            oneDriveUrlCall.CookieContainer = authCookies;
-            oneDriveUrlCall.Method = "POST";
-            oneDriveUrlCall.ContentLength = 0;
-            oneDriveUrlCall.Headers.Add("X-RequestDigest", requestDigest);
-
-
-            //Make sure it doesnt have any proxy
-            if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString() != host)
-            {
-                LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
-                WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));
-                proxy.Credentials = CredentialCache.DefaultCredentials;
-                proxy.UseDefaultCredentials = true;
-                oneDriveUrlCall.Proxy = proxy;
-            }
-
             try
             {
-                using (var response = (HttpWebResponse)oneDriveUrlCall.GetResponse())
-                {
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        using (var digestResponse = response.GetResponseStream())
-                        {
-                            LogManager.Verbose("response code for oneDrive Url: " + host.ToString() + " is " + response.StatusDescription);
+                if (!Utility.ready())
+                    return string.Empty;
+                //get the request digest which will be neeeded to fetch the mysite URL
+                LogManager.Verbose("Retrieving user's onedrive Url");
 
-                            if (digestResponse != null)
-                                using (var rDigestResponse = new StreamReader(digestResponse))
-                                {
-                                    var digestBytes = default(byte[]);
-                                    using (var memstream = new MemoryStream())
+                string requestDigest = getRequestDigest(host, authCookies);
+                LogManager.Verbose("got request digest:" + requestDigest);
+
+                //get mysite url now
+
+
+                //initialize Webrequest
+                var oneDriveUrlCall = (HttpWebRequest)WebRequest.Create((host.EndsWith("//") ? host : host + "//") + "_api/SP.UserProfiles.PeopleManager/GetMyProperties/personalURL");
+
+                //Set header info along with digest value
+                oneDriveUrlCall.Accept = "application/json;odata=verbose";
+                oneDriveUrlCall.ContentType = "application/json;odata=verbose";
+                oneDriveUrlCall.CookieContainer = authCookies;
+                oneDriveUrlCall.Method = "POST";
+                oneDriveUrlCall.ContentLength = 0;
+                oneDriveUrlCall.Headers.Add("X-RequestDigest", requestDigest);
+
+
+                //Make sure it doesnt have any proxy
+                if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString() != host)
+                {
+                    LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
+                    WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));
+                    proxy.Credentials = CredentialCache.DefaultCredentials;
+                    proxy.UseDefaultCredentials = true;
+                    oneDriveUrlCall.Proxy = proxy;
+                }
+
+                try
+                {
+                    using (var response = (HttpWebResponse)oneDriveUrlCall.GetResponse())
+                    {
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            using (var digestResponse = response.GetResponseStream())
+                            {
+                                LogManager.Verbose("response code for oneDrive Url: " + host.ToString() + " is " + response.StatusDescription);
+
+                                if (digestResponse != null)
+                                    using (var rDigestResponse = new StreamReader(digestResponse))
                                     {
-                                        rDigestResponse.BaseStream.CopyTo(memstream);
-                                        digestBytes = memstream.ToArray();
+                                        var digestBytes = default(byte[]);
+                                        using (var memstream = new MemoryStream())
+                                        {
+                                            rDigestResponse.BaseStream.CopyTo(memstream);
+                                            digestBytes = memstream.ToArray();
+                                        }
+                                        var digestReader = JsonReaderWriterFactory.CreateJsonReader(digestBytes, new System.Xml.XmlDictionaryReaderQuotas());
+                                        var rootNode = XElement.Load(digestReader);
+                                        XmlDocument responseDoc = new XmlDocument();
+                                        responseDoc.LoadXml(rootNode.ToString());
+                                        string oneDrivepath = "root/d/PersonalUrl";
+                                        var digestNodes = responseDoc.SelectNodes(oneDrivepath);
+                                        oneDriveUrl = digestNodes[0].InnerText;
                                     }
-                                    var digestReader = JsonReaderWriterFactory.CreateJsonReader(digestBytes, new System.Xml.XmlDictionaryReaderQuotas());
-                                    var rootNode = XElement.Load(digestReader);
-                                    XmlDocument responseDoc = new XmlDocument();
-                                    responseDoc.LoadXml(rootNode.ToString());
-                                    string oneDrivepath = "root/d/PersonalUrl";
-                                    var digestNodes = responseDoc.SelectNodes(oneDrivepath);
-                                    oneDriveUrl = digestNodes[0].InnerText;
-                                }
+                            }
+                        }
+                        ///error received
+                        else
+                        {
+                            LogManager.Verbose("Could not retrive digest, response: " + response.StatusDescription);
                         }
                     }
-                    ///error received
-                    else
-                    {
-                        LogManager.Verbose("Could not retrive digest, response: " + response.StatusDescription);
-                    }
                 }
+                catch { }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
             //return retrieved oneDrive Url 
             return oneDriveUrl.EndsWith("/") ? oneDriveUrl + "Documents" : oneDriveUrl + "/Documents";
         }
 
 
 
-        
+
         /// <summary>
         /// get the request digest value which can be used to retrieve / post the mysite url or anything else from office 365
         /// </summary>
@@ -203,65 +231,76 @@ namespace _365Drive.Office365.CloudConnector
         static string getRequestDigest(string host, CookieContainer authCookies)
         {
             string requestDigest = string.Empty;
-            LogManager.Verbose("Retrieving request digest");
-
-            //initialize Webrequest
-            var requestDigestCall = (HttpWebRequest)WebRequest.Create((host.EndsWith("//") ? host : host + "//") + "_api/contextinfo");
-
-            //Set header info
-            requestDigestCall.Accept = "application/json;odata=verbose";
-            requestDigestCall.ContentType = "application/json;odata=verbose";
-            requestDigestCall.CookieContainer = authCookies;
-            requestDigestCall.Method = "POST";
-            requestDigestCall.ContentLength = 0;
-
-            //Make sure it doesnt have any proxy
-            if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString() != host)
-            {
-                LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
-                WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));
-                proxy.Credentials = CredentialCache.DefaultCredentials;
-                proxy.UseDefaultCredentials = true;
-                requestDigestCall.Proxy = proxy;
-            }
-
             try
             {
-                using (var response = (HttpWebResponse)requestDigestCall.GetResponse())
-                {
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        using (var digestResponse = response.GetResponseStream())
-                        {
-                            LogManager.Verbose("response code for ensure access drive: " + host.ToString() + " is " + response.StatusDescription);
+                if (!Utility.ready())
+                    return string.Empty;
 
-                            if (digestResponse != null)
-                                using (var rDigestResponse = new StreamReader(digestResponse))
-                                {
-                                    var digestBytes = default(byte[]);
-                                    using (var memstream = new MemoryStream())
+                LogManager.Verbose("Retrieving request digest");
+
+                //initialize Webrequest
+                var requestDigestCall = (HttpWebRequest)WebRequest.Create((host.EndsWith("//") ? host : host + "//") + "_api/contextinfo");
+
+                //Set header info
+                requestDigestCall.Accept = "application/json;odata=verbose";
+                requestDigestCall.ContentType = "application/json;odata=verbose";
+                requestDigestCall.CookieContainer = authCookies;
+                requestDigestCall.Method = "POST";
+                requestDigestCall.ContentLength = 0;
+
+                //Make sure it doesnt have any proxy
+                if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString() != host)
+                {
+                    LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
+                    WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));
+                    proxy.Credentials = CredentialCache.DefaultCredentials;
+                    proxy.UseDefaultCredentials = true;
+                    requestDigestCall.Proxy = proxy;
+                }
+
+                try
+                {
+                    using (var response = (HttpWebResponse)requestDigestCall.GetResponse())
+                    {
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            using (var digestResponse = response.GetResponseStream())
+                            {
+                                LogManager.Verbose("response code for ensure access drive: " + host.ToString() + " is " + response.StatusDescription);
+
+                                if (digestResponse != null)
+                                    using (var rDigestResponse = new StreamReader(digestResponse))
                                     {
-                                        rDigestResponse.BaseStream.CopyTo(memstream);
-                                        digestBytes = memstream.ToArray();
+                                        var digestBytes = default(byte[]);
+                                        using (var memstream = new MemoryStream())
+                                        {
+                                            rDigestResponse.BaseStream.CopyTo(memstream);
+                                            digestBytes = memstream.ToArray();
+                                        }
+                                        var digestReader = JsonReaderWriterFactory.CreateJsonReader(digestBytes, new System.Xml.XmlDictionaryReaderQuotas());
+                                        var rootNode = XElement.Load(digestReader);
+                                        XmlDocument responseDoc = new XmlDocument();
+                                        responseDoc.LoadXml(rootNode.ToString());
+                                        string xpath = "root/d/GetContextWebInformation/FormDigestValue";
+                                        var digestNodes = responseDoc.SelectNodes(xpath);
+                                        requestDigest = digestNodes[0].InnerText;
                                     }
-                                    var digestReader = JsonReaderWriterFactory.CreateJsonReader(digestBytes, new System.Xml.XmlDictionaryReaderQuotas());
-                                    var rootNode = XElement.Load(digestReader);
-                                    XmlDocument responseDoc = new XmlDocument();
-                                    responseDoc.LoadXml(rootNode.ToString());
-                                    string xpath = "root/d/GetContextWebInformation/FormDigestValue";
-                                    var digestNodes = responseDoc.SelectNodes(xpath);
-                                    requestDigest = digestNodes[0].InnerText;
-                                }
+                            }
+                        }
+                        ///error received
+                        else
+                        {
+                            LogManager.Verbose("Could not retrive digest, response: " + response.StatusDescription);
                         }
                     }
-                    ///error received
-                    else
-                    {
-                        LogManager.Verbose("Could not retrive digest, response: " + response.StatusDescription);
-                    }
                 }
+                catch { }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
             return requestDigest;
         }
     }

@@ -72,6 +72,17 @@ namespace _365Drive.Office365
             eventLog.WriteEntry("[" + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK") + "] - " + strLogMessage, EventLogEntryType.Information, Constants.lLogeventId);
         }
 
+
+        /// <summary>
+        /// Globally from wherever we get exception, we will handle here
+        /// </summary>
+        /// <param name="MethodName"></param>
+        /// <param name="ex"></param>
+        public static void Exception(string MethodName, Exception ex)
+        {
+            Error("Method: " + MethodName + Environment.NewLine + Environment.NewLine + ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
+        }
+
         /// <summary>
         /// Log Error
         /// </summary>
@@ -84,6 +95,7 @@ namespace _365Drive.Office365
 
             eventLog.WriteEntry("[" + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK") + "] - " + strLogMessage, EventLogEntryType.Error, Constants.lLogeventId);
         }
+
 
         /// <summary>
         /// Log Warning
@@ -103,9 +115,8 @@ namespace _365Drive.Office365
             ///Make sure event log is initialized
             if (eventLog == null)
                 Init();
-
-
         }
+
 
     }
 }
