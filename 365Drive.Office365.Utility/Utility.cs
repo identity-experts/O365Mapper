@@ -62,11 +62,11 @@ namespace _365Drive.Office365
                 {
                     if (sc.Status != ServiceControllerStatus.Running)
                     {
-                        webClientRunning = true;
+                        webClientRunning = false;
                     }
                     else
                     {
-                        webClientRunning = false;
+                        webClientRunning = true;
                     }
                 }
             }

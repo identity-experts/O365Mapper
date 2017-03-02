@@ -12,19 +12,24 @@ using System.Net.NetworkInformation;
 using Microsoft.Win32;
 using System.Threading;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using _365Drive.Office365.NotificationManager;
 
 namespace _365Drive.Office365
 {
     public class Core
     {
+
+
         /// <summary>
         /// Global settings / variables
         /// </summary>
-        private readonly TaskbarIcon notifyIcon;
+        private TaskbarIcon notifyIcon;
 
         //NotificationManager.NotificationManager NotificationManager;
         ///We need to initialize a timer here which will make sure the sync happens every minute
         DispatcherTimer dispatcherTimer;
+        DispatcherTimer iconTimer;
         //Declare current dispacher
         Dispatcher currentDispatcher;
 
@@ -51,6 +56,9 @@ namespace _365Drive.Office365
                 //Initialize the timer
                 dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+
+                //initialize icon timer
+                iconTimer = new DispatcherTimer();
 
                 currentDispatcher = Dispatcher.CurrentDispatcher;
             }
@@ -109,8 +117,10 @@ namespace _365Drive.Office365
 
                 Communications.notifyIcon = notifyIcon;
                 Communications.CurrentState = States.Running;
-                Communications.updateStatus(Globalization.Initializing);
-
+                currentDispatcher.Invoke(() =>
+                {
+                    Communications.updateStatus(Globalization.Initializing);
+                });
                 //Verbose
                 LogManager.Verbose("Initialization started");
 
@@ -127,9 +137,11 @@ namespace _365Drive.Office365
                 }
 
                 //Make sure the exe is registered as startup
-                LogManager.Verbose("Make sure the exe is registered as startup");
-                RegistryManager.RegisterExeOnStartup();
-
+                if (!RegistryManager.IsDev)
+                {
+                    LogManager.Verbose("Make sure the exe is registered as startup");
+                    RegistryManager.RegisterExeOnStartup();
+                }
                 //timer settings
                 LogManager.Verbose("setting timer");
 
@@ -138,7 +150,7 @@ namespace _365Drive.Office365
                 {
                     //Set the value received from registry
                     if (RegistryManager.IsDev)
-                        dispatcherTimer.Interval = new TimeSpan(0, 0, 20);
+                        dispatcherTimer.Interval = new TimeSpan(0, 10, 0);
                     else
                         dispatcherTimer.Interval = new TimeSpan(0, 0, 15);
 
@@ -193,6 +205,8 @@ namespace _365Drive.Office365
                 LogManager.Verbose("Checking Internet access");
                 if (!Utility.ensurePowerMode(e))
                 {
+                    //Lets give 30 seconds of breathing time to let the credential manager load 
+                    Thread.Sleep(new TimeSpan(0, 0, 30));
                     LogManager.Verbose("coming back to resume");
                     Initialize();
                     //NotificationManager.NotificationManager.notify(Globalization.InternetConnection, Globalization.NoInternet, ToolTipIcon.Warning);
@@ -216,6 +230,13 @@ namespace _365Drive.Office365
         {
             try
             {
+                //starting animation
+                Animation.animatedIcontimer = iconTimer;
+                Animation.notifyIcon = notifyIcon;
+
+                ///start the inprogress
+                Animation.Animate(AnimationTheme.Inprogress);
+
                 #region Ensuring Internet
                 currentDispatcher.Invoke(() =>
                 {
@@ -227,6 +248,8 @@ namespace _365Drive.Office365
                     {
                         Communications.updateStatus(Globalization.NoInternet);
                     });
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
                     return;
                 }
                 #endregion
@@ -244,8 +267,10 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.webClientNotRunning);
                     });
                     LogManager.Verbose("WebClient is NOT running");
-                    NotificationManager.NotificationManager.notify(Globalization.webClient, Globalization.webClientNotRunning, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    NotificationManager.NotificationManager.notify(Globalization.webClient, Globalization.webClientNotRunning, ToolTipIcon.Warning);
                     Communications.CurrentState = States.Stopped;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
                     return;
                 }
                 #endregion
@@ -266,6 +291,8 @@ namespace _365Drive.Office365
                     LogManager.Verbose("credentials not present");
                     NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     Communications.CurrentState = States.UserAction;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
                     return;
                 }
                 else
@@ -293,6 +320,8 @@ namespace _365Drive.Office365
                     NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailed, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.Stopped;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Error);
                     return;
                 }
                 else if (licenseValidationState == LicenseValidationState.LoginFailed)
@@ -305,6 +334,8 @@ namespace _365Drive.Office365
                     NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.UserAction;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
                     return;
                 }
                 else if (licenseValidationState == LicenseValidationState.Expired || licenseValidationState == LicenseValidationState.Exceeded)
@@ -317,6 +348,8 @@ namespace _365Drive.Office365
                     NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LicenseExpired, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.Hold;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Error);
                     return;
                 }
                 else
@@ -376,6 +409,8 @@ namespace _365Drive.Office365
                 });
                 #endregion
 
+
+                Animation.Stop();
             }
             catch (Exception ex)
             {

@@ -6,11 +6,11 @@ using System.Windows.Media;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("365Drive.Office365.NotificationManager")]
+[assembly: AssemblyTitle("365Drive")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("365Drive.Office365.NotificationManager")]
+[assembly: AssemblyCompany("Identity Experts Software Limited")]
+[assembly: AssemblyProduct("365Drive")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

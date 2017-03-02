@@ -62,7 +62,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
             isDesignMode =
                 (bool)
                     DependencyPropertyDescriptor.FromProperty(DesignerProperties.IsInDesignModeProperty,
-                        typeof (FrameworkElement))
+                        typeof(FrameworkElement))
                         .Metadata.DefaultValue;
         }
 
@@ -169,7 +169,16 @@ namespace Hardcodet.Wpf.TaskbarNotification
         {
             if (imageSource == null) return null;
 
-            Uri uri = new Uri(imageSource.ToString());
+
+            Uri uri;
+            try
+            {
+                uri = new Uri(imageSource.ToString());
+            }
+            catch
+            {
+                uri = new Uri(imageSource.ToString(),UriKind.Relative);
+            }
             StreamResourceInfo streamInfo = Application.GetResourceStream(uri);
 
             if (streamInfo == null)

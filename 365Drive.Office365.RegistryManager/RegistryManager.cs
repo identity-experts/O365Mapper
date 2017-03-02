@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -58,6 +59,33 @@ namespace _365Drive.Office365
         }
 
         /// <summary>
+        /// Get the key value from registry
+        /// </summary>
+        /// <param name="key"></param>
+        public static NameValueCollection GetMappingDetails()
+        {
+            string value = string.Empty;
+            NameValueCollection mappings = new NameValueCollection();
+            RegistryKey myKey = Registry.CurrentUser.OpenSubKey(Constants.registryRoot + @"\" + Constants.mappingregKey, RegistryKeyPermissionCheck.ReadSubTree);
+            if (myKey != null)
+            {
+                foreach (string subKeyName in myKey.GetValueNames())
+                {
+                    if(subKeyName.Length == 1)
+                    {
+                        string val = myKey.GetValue(subKeyName).ToString();
+                        mappings.Add(subKeyName,val);
+                    }
+                }
+            }
+            else
+            {
+                return null;
+            }
+            return mappings;
+        }
+
+        /// <summary>
         /// Set the value to registry
         /// </summary>
         /// <param name="key">enum for key</param>
@@ -94,7 +122,7 @@ namespace _365Drive.Office365
             string path = Uri.UnescapeDataString(uri.Path);
 
             RegistryKey add = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            add.SetValue(Constants.regStartupAppName, "\"" + AppDomain.CurrentDomain.BaseDirectory + "\"" + Constants.exeName + "\"");
+            add.SetValue(Constants.regStartupAppName, "\"" + AppDomain.CurrentDomain.BaseDirectory + Constants.exeName + "\"");
         }
 
         /// <summary>

@@ -36,12 +36,24 @@ namespace _365Drive.Office365.NotificationManager
         {
             try
             {
-                //this.notifyIcon.ShowBalloonTip(200, tipTitle, tipMessage, ToolTipIcon.Warning);
-                FancyBalloon balloon = new FancyBalloon();
-                balloon.BalloonText = tipTitle;
-                balloon.BalloonMessage = tipMessage;
-                //show balloon and close it after 4 seconds
-                notifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
+                if (AlreadyNotified == null)
+                    AlreadyNotified = new List<string>();
+
+                if (!AlreadyNotified.Contains(tipMessage))
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        //this.notifyIcon.ShowBalloonTip(200, tipTitle, tipMessage, ToolTipIcon.Warning);
+                        FancyBalloon balloon = new FancyBalloon();
+                        balloon.BalloonText = tipTitle;
+                        balloon.BalloonMessage = tipMessage;
+                        //show balloon and close it after 4 seconds
+                        notifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
+
+                        //Add to already notified
+                        AlreadyNotified.Add(tipMessage);
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -58,17 +70,24 @@ namespace _365Drive.Office365.NotificationManager
         {
             try
             {
+                if (AlreadyNotified == null)
+                    AlreadyNotified = new List<string>();
+
                 if (!AlreadyNotified.Contains(tipMessage))
                 {
-                    FancyBalloon balloon = new FancyBalloon();
-                    balloon.BalloonText = tipTitle;
-                    balloon.BalloonMessage = tipMessage;
-                    balloon.Callback = callback;
-                    //show balloon and close it after 4 seconds
-                    notifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
 
-                    //add it to already notified array to avoil re-notifications and irretations
-                    AlreadyNotified.Add(tipMessage);
+                        FancyBalloon balloon = new FancyBalloon();
+                        balloon.BalloonText = tipTitle;
+                        balloon.BalloonMessage = tipMessage;
+                        balloon.Callback = callback;
+                        //show balloon and close it after 4 seconds
+                        notifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
+
+                        //add it to already notified array to avoil re-notifications and irretations
+                        AlreadyNotified.Add(tipMessage);
+                    });
 
                 }
             }

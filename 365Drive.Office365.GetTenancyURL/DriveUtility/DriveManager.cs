@@ -1,7 +1,9 @@
 ﻿using _365Drive.Office365.CommunicationManager;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Net;
@@ -48,18 +50,22 @@ namespace _365Drive.Office365.CloudConnector
         /// <param name="driveUrl"></param>
         public static void addDrive(string driveLetter, string driveName, string driveUrl)
         {
+
             if (mappableDrives == null)
                 mappableDrives = new List<Drive>();
-            LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-            //Create a new drive class instance and add the mappable drive
-            Drive drive = new Drive();
-            drive.DriveLetter = driveLetter;
-            drive.DriveName = driveName;
-            drive.DriveUrl = driveUrl;
-            drive.Drivetype = driveType.SharePoint;
-            //if no state is passed, which means its active
-            drive.Drivestate = driveState.Active;
-            mappableDrives.Add(drive);
+            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            {
+                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                //Create a new drive class instance and add the mappable drive
+                Drive drive = new Drive();
+                drive.DriveLetter = driveLetter;
+                drive.DriveName = driveName;
+                drive.DriveUrl = driveUrl;
+                drive.Drivetype = driveType.DocLib;
+                //if no state is passed, which means its active
+                drive.Drivestate = driveState.Active;
+                mappableDrives.Add(drive);
+            }
         }
 
 
@@ -74,17 +80,45 @@ namespace _365Drive.Office365.CloudConnector
         {
             if (mappableDrives == null)
                 mappableDrives = new List<Drive>();
-            LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-            //Create a new drive class instance and add the mappable drive
-            Drive drive = new Drive();
-            drive.DriveLetter = driveLetter;
-            drive.DriveName = driveName;
-            drive.DriveUrl = driveUrl;
-            drive.Drivestate = state;
-            drive.Drivetype = driveType.SharePoint;
-            mappableDrives.Add(drive);
+            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            {
+                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                //Create a new drive class instance and add the mappable drive
+                Drive drive = new Drive();
+                drive.DriveLetter = driveLetter;
+                drive.DriveName = driveName;
+                drive.DriveUrl = driveUrl;
+                drive.Drivestate = state;
+                drive.Drivetype = driveType.DocLib;
+                mappableDrives.Add(drive);
+            }
         }
 
+        /// <summary>
+        /// Pass all values without asusmptions
+        /// </summary>
+        /// <param name="driveLetter"></param>
+        /// <param name="driveName"></param>
+        /// <param name="driveUrl"></param>
+        /// <param name="state"></param>
+        /// <param name="type"></param>
+        public static void addDrive(string driveLetter, string driveName, string driveUrl, driveState state, driveType type)
+        {
+            if (mappableDrives == null)
+                mappableDrives = new List<Drive>();
+            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            {
+                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                //Create a new drive class instance and add the mappable drive
+                Drive drive = new Drive();
+                drive.DriveLetter = driveLetter;
+                drive.DriveName = driveName;
+                drive.DriveUrl = driveUrl;
+                drive.Drivestate = state;
+                drive.Drivetype = type;
+                mappableDrives.Add(drive);
+            }
+        }
 
         /// <summary>
         /// Add drive with state
@@ -97,15 +131,18 @@ namespace _365Drive.Office365.CloudConnector
         {
             if (mappableDrives == null)
                 mappableDrives = new List<Drive>();
-            LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-            //Create a new drive class instance and add the mappable drive
-            Drive drive = new Drive();
-            drive.DriveLetter = driveLetter;
-            drive.DriveName = driveName;
-            drive.DriveUrl = driveUrl;
-            drive.Drivestate = driveState.Active;
-            drive.Drivetype = type;
-            mappableDrives.Add(drive);
+            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            {
+                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                //Create a new drive class instance and add the mappable drive
+                Drive drive = new Drive();
+                drive.DriveLetter = driveLetter;
+                drive.DriveName = driveName;
+                drive.DriveUrl = driveUrl;
+                drive.Drivestate = driveState.Active;
+                drive.Drivetype = type;
+                mappableDrives.Add(drive);
+            }
         }
         /// <summary>
         /// Set the cookies in IE to keep them persistant and used by drive mapper
@@ -152,7 +189,7 @@ namespace _365Drive.Office365.CloudConnector
                     return;
 
                 //{0}=Letter,{1}=Path,{2}=Name
-                string singleDrivePowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};(New-Object -ComObject WScript.Network).MapNetworkDrive(\"" + "{0}" + "\", \"" + "{1}" + "\", $true, \"" + "\", \"" + "\"); (New-Object -ComObject Shell.Application).NameSpace(\"" + "{0}" + "\").Self.Name = \"" + "{2}" + "\";$RegKey = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{3}\";Set-ItemProperty -Path $RegKey -Name _LabelFromReg -Value \"{2}\";}}Catch{{}}";
+                string singleDrivePowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};(New-Object -ComObject WScript.Network).MapNetworkDrive(\"" + "{0}" + "\", \"" + "{1}" + "\", $true, \"" + "\", \"" + "\"); (New-Object -ComObject Shell.Application).NameSpace(\"" + "{0}" + "\").Self.Name = \"" + "{2}" + "\";$RegKey = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{3}\";$RegKey2 = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{4}\";Set-ItemProperty -Path $RegKey2 -Name _LabelFromReg -Value \"{2}\";Set-ItemProperty -Path $RegKey -Name _LabelFromReg -Value \"{2}\";}}Catch{{}}";
                 string singleDriveunmapPowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};}}Catch{{}}";
                 StringBuilder powerShell = new StringBuilder();
 
@@ -160,44 +197,61 @@ namespace _365Drive.Office365.CloudConnector
                 foreach (Drive d in mappableDrives)
                 {
                     LogManager.Verbose("Ensuring user has access to:" + d.DriveUrl);
-                    if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies))
+                    string webDavPath;
+                    if (!string.IsNullOrEmpty(d.DriveUrl))
+                        webDavPath = d.DriveUrl.Replace("http://", "\\\\").Replace("https://", "\\\\").Replace(new Uri(d.DriveUrl).Host, new Uri(d.DriveUrl).Host + (new Uri(d.DriveUrl).Scheme == Uri.UriSchemeHttps ? "@SSL\\DavWWWRoot" : "\\DavWWWRoot")).Replace("/", "\\");
+                    else
+                        webDavPath = string.Empty;
+
+                    if (!isDriveExists(d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + @":\", webDavPath) && d.Drivestate == driveState.Active)
                     {
-                        LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);
-                        string psCommand = string.Empty;
-
-                        //checking for OneDrive
-                        if (d.Drivetype == driveType.OneDrive)
+                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies))
                         {
-                            //map drives
-                            currentDispatcher.Invoke(() =>
+                            LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);
+                            string psCommand = string.Empty;
+
+                            //checking for OneDrive
+                            if (d.Drivetype == driveType.OneDrive)
                             {
-                                Communications.updateStatus(gettingOneDriveUrlText);
-                            });
+                                //map drives
+                                currentDispatcher.Invoke(() =>
+                                {
+                                    Communications.updateStatus(gettingOneDriveUrlText);
+                                });
 
-                            ///getting user drive details
-                            d.DriveUrl = DriveMapper.getOneDriveUrl(rootSiteUrl, userCookies);
+                                ///getting user drive details
+                                d.DriveUrl = DriveMapper.getOneDriveUrl(rootSiteUrl, userCookies);
+                            }
+
+                            //If the drive is NOT changed by company admin, which means still active. Continue as we do.
+                            if (d.Drivestate == driveState.Active)
+                            {
+                                //we have to do it again because incase of OneDrive it is blank above 
+                                webDavPath = d.DriveUrl.Replace("http://", "\\\\").Replace("https://", "\\\\").Replace(new Uri(d.DriveUrl).Host, new Uri(d.DriveUrl).Host + (new Uri(d.DriveUrl).Scheme == Uri.UriSchemeHttps ? "@SSL\\DavWWWRoot" : "\\DavWWWRoot")).Replace("/", "\\");
+
+                                LogManager.Verbose("WebDav Path:" + webDavPath);
+                                string regKey = webDavPath.Replace(@"\", "#").EndsWith("#") ? webDavPath.Replace(@"\", "#").TrimEnd('#') : webDavPath.Replace(@"\", "#");
+                                string webDavPath2 = webDavPath.Replace(@"\", "#").Replace("#DavWWWRoot", "").EndsWith("#") ? webDavPath.Replace(@"\", "#").Replace("#DavWWWRoot", "").TrimEnd('#') : webDavPath.Replace(@"\", "#").Replace("#DavWWWRoot", "");
+
+                                string strDriveLetter = d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + ":";
+
+                                psCommand = String.Format(singleDrivePowershellCommand, strDriveLetter, webDavPath, d.DriveName, regKey, webDavPath2);
+                                LogManager.Verbose("PS: " + String.Format(singleDrivePowershellCommand, d.DriveLetter, webDavPath, d.DriveName, regKey, webDavPath2));
+                            }
+
+                            //If the drive is changed by company admin and marked as to be removed, which means it needs to be unmapped
+                            else if (d.Drivestate == driveState.Deleted)
+                            {
+                                string strDriveLetter = d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + ":";
+                                psCommand = String.Format(singleDriveunmapPowershellCommand, strDriveLetter);
+                                LogManager.Verbose("PS: " + String.Format(singleDriveunmapPowershellCommand, d.DriveLetter));
+                            }
+                            powerShell.Append(psCommand);
                         }
-
-                        //If the drive is NOT changed by company admin, which means still active. Continue as we do.
-                        if (d.Drivestate == driveState.Active)
-                        {
-                            string webDavPath = d.DriveUrl.Replace("http://", "\\\\").Replace("https://", "\\\\").Replace(new Uri(d.DriveUrl).Host, new Uri(d.DriveUrl).Host + (new Uri(d.DriveUrl).Scheme == Uri.UriSchemeHttps ? "@SSL\\DavWWWRoot" : "\\DavWWWRoot")).Replace("/", "\\");
-                            LogManager.Verbose("WebDav Path:" + webDavPath);
-                            string regKey = webDavPath.Replace(@"\", "#");
-                            string strDriveLetter = d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + ":";
-                            psCommand = String.Format(singleDrivePowershellCommand, strDriveLetter, webDavPath, d.DriveName, regKey);
-                            LogManager.Verbose("PS: " + String.Format(singleDrivePowershellCommand, d.DriveLetter, webDavPath, d.DriveName, regKey));
-                        }
-
-                        //If the drive is changed by company admin and marked as to be removed, which means it needs to be unmapped
-                        else if (d.Drivestate == driveState.Deleted)
-                        {
-                            string strDriveLetter = d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + ":";
-                            psCommand = String.Format(singleDriveunmapPowershellCommand, strDriveLetter);
-                            LogManager.Verbose("PS: " + String.Format(singleDriveunmapPowershellCommand, d.DriveLetter));
-                        }
-                        powerShell.Append(psCommand);
-
+                    }
+                    else
+                    {
+                        LogManager.Verbose(d.DriveLetter + " already exist, hence skipping");
                     }
                 }
 
@@ -209,7 +263,8 @@ namespace _365Drive.Office365.CloudConnector
                 {
                     runspace.Open();
                     RunspaceInvoke scriptInvoker = new RunspaceInvoke(runspace);
-                    scriptInvoker.Invoke(powerShell.ToString());
+                    string psCommand = powerShell.ToString();
+                    scriptInvoker.Invoke(psCommand);
                 }
             }
             catch (Exception ex)
@@ -219,6 +274,67 @@ namespace _365Drive.Office365.CloudConnector
             }
         }
 
+
+
+        /// <summary>
+        /// check whether the drive already exist, if yes dont touch it
+        /// </summary>
+        /// <param name="driveLetterWithColonAndSlash"></param>
+        /// <returns></returns>
+        static bool isDriveExists(string driveLetterWithColonAndSlash, string webDavPath)
+        {
+            DriveInfo di = DriveInfo.GetDrives().Where(x => x.Name == driveLetterWithColonAndSlash).FirstOrDefault();
+            if (di != null)
+            {
+                try
+                {
+                    string strPath = FindUNCPaths(di);
+                    if (webDavPath == string.Empty || strPath.TrimEnd('\\').ToLower() == webDavPath.TrimEnd('\\').ToLower())
+                        return true;
+                    else
+                        return false;
+                }
+                catch { return true; }
+            }
+            else
+                return false;
+        }
+
+        public static string FindUNCPaths(DriveInfo di)
+        {
+            DriveInfo[] dis = DriveInfo.GetDrives();
+            //foreach (DriveInfo di in dis)
+            //{
+            //    if (di.DriveType == DriveType.Network)
+            //    {
+            DirectoryInfo dir = di.RootDirectory;
+            // "x:"
+            //MessageBox.Show(GetUNCPath(dir.FullName.Substring(0, 2)));
+            return GetUNCPath(dir.FullName.Substring(0, 2));
+            //    }
+            //}
+        }
+
+        public static string GetUNCPath(string path)
+        {
+            if (path.StartsWith(@"\\"))
+            {
+                return path;
+            }
+
+            ManagementObject mo = new ManagementObject();
+            mo.Path = new ManagementPath(String.Format("Win32_LogicalDisk='{0}'", path));
+
+            // DriveType 4 = Network Drive
+            if (Convert.ToUInt32(mo["DriveType"]) == 4)
+            {
+                return Convert.ToString(mo["ProviderName"]);
+            }
+            else
+            {
+                return path;
+            }
+        }
 
         /// <summary>
         /// Incase of exit, we need to remove cookies so noone else can use it
@@ -306,6 +422,7 @@ namespace _365Drive.Office365.CloudConnector
     public enum driveType
     {
         OneDrive = 0,
-        SharePoint = 1
+        SharePoint = 1,
+        DocLib = 2
     }
 }

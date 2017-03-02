@@ -78,4 +78,19 @@ namespace _365Drive.Office365.CloudConnector
     {
         public List<MySiteMetadata> value { get; set; }
     }
+
+    public class apiCanaryResponse
+    {
+        public string apiCanary { get; set; }
+    }
+
+    public class pollResponse
+    {
+        public string apiCanary { get; set; }
+        public string flowToken { get; set; }
+        public string ctx { get; set; }
+    }
+
+    public enum FedType
+    { Cloud, AAD, AADP, ADFS }
 }

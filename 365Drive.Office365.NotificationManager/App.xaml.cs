@@ -23,7 +23,11 @@ namespace _365Drive.Office365.NotificationManager
 
             //create the notifyicon (it's a resource declared in NotifyIconResources.xaml
             notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
-            if (!SingleInstance.Start()) { return; }
+            if (!SingleInstance.Start())
+            {      //exit
+                Application.Current.Shutdown(); ;
+                return;
+            }
             //Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
             try
