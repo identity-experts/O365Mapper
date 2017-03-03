@@ -228,4 +228,10 @@
   <data name="webClientNotRunning" xml:space="preserve">
     <value>WebClient service is not running. Please start it.</value>
   </data>
+  <data name="AuthenticationTypeNotSupported" xml:space="preserve">
+    <value>We do not support the authentication type set to your office 365 tenancy. please check with Identity Experts support team.</value>
+  </data>
+  <data name="Federation" xml:space="preserve">
+    <value>Authentication Method</value>
+  </data>
 </root>

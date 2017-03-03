@@ -67,6 +67,7 @@
     <Compile Include="CookieManager\CloudIdentity\WcfClientContracts.cs" />
     <Compile Include="DriveMapper.cs" />
     <Compile Include="DriveUtility\DriveManager.cs" />
+    <Compile Include="HttpHelper\HttpClientHelper.cs" />
     <Compile Include="LicenseManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

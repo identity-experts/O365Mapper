@@ -12,6 +12,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using _365Drive.Office365.GetTenancyURL;
+using Newtonsoft.Json;
 
 namespace _365Drive.Office365.CloudConnector
 {
@@ -26,6 +28,11 @@ namespace _365Drive.Office365.CloudConnector
         [DllImport("kernel32.dll")]
         #endregion
         public static extern uint GetLastError();
+
+
+        ///Allowed federation types
+        /// 
+        static FedType?[] AllowedAuthenticationTypes = { FedType.Cloud, FedType.AAD };
 
         /// <summary>
         /// Collection of all mappable drives
@@ -43,6 +50,104 @@ namespace _365Drive.Office365.CloudConnector
         public static string oneDriveHostSiteUrl { get; set; }
 
         /// <summary>
+        /// goint to be useful at many places
+        /// </summary>
+        public static string AADSSODomainName { get; set; }
+
+
+        /// <summary>
+        /// goint to be useful at many places
+        /// </summary>
+        public static string ADFSAuthURL { get; set; }
+
+        /// <summary>
+        /// goint to be useful at many places
+        /// </summary>
+        public static FedType? FederationType { get; set; }
+
+        /// <summary>
+        /// goint to be useful at many places
+        /// </summary>
+        public static string FederationProtocol { get; set; }
+        /// <summary>
+        /// Set authentication type
+        /// </summary>
+        /// <param name="upn">User principal name</param>
+        /// <returns></returns>
+        public static FedType RetrieveAuthType(string upn)
+        {
+            FedType userFedType = FedType.Cloud;
+
+            try
+            {
+                if (!Utility.ready())
+                    return FedType.NA;
+
+                LogManager.Verbose("Fetching authentication type using realm");
+                FederationType = FedType.Cloud;
+
+                Task<string> realM = HttpClientHelper.GetAsync(String.Format(StringConstants.UserrealMrequest, upn));
+                realM.Wait();
+
+                RealM userRealM = JsonConvert.DeserializeObject<RealM>(realM.Result);
+
+                //AAD SSO
+                if (userRealM.is_dsso_enabled != null && userRealM.is_dsso_enabled == true)
+                {
+                    LogManager.Verbose("AAD SSO auth found");
+                    AADSSODomainName = userRealM.DomainName;
+                    userFedType = FedType.AAD;
+                    FederationType = FedType.AAD;
+                }
+
+                //adfs
+                else if (userRealM.NameSpaceType.ToLower() == "federated")
+                {
+                    LogManager.Verbose("ADFS auth found");
+                    AADSSODomainName = userRealM.DomainName;
+                    userFedType = FedType.ADFS;
+                    ADFSAuthURL = userRealM.AuthURL;
+                    FederationType = FedType.ADFS;
+                    FederationProtocol = userRealM.federation_protocol;
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return userFedType;
+        }
+
+
+        /// <summary>
+        /// make sure the user federation type is something we do
+        /// </summary>
+        /// <param name="upn"></param>
+        public static bool isAllowedFedType(string upn)
+        {
+            try
+            {
+                if (!Utility.ready())
+                    return false;
+                LogManager.Verbose("Ensuring the authentication type");
+                //if we still havent retrieved federation type, do so
+                if (FederationType == null)
+                {
+                    LogManager.Verbose("Could not retrieve authentication type, so getting it");
+                    RetrieveAuthType(upn);
+                }
+                return AllowedAuthenticationTypes.Contains(FederationType);
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+                return false;
+            }
+
+        }
+        /// <summary>
         /// Add a new drive to mappable drive
         /// </summary>
         /// <param name="driveLetter"></param>
@@ -50,21 +155,31 @@ namespace _365Drive.Office365.CloudConnector
         /// <param name="driveUrl"></param>
         public static void addDrive(string driveLetter, string driveName, string driveUrl)
         {
-
-            if (mappableDrives == null)
-                mappableDrives = new List<Drive>();
-            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            try
             {
-                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-                //Create a new drive class instance and add the mappable drive
-                Drive drive = new Drive();
-                drive.DriveLetter = driveLetter;
-                drive.DriveName = driveName;
-                drive.DriveUrl = driveUrl;
-                drive.Drivetype = driveType.DocLib;
-                //if no state is passed, which means its active
-                drive.Drivestate = driveState.Active;
-                mappableDrives.Add(drive);
+                if (!Utility.ready())
+                    return;
+
+                if (mappableDrives == null)
+                    mappableDrives = new List<Drive>();
+                if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+                {
+                    LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                    //Create a new drive class instance and add the mappable drive
+                    Drive drive = new Drive();
+                    drive.DriveLetter = driveLetter;
+                    drive.DriveName = driveName;
+                    drive.DriveUrl = driveUrl;
+                    drive.Drivetype = driveType.DocLib;
+                    //if no state is passed, which means its active
+                    drive.Drivestate = driveState.Active;
+                    mappableDrives.Add(drive);
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
         }
 
@@ -78,19 +193,29 @@ namespace _365Drive.Office365.CloudConnector
         /// <param name="state"></param>
         public static void addDrive(string driveLetter, string driveName, string driveUrl, driveState state)
         {
-            if (mappableDrives == null)
-                mappableDrives = new List<Drive>();
-            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            try
             {
-                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-                //Create a new drive class instance and add the mappable drive
-                Drive drive = new Drive();
-                drive.DriveLetter = driveLetter;
-                drive.DriveName = driveName;
-                drive.DriveUrl = driveUrl;
-                drive.Drivestate = state;
-                drive.Drivetype = driveType.DocLib;
-                mappableDrives.Add(drive);
+                if (!Utility.ready())
+                    return;
+                if (mappableDrives == null)
+                    mappableDrives = new List<Drive>();
+                if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+                {
+                    LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                    //Create a new drive class instance and add the mappable drive
+                    Drive drive = new Drive();
+                    drive.DriveLetter = driveLetter;
+                    drive.DriveName = driveName;
+                    drive.DriveUrl = driveUrl;
+                    drive.Drivestate = state;
+                    drive.Drivetype = driveType.DocLib;
+                    mappableDrives.Add(drive);
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
         }
 
@@ -104,19 +229,30 @@ namespace _365Drive.Office365.CloudConnector
         /// <param name="type"></param>
         public static void addDrive(string driveLetter, string driveName, string driveUrl, driveState state, driveType type)
         {
-            if (mappableDrives == null)
-                mappableDrives = new List<Drive>();
-            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            try
             {
-                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-                //Create a new drive class instance and add the mappable drive
-                Drive drive = new Drive();
-                drive.DriveLetter = driveLetter;
-                drive.DriveName = driveName;
-                drive.DriveUrl = driveUrl;
-                drive.Drivestate = state;
-                drive.Drivetype = type;
-                mappableDrives.Add(drive);
+                if (!Utility.ready())
+                    return;
+
+                if (mappableDrives == null)
+                    mappableDrives = new List<Drive>();
+                if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+                {
+                    LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                    //Create a new drive class instance and add the mappable drive
+                    Drive drive = new Drive();
+                    drive.DriveLetter = driveLetter;
+                    drive.DriveName = driveName;
+                    drive.DriveUrl = driveUrl;
+                    drive.Drivestate = state;
+                    drive.Drivetype = type;
+                    mappableDrives.Add(drive);
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
         }
 
@@ -129,19 +265,30 @@ namespace _365Drive.Office365.CloudConnector
         /// <param name="state"></param>
         public static void addDrive(string driveLetter, string driveName, string driveUrl, driveType type)
         {
-            if (mappableDrives == null)
-                mappableDrives = new List<Drive>();
-            if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+            try
             {
-                LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
-                //Create a new drive class instance and add the mappable drive
-                Drive drive = new Drive();
-                drive.DriveLetter = driveLetter;
-                drive.DriveName = driveName;
-                drive.DriveUrl = driveUrl;
-                drive.Drivestate = driveState.Active;
-                drive.Drivetype = type;
-                mappableDrives.Add(drive);
+                if (!Utility.ready())
+                    return;
+
+                if (mappableDrives == null)
+                    mappableDrives = new List<Drive>();
+                if (!mappableDrives.Any(d => d.DriveLetter.ToLower() == driveLetter.ToLower()))
+                {
+                    LogManager.Verbose("Adding a new drive to mappablearray: " + driveUrl);
+                    //Create a new drive class instance and add the mappable drive
+                    Drive drive = new Drive();
+                    drive.DriveLetter = driveLetter;
+                    drive.DriveName = driveName;
+                    drive.DriveUrl = driveUrl;
+                    drive.Drivestate = driveState.Active;
+                    drive.Drivetype = type;
+                    mappableDrives.Add(drive);
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
         }
         /// <summary>
@@ -283,56 +430,89 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         static bool isDriveExists(string driveLetterWithColonAndSlash, string webDavPath)
         {
-            DriveInfo di = DriveInfo.GetDrives().Where(x => x.Name == driveLetterWithColonAndSlash).FirstOrDefault();
-            if (di != null)
+            try
             {
-                try
+                if (!Utility.ready())
+                    return false;
+                DriveInfo di = DriveInfo.GetDrives().Where(x => x.Name == driveLetterWithColonAndSlash).FirstOrDefault();
+                if (di != null)
                 {
-                    string strPath = FindUNCPaths(di);
-                    if (webDavPath == string.Empty || strPath.TrimEnd('\\').ToLower() == webDavPath.TrimEnd('\\').ToLower())
-                        return true;
-                    else
-                        return false;
+                    try
+                    {
+                        string strPath = FindUNCPaths(di);
+                        if (webDavPath == string.Empty || strPath.TrimEnd('\\').ToLower() == webDavPath.TrimEnd('\\').ToLower())
+                            return true;
+                        else
+                            return false;
+                    }
+                    catch { return true; }
                 }
-                catch { return true; }
+                else
+                    return false;
             }
-            else
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
                 return false;
+            }
         }
 
         public static string FindUNCPaths(DriveInfo di)
         {
-            DriveInfo[] dis = DriveInfo.GetDrives();
-            //foreach (DriveInfo di in dis)
-            //{
-            //    if (di.DriveType == DriveType.Network)
-            //    {
-            DirectoryInfo dir = di.RootDirectory;
-            // "x:"
-            //MessageBox.Show(GetUNCPath(dir.FullName.Substring(0, 2)));
-            return GetUNCPath(dir.FullName.Substring(0, 2));
-            //    }
-            //}
+            try
+            {
+                if (!Utility.ready())
+                    return string.Empty;
+                DriveInfo[] dis = DriveInfo.GetDrives();
+                //foreach (DriveInfo di in dis)
+                //{
+                //    if (di.DriveType == DriveType.Network)
+                //    {
+                DirectoryInfo dir = di.RootDirectory;
+                // "x:"
+                //MessageBox.Show(GetUNCPath(dir.FullName.Substring(0, 2)));
+                return GetUNCPath(dir.FullName.Substring(0, 2));
+                //    }
+                //}
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+                return string.Empty;
+            }
         }
 
         public static string GetUNCPath(string path)
         {
-            if (path.StartsWith(@"\\"))
+            try
             {
-                return path;
-            }
+                if (!Utility.ready())
+                    return string.Empty;
+                if (path.StartsWith(@"\\"))
+                {
+                    return path;
+                }
 
-            ManagementObject mo = new ManagementObject();
-            mo.Path = new ManagementPath(String.Format("Win32_LogicalDisk='{0}'", path));
+                ManagementObject mo = new ManagementObject();
+                mo.Path = new ManagementPath(String.Format("Win32_LogicalDisk='{0}'", path));
 
-            // DriveType 4 = Network Drive
-            if (Convert.ToUInt32(mo["DriveType"]) == 4)
-            {
-                return Convert.ToString(mo["ProviderName"]);
+                // DriveType 4 = Network Drive
+                if (Convert.ToUInt32(mo["DriveType"]) == 4)
+                {
+                    return Convert.ToString(mo["ProviderName"]);
+                }
+                else
+                {
+                    return path;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return path;
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+                return string.Empty;
             }
         }
 

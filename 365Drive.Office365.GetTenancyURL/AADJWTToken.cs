@@ -91,6 +91,20 @@ namespace _365Drive.Office365.CloudConnector
         public string ctx { get; set; }
     }
 
+    public class RealM
+    {
+        public int MicrosoftAccount { get; set; }
+        public string NameSpaceType { get; set; }
+        public string Login { get; set; }
+        public string DomainName { get; set; }
+        public string FederationBrandName { get; set; }
+        public string cloud_instance_name { get; set; }
+        public bool? is_dsso_enabled { get; set; }
+        public string AuthURL { get; set; }
+        public string federation_protocol { get; set; }
+
+    }
+
     public enum FedType
-    { Cloud, AAD, AADP, ADFS }
+    { Cloud, AAD, AADP, ADFS, OCTA, IAC, PING, NA }
 }

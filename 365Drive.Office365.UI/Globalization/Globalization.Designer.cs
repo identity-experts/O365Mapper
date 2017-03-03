@@ -79,6 +79,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to We do not support the authentication type set to your office 365 tenancy. please check with Identity Experts support team..
+        /// </summary>
+        public static string AuthenticationTypeNotSupported {
+            get {
+                return ResourceManager.GetString("AuthenticationTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {
@@ -219,6 +228,15 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string ExitSure {
             get {
                 return ResourceManager.GetString("ExitSure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication Method.
+        /// </summary>
+        public static string Federation {
+            get {
+                return ResourceManager.GetString("Federation", resourceCulture);
             }
         }
         

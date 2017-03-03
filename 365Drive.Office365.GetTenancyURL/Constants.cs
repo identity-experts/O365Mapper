@@ -17,13 +17,13 @@ namespace _365Drive.Office365.CloudConnector
     }
     internal class StringConstants
     {
-        internal const string UserrealMrequest = "https://login.microsoftonline.com/GetUserRealm.srf?login={0}&handler=1&extended=1";
+        internal const string UserrealMrequest = "https://login.microsoftonline.com/common/userrealm?user={0}&api-version=2.1&checkForMicrosoftAccount=true";
         internal const string AzureADSTSURL = "https://login.windows.net/common/oauth2/token?api-version=1.0";
         internal const string AzureADUserURL = "https://graph.windows.net/{0}/users?api-version=2013-11-08";
         internal const string AzureUpdateUser = "https://graph.windows.net/{0}/users/{1}?api-version=1.6";
         internal const string AzureADUserLicenseURL = "https://graph.windows.net/{0}/users/{1}/assignLicense?api-version=2013-11-08";
         internal const string AzureGetALLSKUURL = "https://graph.windows.net/{0}/subscribedSkus?api-version=2013-11-08";
-        internal const string AzureActivateUserStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=df166692-81e3-404b-97ae-d09038e90d8c&redirect_uri=http://identityexperts.co.uk&resource=https://api.office.com/discovery/&amr_values=pwd&nux=1&login_hint={0}";
+        internal const string AzureActivateUserStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id={1}&redirect_uri={2}&resource={3}&amr_values=pwd&nux=1&login_hint={0}";
         internal const string AzureActivateUserStep2 = "https://login.microsoftonline.com/common/login";
         internal const string AzureActivationUserLogin = "login={0}&passwd={1}&ctx={2}&flowToken={3}";
         internal const string AzureActivateUserStep3 = "https://login.microsoftonline.com/common/oauth2/token";
@@ -42,11 +42,15 @@ namespace _365Drive.Office365.CloudConnector
         internal const string FailedLoginUrl = "https://login.microsoftonline.com/common/login";
         //internal const string AzureActivationUserToken = "grant_type=authorization_code&code={0}&redirect_uri=urn%3aietf%3awg%3aoauth%3a2.0%3aoob&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c";
 
-        internal const string AzureActivationUserToken = "client_id=df166692-81e3-404b-97ae-d09038e90d8c&redirect_uri=http://identityexperts.co.uk&client_secret=nIEIuEyhATgLdFqhcHCMTJKky3QiXDQ7eYcQjkjhmPc=&code={0}&grant_type=authorization_code&resource=https://api.office.com/discovery/";
+        internal const string AzureActivationUserToken = "client_id={1}&redirect_uri={3}&client_secret={2}&code={0}&grant_type=authorization_code&resource={4}";
         internal const string AzureActivateUserStep4 = "https://api.office.com/discovery/v2.0/me/services";
         internal const string rootUrlFinder = "rootsite@";
         internal const string rootUrltobeRemoved = ".sharepoint.com";
         internal const string rootUrltobeReplacedWith = ".onmicrosoft.com";
+        internal const string clientID = "df166692-81e3-404b-97ae-d09038e90d8c";
+        internal const string clientSecret = "nIEIuEyhATgLdFqhcHCMTJKky3QiXDQ7eYcQjkjhmPc=";
+        internal const string appRedirectURL = "http://identityexperts.co.uk";
+        internal const string appResourceUri = "https://api.office.com/discovery/";
 
         //internal const string AzureActivateUserStep5 = "https://ols.officeapps.live.com/olsc/OlsClient.svc/OlsClient";
         internal const string GraphPrincipalId = "https://graph.windows.net";

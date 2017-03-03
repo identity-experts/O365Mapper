@@ -307,6 +307,22 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
+                //Mare sure the user authentication type is supported
+                LogManager.Verbose("Checking, does the user authentication type is supported");
+                if (!DriveManager.isAllowedFedType(CredentialManager.GetCredential().UserName))
+                {
+                    LogManager.Verbose("authentication type is NOT supported");
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.AuthenticationTypeNotSupported);
+                    });
+                    NotificationManager.NotificationManager.notify(Globalization.Federation, Globalization.AuthenticationTypeNotSupported, ToolTipIcon.Warning);
+                    Communications.CurrentState = States.Stopped;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Error);
+                    return;
+                }
+
                 #region Ensuring License
                 //make sure we have valid license
                 LicenseValidationState licenseValidationState = DriveMapper.EnsureLicense(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
