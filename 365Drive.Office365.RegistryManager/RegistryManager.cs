@@ -18,7 +18,9 @@ namespace _365Drive.Office365
     {
         Verbose = 0,
         BalloonNotification = 1,
-        TenancyName = 2
+        TenancyName = 2,
+        RootSiteUrl = 3,
+        MySiteUrl = 4
     }
 
 
@@ -69,7 +71,7 @@ namespace _365Drive.Office365
             RegistryKey myKey = Registry.CurrentUser.OpenSubKey(Constants.registryRoot, RegistryKeyPermissionCheck.ReadSubTree);
             if (myKey != null)
             {
-                myKey.DeleteValue((string)key.ToString());
+                myKey.SetValue((string)key.ToString(), string.Empty);
             }
             else
             {
@@ -151,13 +153,11 @@ namespace _365Drive.Office365
         public static void DeleteAllRegistry()
         {
 
-            if (IsDev)
-            {
-                Delete(RegistryKeys.Verbose);
-                Delete(RegistryKeys.BalloonNotification);
-                Delete(RegistryKeys.TenancyName);
-            }
-
+            Set(RegistryKeys.Verbose, string.Empty);
+            Set(RegistryKeys.BalloonNotification, string.Empty);
+            Set(RegistryKeys.TenancyName, string.Empty);
+            Set(RegistryKeys.RootSiteUrl, string.Empty);
+            Set(RegistryKeys.MySiteUrl, string.Empty);
         }
 
         /// <summary>

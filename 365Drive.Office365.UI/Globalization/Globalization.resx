@@ -235,6 +235,9 @@
     <value>Authentication Method</value>
   </data>
   <data name="SignoutSure" xml:space="preserve">
-    <value>Exiting application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?</value>
+    <value>Signing out application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Signout</value>
   </data>
 </root>

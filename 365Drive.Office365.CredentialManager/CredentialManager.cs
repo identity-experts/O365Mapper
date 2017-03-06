@@ -90,6 +90,11 @@ namespace _365Drive.Office365
             return blSetCredentialstate;
         }
 
+
+        /// <summary>
+        /// Deletes all saved credentials
+        /// </summary>
+        /// <returns></returns>
         public static bool RemoveCredentials()
         {
             bool blCredDeleted = false;

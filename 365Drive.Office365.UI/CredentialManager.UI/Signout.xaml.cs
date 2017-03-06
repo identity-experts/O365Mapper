@@ -29,7 +29,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             // define the dialog buttons
             this.Buttons = new Button[] { this.OkButton, this.CancelButton };
 
-            this.OkButton.Content = Globalization.Globalization.Exit;
+            this.OkButton.Content = Globalization.Globalization.SignOut;
             this.OkButton.Click += OkButton_Click;
 
             this.CancelButton.Content = Globalization.Globalization.Cancel;
@@ -55,11 +55,23 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         /// <param name="e"></param>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
+
+
+
             //unmap all drives
             DriveManager.unmapAllDrives();
 
             //Clear all cookies
             DriveManager.clearCookies();
+
+            //reset the fedType
+            DriveManager.FederationType = null;
+
+            //remove all drive from array
+            DriveManager.clearAll();
+
+            //Delete credentials
+            _365Drive.Office365.CredentialManager.RemoveCredentials();
 
             //Delete registrries
             RegistryManager.DeleteAllRegistry();

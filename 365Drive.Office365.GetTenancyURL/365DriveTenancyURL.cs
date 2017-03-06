@@ -27,8 +27,10 @@ namespace _365Drive.Office365.CloudConnector
             string TenancyName = string.Empty;
 
             //Checking first registry
-            if (RegistryManager.Get(RegistryKeys.TenancyName) != null)
+            if (!String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.TenancyName)) && !String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.RootSiteUrl)) && !String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.MySiteUrl)))
             {
+                DriveManager.rootSiteUrl = RegistryManager.Get(RegistryKeys.RootSiteUrl);
+                DriveManager.oneDriveHostSiteUrl = RegistryManager.Get(RegistryKeys.MySiteUrl);
                 return RegistryManager.Get(RegistryKeys.TenancyName);
             }
             else
@@ -169,6 +171,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 //as this is going to be needed at many places, we will save it 
                 DriveManager.rootSiteUrl = rootSiteURL;
+                RegistryManager.Set(RegistryKeys.RootSiteUrl, rootSiteURL);
 
                 if (!string.IsNullOrEmpty(rootSiteURL))
                 {
@@ -178,6 +181,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 //Set onedrive host
                 DriveManager.oneDriveHostSiteUrl = "https://" + tenancyUniqueName + "-my.sharepoint.com";
+                RegistryManager.Set(RegistryKeys.MySiteUrl, DriveManager.oneDriveHostSiteUrl);
 
 
                 LogManager.Verbose("office api call finished");
@@ -410,6 +414,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 //as this is going to be needed at many places, we will save it 
                 DriveManager.rootSiteUrl = rootSiteURL;
+                RegistryManager.Set(RegistryKeys.RootSiteUrl, DriveManager.rootSiteUrl);
 
                 if (!string.IsNullOrEmpty(rootSiteURL))
                 {
@@ -419,7 +424,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 //Set onedrive host
                 DriveManager.oneDriveHostSiteUrl = "https://" + tenancyUniqueName + "-my.sharepoint.com";
-
+                RegistryManager.Set(RegistryKeys.MySiteUrl, DriveManager.oneDriveHostSiteUrl);
 
                 LogManager.Verbose("office api call finished");
                 LogManager.Verbose("tenancy name: " + tenancyUniqueName + StringConstants.rootUrltobeReplacedWith);

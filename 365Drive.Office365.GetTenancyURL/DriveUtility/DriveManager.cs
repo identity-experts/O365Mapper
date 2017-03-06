@@ -120,6 +120,27 @@ namespace _365Drive.Office365.CloudConnector
         }
 
 
+        public static void clearAll()
+        {
+            try
+            {
+                if (!Utility.ready())
+                    return;
+                LogManager.Verbose("Deleting all entries");
+
+                //clear all drives
+                mappableDrives = new List<Drive>();
+                rootSiteUrl = string.Empty;
+                oneDriveHostSiteUrl = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+                return;
+            }
+        }
+
         /// <summary>
         /// make sure the user federation type is something we do
         /// </summary>

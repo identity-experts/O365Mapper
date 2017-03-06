@@ -157,7 +157,7 @@ namespace _365Drive.Office365.NotificationManager
                 //the tray icon assigned this attached property to simplify access
                 TaskbarIcon taskbarI = TaskbarIcon.GetParentTaskbarIcon(this);
                 taskbarI.CloseBalloon();
-                isClosing = true;
+                //isClosing = true;
             }
         }
     }

@@ -376,7 +376,16 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exiting application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?.
+        ///   Looks up a localized string similar to Signout.
+        /// </summary>
+        public static string SignOut {
+            get {
+                return ResourceManager.GetString("SignOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signing out application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?.
         /// </summary>
         public static string SignoutSure {
             get {
