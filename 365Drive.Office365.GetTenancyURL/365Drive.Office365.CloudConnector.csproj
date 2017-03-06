@@ -62,9 +62,11 @@
   <ItemGroup>
     <Compile Include="365DriveTenancyURL.cs" />
     <Compile Include="AADJWTToken.cs" />
+    <Compile Include="CookieManager\AADConnect\AADConnectCookieManager.cs" />
     <Compile Include="CookieManager\CloudIdentity\CloudIdentityCookieManager.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="CookieManager\CloudIdentity\WcfClientContracts.cs" />
+    <Compile Include="CookieManager\CookieManager.cs" />
     <Compile Include="DriveMapper.cs" />
     <Compile Include="DriveUtility\DriveManager.cs" />
     <Compile Include="HttpHelper\HttpClientHelper.cs" />
@@ -96,6 +98,7 @@
       <Name>365Drive.Office365.Utility</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

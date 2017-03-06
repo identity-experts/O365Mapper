@@ -17,7 +17,8 @@ namespace _365Drive.Office365
     public enum RegistryKeys : int
     {
         Verbose = 0,
-        BalloonNotification = 1
+        BalloonNotification = 1,
+        TenancyName = 2
     }
 
 
@@ -62,6 +63,25 @@ namespace _365Drive.Office365
         /// Get the key value from registry
         /// </summary>
         /// <param name="key"></param>
+        public static string Delete(RegistryKeys key)
+        {
+            string value = string.Empty;
+            RegistryKey myKey = Registry.CurrentUser.OpenSubKey(Constants.registryRoot, RegistryKeyPermissionCheck.ReadSubTree);
+            if (myKey != null)
+            {
+                myKey.DeleteValue((string)key.ToString());
+            }
+            else
+            {
+                return null;
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Get the key value from registry
+        /// </summary>
+        /// <param name="key"></param>
         public static NameValueCollection GetMappingDetails()
         {
             string value = string.Empty;
@@ -71,10 +91,10 @@ namespace _365Drive.Office365
             {
                 foreach (string subKeyName in myKey.GetValueNames())
                 {
-                    if(subKeyName.Length == 1)
+                    if (subKeyName.Length == 1)
                     {
                         string val = myKey.GetValue(subKeyName).ToString();
-                        mappings.Add(subKeyName,val);
+                        mappings.Add(subKeyName, val);
                     }
                 }
             }
@@ -123,6 +143,21 @@ namespace _365Drive.Office365
 
             RegistryKey add = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             add.SetValue(Constants.regStartupAppName, "\"" + AppDomain.CurrentDomain.BaseDirectory + Constants.exeName + "\"");
+        }
+
+        /// <summary>
+        /// incase if its Dev environment, we can use below method to set hardcoded values.
+        /// </summary>
+        public static void DeleteAllRegistry()
+        {
+
+            if (IsDev)
+            {
+                Delete(RegistryKeys.Verbose);
+                Delete(RegistryKeys.BalloonNotification);
+                Delete(RegistryKeys.TenancyName);
+            }
+
         }
 
         /// <summary>

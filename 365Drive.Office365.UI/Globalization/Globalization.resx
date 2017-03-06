@@ -234,4 +234,7 @@
   <data name="Federation" xml:space="preserve">
     <value>Authentication Method</value>
   </data>
+  <data name="SignoutSure" xml:space="preserve">
+    <value>Exiting application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?</value>
+  </data>
 </root>

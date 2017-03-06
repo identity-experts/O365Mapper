@@ -66,6 +66,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CredentialManager.UI\Signout.xaml.cs">
+      <DependentUpon>Signout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CredentialManager.UI\Exit.xaml.cs">
       <DependentUpon>Exit.xaml</DependentUpon>
     </Compile>
@@ -84,6 +87,10 @@
     <Page Include="Assets\ModernUI.Black.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CredentialManager.UI\Signout.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="CredentialManager.UI\Exit.xaml">
       <Generator>MSBuild:Compile</Generator>

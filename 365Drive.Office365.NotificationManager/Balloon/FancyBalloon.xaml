@@ -116,7 +116,7 @@
                    VerticalAlignment="Top"
                    Foreground="WhiteSmoke"
                           Text="{Binding Path=BalloonMessage, ElementName=me, Mode=Default}"
-                   TextWrapping="Wrap">
+                   TextWrapping="Wrap" PreviewMouseDown="TextBlock_MouseEnter">
             <!--<Run Text="This is a user control. The animation uses the attached " />
             <Run FontStyle="Italic"
                  FontWeight="Bold"

@@ -60,5 +60,20 @@ namespace _365Drive.Office365.UI.Utility
             }
             catch { }
         }
+
+        /// <summary>
+        /// Display about form
+        /// </summary>
+        public static void SignOut()
+        {
+            CredentialManager.UI.SignOut signOutForm = new CredentialManager.UI.SignOut();
+            ElementHost.EnableModelessKeyboardInterop(signOutForm);
+            //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
+            try
+            {
+                signOutForm.ShowDialog();
+            }
+            catch { }
+        }
     }
 }

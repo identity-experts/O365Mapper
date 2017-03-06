@@ -24,16 +24,31 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static string Get365TenancyName(string upn, string password)
         {
-            if (DriveManager.FederationType == FedType.Cloud)
+            string TenancyName = string.Empty;
+
+            //Checking first registry
+            if (RegistryManager.Get(RegistryKeys.TenancyName) != null)
             {
-                return cloudItentityTenancy(upn, password);
+                return RegistryManager.Get(RegistryKeys.TenancyName);
             }
-            else if (DriveManager.FederationType == FedType.AAD)
+            else
             {
-                return aadConnectTenancy(upn, password);
+                //if not found in registry, we need to go and try gettting online
+                if (DriveManager.FederationType == FedType.Cloud)
+                {
+                    TenancyName = cloudItentityTenancy(upn, password);
+                }
+                else if (DriveManager.FederationType == FedType.AAD)
+                {
+                    TenancyName = aadConnectTenancy(upn, password);
+                }
             }
 
-            return string.Empty;
+            //Set the tennacy name at registry for next time use
+            if (!string.IsNullOrEmpty(TenancyName))
+                RegistryManager.Set(RegistryKeys.TenancyName, TenancyName);
+
+            return TenancyName;
         }
 
         /// <summary>
@@ -758,7 +773,7 @@ namespace _365Drive.Office365.CloudConnector
         /// </summary>
         /// <param name="response"></param>
         /// <returns></returns>
-        static string getapiCanary(string response)
+        public static string getapiCanary(string response)
         {
             int indexofCanary = response.IndexOf("\"apiCanary\":") + 13;
             int endIndex = response.IndexOf("\"", indexofCanary + 1);
@@ -766,7 +781,7 @@ namespace _365Drive.Office365.CloudConnector
             return Canary;
         }
 
-        static string getCanary2(string response)
+        public static string getCanary2(string response)
         {
             int indexofCanary = response.IndexOf("\"canary\":") + 10;
             int endIndex = response.IndexOf("\"", indexofCanary + 1);
@@ -774,7 +789,7 @@ namespace _365Drive.Office365.CloudConnector
             return Canary;
         }
 
-        static string getClientRequest(string response)
+        public static string getClientRequest(string response)
         {
             int indexofCanary = response.IndexOf("\"correlationId\":") + 17;
             int endIndex = response.IndexOf("\"", indexofCanary + 1);
@@ -782,7 +797,7 @@ namespace _365Drive.Office365.CloudConnector
             return clientRequest;
         }
 
-        static string getHPGact(string response)
+        public static string getHPGact(string response)
         {
             int indexofCanary = response.IndexOf("\"hpgact\":") + 9;
             int endIndex = response.IndexOf(",", indexofCanary + 1);
@@ -790,7 +805,7 @@ namespace _365Drive.Office365.CloudConnector
             return clientRequest;
         }
 
-        static string getHPGId(string response)
+        public static string getHPGId(string response)
         {
             int indexofCanary = response.IndexOf("\"hpgid\":") + 8;
             int endIndex = response.IndexOf(",", indexofCanary + 1);

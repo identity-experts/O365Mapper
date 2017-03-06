@@ -32,6 +32,21 @@ namespace _365Drive.Office365.GetTenancyURL
             }
         }
 
+
+        /// <summary>
+        /// General get call with NO parameter and will return simple response
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static async Task<HttpResponseMessage> GetAsyncFullResponse(string url,CookieContainer container)
+        {
+            using (var handler = new HttpClientHandler() { CookieContainer = container })
+            using (HttpClient request = new HttpClient(handler))
+            {
+                var responseMessage = await request.GetAsync(url);
+                return await request.GetAsync(url);
+            }
+        }
         /// <summary>
         /// Call with header preset
         /// </summary>
@@ -102,6 +117,7 @@ namespace _365Drive.Office365.GetTenancyURL
         {
             using (HttpClient request = new HttpClient())
             {
+                
                 var responseMessage = await request.PostAsync(url, new StringContent(postBody, Encoding.UTF8, contentType));
                 responseMessage.EnsureSuccessStatusCode();
                 return await responseMessage.Content.ReadAsStringAsync();
@@ -148,6 +164,22 @@ namespace _365Drive.Office365.GetTenancyURL
             }
         }
 
+        /// <summary>
+        /// Call with cookies preset
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public static async Task<string> PostAsync(string url, string postBody, string contentType, CookieContainer container,bool automaticredirect)
+        {
+            using (var handler = new HttpClientHandler() { CookieContainer = container,AllowAutoRedirect = automaticredirect })
+            using (HttpClient request = new HttpClient(handler))
+            {
+                var responseMessage = await request.PostAsync(url, new StringContent(postBody, Encoding.UTF8, contentType));
+                //responseMessage.EnsureSuccessStatusCode();
+                return await responseMessage.Content.ReadAsStringAsync();
+            }
+        }
 
         /// <summary>
         /// Call with cookies preset and extra header values

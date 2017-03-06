@@ -56,6 +56,7 @@
     </ContextMenu>-->
     <ContextMenu x:Shared="false" x:Key="SysTrayMenu">
         <MenuItem Header="Sign in" Command="{Binding ShowAuthForm}" CommandParameter="{Binding}" />
+        <MenuItem Header="Sign out" Command="{Binding SignOutApplicationCommand}" CommandParameter="{Binding}" />
         <Separator />
         <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" />
     </ContextMenu>

@@ -14,6 +14,7 @@ using System.Threading;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using _365Drive.Office365.NotificationManager;
+using _365Drive.Office365.GetTenancyURL;
 
 namespace _365Drive.Office365
 {
@@ -150,7 +151,7 @@ namespace _365Drive.Office365
                 {
                     //Set the value received from registry
                     if (RegistryManager.IsDev)
-                        dispatcherTimer.Interval = new TimeSpan(0, 10, 0);
+                        dispatcherTimer.Interval = new TimeSpan(0, 0, 15);
                     else
                         dispatcherTimer.Interval = new TimeSpan(0, 0, 15);
 
@@ -393,7 +394,7 @@ namespace _365Drive.Office365
                 #region Getting auth cookies and setting them to IE
                 //Get fedauth and rtfa cookies
                 LogManager.Verbose("getting cookies manager");
-                o365cookieManager cookieManager = new o365cookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
+                GlobalCookieManager cookieManager = new GlobalCookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 CookieContainer userCookies = cookieManager.getCookieContainer();
                 LogManager.Verbose("cookies found");
 

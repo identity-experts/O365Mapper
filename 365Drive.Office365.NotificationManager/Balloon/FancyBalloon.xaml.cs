@@ -125,15 +125,7 @@ namespace _365Drive.Office365.NotificationManager
         /// </summary>
         private void grid_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (Callback != null)
-            { 
-                Callback();
-
-                //the tray icon assigned this attached property to simplify access
-                TaskbarIcon taskbarI = TaskbarIcon.GetParentTaskbarIcon(this);
-                taskbarI.CloseBalloon();
-                isClosing = true;
-            }
+           
 
             //if we're already running the fade-out animation, do not interrupt anymore
             //(makes things too complicated for the sample)
@@ -154,6 +146,19 @@ namespace _365Drive.Office365.NotificationManager
         {
             Popup pp = (Popup) Parent;
             pp.IsOpen = false;
+        }
+
+        private void TextBlock_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (Callback != null)
+            {
+                Callback();
+
+                //the tray icon assigned this attached property to simplify access
+                TaskbarIcon taskbarI = TaskbarIcon.GetParentTaskbarIcon(this);
+                taskbarI.CloseBalloon();
+                isClosing = true;
+            }
         }
     }
 }
