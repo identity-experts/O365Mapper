@@ -358,6 +358,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 //{0}=Letter,{1}=Path,{2}=Name
                 string singleDrivePowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};(New-Object -ComObject WScript.Network).MapNetworkDrive(\"" + "{0}" + "\", \"" + "{1}" + "\", $true, \"" + "\", \"" + "\"); (New-Object -ComObject Shell.Application).NameSpace(\"" + "{0}" + "\").Self.Name = \"" + "{2}" + "\";$RegKey = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{3}\";$RegKey2 = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{4}\";Set-ItemProperty -Path $RegKey2 -Name _LabelFromReg -Value \"{2}\";Set-ItemProperty -Path $RegKey -Name _LabelFromReg -Value \"{2}\";}}Catch{{}}";
+                string singleRepairDrivePowershellCommand = "Try{{(New-Object -ComObject Shell.Application).NameSpace(\"" + "{0}" + "\").Self.Name = \"" + "{1}" + "\";$RegKey = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{2}\";$RegKey2 = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{3}\";Set-ItemProperty -Path $RegKey2 -Name _LabelFromReg -Value \"{1}\";Set-ItemProperty -Path $RegKey -Name _LabelFromReg -Value \"{1}\";}}Catch{{}}";
                 string singleDriveunmapPowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};}}Catch{{}}";
                 StringBuilder powerShell = new StringBuilder();
 
@@ -419,7 +420,39 @@ namespace _365Drive.Office365.CloudConnector
                     }
                     else
                     {
-                        LogManager.Verbose(d.DriveLetter + " already exist, hence skipping");
+                        LogManager.Verbose(d.DriveLetter + " already exist, hence skipping the create drive but repairing...");
+
+                        //Repair names (Some times it is buggy so lets repair them)
+                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies))
+                        {
+                            LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);
+                            string psCommand = string.Empty;
+
+                            //If the drive is NOT changed by company admin, which means still active. Continue as we do.
+                            if (d.Drivestate == driveState.Active)
+                            {
+                                //we have to do it again because incase of OneDrive it is blank above 
+                                webDavPath = d.DriveUrl.Replace("http://", "\\\\").Replace("https://", "\\\\").Replace(new Uri(d.DriveUrl).Host, new Uri(d.DriveUrl).Host + (new Uri(d.DriveUrl).Scheme == Uri.UriSchemeHttps ? "@SSL\\DavWWWRoot" : "\\DavWWWRoot")).Replace("/", "\\");
+
+                                LogManager.Verbose("WebDav Path:" + webDavPath);
+                                string regKey = webDavPath.Replace(@"\", "#").EndsWith("#") ? webDavPath.Replace(@"\", "#").TrimEnd('#') : webDavPath.Replace(@"\", "#");
+                                string webDavPath2 = webDavPath.Replace(@"\", "#").Replace("#DavWWWRoot", "").EndsWith("#") ? webDavPath.Replace(@"\", "#").Replace("#DavWWWRoot", "").TrimEnd('#') : webDavPath.Replace(@"\", "#").Replace("#DavWWWRoot", "");
+
+                                string strDriveLetter = d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + ":";
+
+                                psCommand = String.Format(singleRepairDrivePowershellCommand, strDriveLetter, d.DriveName, regKey, webDavPath2);
+                                LogManager.Verbose("PS: " + String.Format(singleRepairDrivePowershellCommand, d.DriveLetter, d.DriveName, regKey, webDavPath2));
+                            }
+
+                            //If the drive is changed by company admin and marked as to be removed, which means it needs to be unmapped
+                            else if (d.Drivestate == driveState.Deleted)
+                            {
+                                string strDriveLetter = d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + ":";
+                                psCommand = String.Format(singleDriveunmapPowershellCommand, strDriveLetter);
+                                LogManager.Verbose("PS: " + String.Format(singleDriveunmapPowershellCommand, d.DriveLetter));
+                            }
+                            powerShell.Append(psCommand);
+                        }
                     }
                 }
 
