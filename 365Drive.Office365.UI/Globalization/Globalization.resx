@@ -136,7 +136,7 @@
     <value>Password cannot be blank</value>
   </data>
   <data name="ProductName" xml:space="preserve">
-    <value>365Drive</value>
+    <value>365Mapper</value>
   </data>
   <data name="Submit" xml:space="preserve">
     <value>Save</value>
@@ -157,10 +157,10 @@
     <value>Fetching mappable drive details</value>
   </data>
   <data name="Initializing" xml:space="preserve">
-    <value>Intializing 365Drive</value>
+    <value>Intializing 365Mapper</value>
   </data>
   <data name="LoginFailed" xml:space="preserve">
-    <value>Either credentials not valid or your IT admin has not granted 365 Access to 365Drive app</value>
+    <value>Either credentials not valid or your IT admin has not granted 365 Access to 365Mapper app</value>
   </data>
   <data name="About" xml:space="preserve">
     <value>About: </value>
@@ -208,7 +208,7 @@
     <value>Internet</value>
   </data>
   <data name="LicenseCouldNotVerified" xml:space="preserve">
-    <value>We could not verify the license details, 365Drive will attempt again in few seconds</value>
+    <value>We could not verify the license details, 365Mapper will attempt again in few seconds</value>
   </data>
   <data name="LicenseExpired" xml:space="preserve">
     <value>Your license has been expired or limit exceeded, kindly contact your administrator</value>

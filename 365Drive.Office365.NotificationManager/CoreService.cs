@@ -47,8 +47,9 @@ namespace _365Drive.Office365
         {
             try
             {
-                if (!Utility.ready())
-                    return;
+                //If the internet is not there, its exiting from here without notification which is creating confusion
+                //if (!Utility.ready())
+                //    return;
                 LogManager.Verbose("Initializing Notifications, Timer and other elements from core constructor");
                 this.notifyIcon = notifyIcon;
                 //this.NotificationManager = new NotificationManager.NotificationManager(notifyIcon);
@@ -98,8 +99,9 @@ namespace _365Drive.Office365
         {
             try
             {
-                if (!Utility.ready())
-                    return;
+                //If the internet is not there, its exiting from here without notification which is creating confusion
+                //if (!Utility.ready())
+                //    return;
 
 
                 //Checking .NET version

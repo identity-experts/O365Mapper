@@ -259,7 +259,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Intializing 365Drive.
+        ///   Looks up a localized string similar to Intializing 365Mapper.
         /// </summary>
         public static string Initializing {
             get {
@@ -277,7 +277,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We could not verify the license details, 365Drive will attempt again in few seconds.
+        ///   Looks up a localized string similar to We could not verify the license details, 365Mapper will attempt again in few seconds.
         /// </summary>
         public static string LicenseCouldNotVerified {
             get {
@@ -313,7 +313,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Either credentials not valid or your IT admin has not granted 365 Access to 365Drive app.
+        ///   Looks up a localized string similar to Either credentials not valid or your IT admin has not granted 365 Access to 365Mapper app.
         /// </summary>
         public static string LoginFailed {
             get {
@@ -367,7 +367,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 365Drive.
+        ///   Looks up a localized string similar to 365Mapper.
         /// </summary>
         public static string ProductName {
             get {
