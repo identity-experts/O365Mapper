@@ -33,9 +33,6 @@ namespace _365Drive.Office365.NotificationManager
             Core coreService = new Core(notifyIcon);
             coreService.Initialize();    
 		}
-
-      
-
-      
+        
     }
 }

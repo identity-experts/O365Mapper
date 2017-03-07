@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
@@ -25,6 +26,7 @@ namespace _365Drive.Office365.UI.Utility
             //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
             try
             {
+                credForm.Loaded += AboutForm_Loaded;
                 credForm.ShowDialog();
             }
             catch { }
@@ -41,9 +43,19 @@ namespace _365Drive.Office365.UI.Utility
             //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
             try
             {
+                //aboutForm.Loca = FormStartPosition.CenterScreen
+                aboutForm.Loaded += AboutForm_Loaded;
                 bool? DialogResult = aboutForm.ShowDialog();
             }
             catch { }
+        }
+
+        private static void AboutForm_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            System.Windows.Application curApp = System.Windows.Application.Current;
+            Window mainWindow = curApp.MainWindow;
+            ((ModernDialog)sender).Left = mainWindow.Left + (mainWindow.Width - ((ModernDialog)sender).ActualWidth) / 2;
+            ((ModernDialog)sender).Top = mainWindow.Top + (mainWindow.Height - ((ModernDialog)sender).ActualHeight) / 2;
         }
 
         /// <summary>
@@ -56,6 +68,7 @@ namespace _365Drive.Office365.UI.Utility
             //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
             try
             {
+                exitForm.Loaded += AboutForm_Loaded;
                 exitForm.ShowDialog();
             }
             catch { }
@@ -71,6 +84,7 @@ namespace _365Drive.Office365.UI.Utility
             //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
             try
             {
+                signOutForm.Loaded += AboutForm_Loaded;
                 signOutForm.ShowDialog();
             }
             catch { }

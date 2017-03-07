@@ -7,11 +7,11 @@
                   xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
                   mc:Ignorable="d" 
                   d:DesignHeight="300"
-                  Title="{x:Static p:Globalization.ProductName}" Width="300px" Height="200px" >
+                  Title="{x:Static p:Globalization.ProductName}" Width="400px" Height="200px" >
 
 
     <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
-    <Grid Margin="10" Width="300px">
+    <Grid Margin="10" Width="400px">
         <Grid.Resources>
             <Style TargetType="{x:Type Image}">
                 <Setter Property="Margin" Value="4,4,4,20" />

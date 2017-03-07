@@ -47,7 +47,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Samples\wpf-notifyicon\wpf-notifyicon\NotifyIconWpf\NotifyIconWpf.csproj">
+    <ProjectReference Include="..\wpf-notifyicon\wpf-notifyicon\NotifyIconWpf\NotifyIconWpf.csproj">
       <Project>{7ac63864-7638-41c4-969c-d3197ef2bed9}</Project>
       <Name>NotifyIconWpf</Name>
     </ProjectReference>
