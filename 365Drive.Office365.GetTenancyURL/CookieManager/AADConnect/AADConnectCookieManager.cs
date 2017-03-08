@@ -59,11 +59,13 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 if (!Utility.ready())
                     return null;
 
-                // Get the SAML tokens from SPO STS (via MSO STS) using fed auth passive approach
-                cookies = getAzureAADConnectCookies();
-
+              
+                //Only retrieve cookies when its NULL or expired. otherwise get it from cache.
                 if (_cachedCookieContainer == null || DateTime.Now > _expires)
                 {
+                    // Get the SAML tokens from SPO STS (via MSO STS) using fed auth passive approach
+                    cookies = getAzureAADConnectCookies();
+
                     //retrieving cookies from here
                     if (!string.IsNullOrEmpty(cookies.FedAuth))
                     {
@@ -86,7 +88,6 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
                         if (_useRtfa)
                         {
-                            // Set the rtFA (sign-out) cookie, added march 2011
                             Cookie rtFa = new Cookie("rtFA", cookies.rtFa)
                             {
                                 Expires = cookies.Expires,

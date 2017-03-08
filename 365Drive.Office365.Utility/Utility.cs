@@ -12,7 +12,7 @@ namespace _365Drive.Office365
     public static class Utility
     {
 
-         
+
 
         /// <summary>
         /// Make sure internet is up and working
@@ -58,16 +58,34 @@ namespace _365Drive.Office365
             bool webClientRunning = false;
             try
             {
-                using (ServiceController sc = new ServiceController("WebClient"))
+                using (ServiceController wcService = new ServiceController("WebClient"))
                 {
-                    if (sc.Status != ServiceControllerStatus.Running)
+                    if (wcService.Status != ServiceControllerStatus.Running)
                     {
-                        webClientRunning = false;
+                        //first lets try turning that on using code and automate it
+                        try
+                        {
+                            LogManager.Verbose("trying to change service to automatic start");
+                            ServiceHelper.ChangeStartMode(wcService, ServiceStartMode.Automatic);
+
+                            LogManager.Verbose("trying to start the service");
+                            wcService.Start();
+
+                            webClientRunning = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                            LogManager.Exception(method, ex);
+                            webClientRunning = false;
+                        }
+
                     }
                     else
                     {
                         webClientRunning = true;
                     }
+
                 }
             }
             catch (Exception ex)
@@ -142,7 +160,7 @@ namespace _365Drive.Office365
                 LogManager.Exception(method, ex);
             }
 
-            return frameworkInstalled; 
+            return frameworkInstalled;
         }
 
         /// <summary>

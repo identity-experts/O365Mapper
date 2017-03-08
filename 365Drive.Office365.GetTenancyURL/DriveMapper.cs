@@ -119,7 +119,6 @@ namespace _365Drive.Office365.CloudConnector
                         {
                             responsereceived = false;
                             return false;
-
                         }
                     }
                 }

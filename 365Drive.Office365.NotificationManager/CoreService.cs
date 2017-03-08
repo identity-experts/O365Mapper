@@ -34,6 +34,12 @@ namespace _365Drive.Office365
         //Declare current dispacher
         Dispatcher currentDispatcher;
 
+        /// <summary>
+        /// to stop multiple thread and drive mapping name issues, we will make sure the thread will be called only once
+        /// </summary>
+        static bool busy = false;
+        static int busyCounter = 0;
+
         public Core()
         {
             //this.NotificationManager = new Notifications(notifyIcon);
@@ -61,8 +67,8 @@ namespace _365Drive.Office365
 
                 //initialize icon timer
                 iconTimer = new DispatcherTimer();
-
                 currentDispatcher = Dispatcher.CurrentDispatcher;
+
             }
             catch (Exception ex)
             {
@@ -82,8 +88,20 @@ namespace _365Drive.Office365
             {
                 if (!Utility.ready())
                     return;
-                //Code goes here
-                await Task.Run(() => tick());
+
+                //make sure other treads are not running to avoid race conditions
+                //We will wait 6 times which means 6 minutes. If until 6 minutes we still find its busy, which means something is fishy and ignore busy
+                if (!busy || busyCounter == 5)
+                {
+                    busyCounter = 0;
+                    //Code goes here
+                    await Task.Run(() => tick());
+                }
+                else
+                {
+                    busyCounter++;
+                    LogManager.Verbose("Already other thread is running");
+                }
             }
             catch (Exception ex)
             {
@@ -155,7 +173,7 @@ namespace _365Drive.Office365
                     if (RegistryManager.IsDev)
                         dispatcherTimer.Interval = new TimeSpan(0, 0, 15);
                     else
-                        dispatcherTimer.Interval = new TimeSpan(0, 0, 15);
+                        dispatcherTimer.Interval = new TimeSpan(0, 1, 0);
 
                     dispatcherTimer.Start();
                 });
@@ -168,7 +186,7 @@ namespace _365Drive.Office365
                 LogManager.Verbose("Registering power mode change event to make sure the system is not in resume mode");
                 SystemEvents.PowerModeChanged += EnsurePowerMode;
 
-                //call it now
+                //call tick now
                 await Task.Run(() => tick());
             }
             catch (Exception ex)
@@ -231,6 +249,9 @@ namespace _365Drive.Office365
         //Going to be triggered on every specific interval
         async void tick()
         {
+            //set busy to true so other thread doesnt access this code
+            busy = true;
+
             try
             {
                 //starting animation
@@ -430,9 +451,11 @@ namespace _365Drive.Office365
 
 
                 Animation.Stop();
+                busy = false;
             }
             catch (Exception ex)
             {
+                busy = false;
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);
             }

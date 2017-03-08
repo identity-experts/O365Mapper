@@ -423,7 +423,7 @@ namespace _365Drive.Office365.CloudConnector
                         LogManager.Verbose(d.DriveLetter + " already exist, hence skipping the create drive but repairing...");
 
                         //Repair names (Some times it is buggy so lets repair them)
-                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies))
+                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive)
                         {
                             LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);
                             string psCommand = string.Empty;
@@ -431,6 +431,20 @@ namespace _365Drive.Office365.CloudConnector
                             //If the drive is NOT changed by company admin, which means still active. Continue as we do.
                             if (d.Drivestate == driveState.Active)
                             {
+                                //Make sure if its OneDrive, we have the URL set
+                                //checking for OneDrive
+                                if (d.Drivetype == driveType.OneDrive && String.IsNullOrEmpty(d.DriveUrl))
+                                {
+                                    //map drives
+                                    currentDispatcher.Invoke(() =>
+                                    {
+                                        Communications.updateStatus(gettingOneDriveUrlText);
+                                    });
+
+                                    ///getting user drive details
+                                    d.DriveUrl = DriveMapper.getOneDriveUrl(rootSiteUrl, userCookies);
+                                }
+
                                 //we have to do it again because incase of OneDrive it is blank above 
                                 webDavPath = d.DriveUrl.Replace("http://", "\\\\").Replace("https://", "\\\\").Replace(new Uri(d.DriveUrl).Host, new Uri(d.DriveUrl).Host + (new Uri(d.DriveUrl).Scheme == Uri.UriSchemeHttps ? "@SSL\\DavWWWRoot" : "\\DavWWWRoot")).Replace("/", "\\");
 
