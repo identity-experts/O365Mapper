@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.CloudConnector", "365Drive.Office365.GetTenancyURL\365Drive.Office365.CloudConnector.csproj", "{36DFECB8-5EB3-4F2C-9988-DCB8CB417F83}"
 EndProject
@@ -28,6 +28,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "365Drive.Office365.Utility", "365Drive.Office365.Utility\365Drive.Office365.Utility.csproj", "{2A55BEC8-5690-4FF9-95C0-29AC5C97CE35}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "365Drive", "365Drive\365Drive.vdproj", "{7ECD553C-300D-4709-9776-7D84C691CA57}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Releases", "Releases", "{1ABE9886-49CA-443C-9402-A4835AC93BB0}"
+	ProjectSection(SolutionItems) = preProject
+		Releases\0.0.1.zip = Releases\0.0.1.zip
+		Releases\0.0.12.zip = Releases\0.0.12.zip
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
