@@ -24,14 +24,17 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         public Authenticate()
         {
             InitializeComponent();
-
+            Button customOK = new Button();
             // define the dialog buttons
-            this.Buttons = new Button[] { this.OkButton, this.CancelButton };
+            this.Buttons = new Button[] { customOK, this.CancelButton };
 
-            this.OkButton.Click += OkButton_Click;
-            this.OkButton.IsCancel = true;
+            customOK.Click += OkButton_Click;
+            customOK.Content = "Save";
+            customOK.IsCancel = false;
+            customOK.IsDefault = false;
+
+            this.CancelButton.IsCancel = true;
             this.OkButton.IsDefault = true;
-
             //set existing 
             setExistingCredentials();
         }
@@ -49,6 +52,10 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 LogManager.Verbose("Setting username password");
                 _365Drive.Office365.CredentialManager.SetCredentials(userName.Text, password.Password);
                 this.Close();
+            }
+            else
+            {
+                //this.DialogResult = false;
             }
         }
 
@@ -88,17 +95,20 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         bool ValidateEmailandPassword(bool bottonclick)
         {
             LogManager.Verbose("validating username and password");
+
             //email validation
             bool result = ValidatorExtensions.IsValidEmailAddress(userName.Text);
+            if (string.IsNullOrEmpty(userName.Text))
+                result = false;
 
             //email validation failed
             if (!result)
             {
-                validationSummary.Content = Globalization.Globalization.emailvalidation;
+                validationSummary.Text = Globalization.Globalization.emailvalidation;
             }
             else
             {
-                validationSummary.Content = string.Empty;
+                validationSummary.Text = string.Empty;
             }
 
             if (bottonclick)
@@ -107,11 +117,11 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 if (string.IsNullOrEmpty(password.Password))
                 {
                     result = false;
-                    validationSummary.Content += Globalization.Globalization.passwordcannotbeblank;
+                    validationSummary.Text += Environment.NewLine + Globalization.Globalization.passwordcannotbeblank;
                 }
                 else
                 {
-                    validationSummary.Content = string.Empty;
+                    //validationSummary.Content += string.Empty;
                 }
             }
             LogManager.Verbose("credential validation result: " + result.ToString());
@@ -125,7 +135,8 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         /// <param name="e"></param>
         private void userName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ValidateEmailandPassword(false);
+            //This looks irretating as the user is still typing username, hence no need to validate during that time.
+            //ValidateEmailandPassword(false);
         }
 
 

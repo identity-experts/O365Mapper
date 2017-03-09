@@ -171,7 +171,7 @@ namespace _365Drive.Office365
                 {
                     //Set the value received from registry
                     if (RegistryManager.IsDev)
-                        dispatcherTimer.Interval = new TimeSpan(0, 0, 15);
+                        dispatcherTimer.Interval = new TimeSpan(0, 2, 15);
                     else
                         dispatcherTimer.Interval = new TimeSpan(0, 1, 0);
 
@@ -274,6 +274,7 @@ namespace _365Drive.Office365
                     });
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
                     return;
                 }
                 #endregion
@@ -291,10 +292,11 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.webClientNotRunning);
                     });
                     LogManager.Verbose("WebClient is NOT running");
-                    NotificationManager.NotificationManager.notify(Globalization.webClient, Globalization.webClientNotRunning, ToolTipIcon.Warning);
+                    NotificationManager.NotificationManager.notify(Globalization.webClient, Globalization.webClientNotRunning, ToolTipIcon.Warning, CommunicationCallBacks.OpenWebClient);
                     Communications.CurrentState = States.Stopped;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
                     return;
                 }
                 #endregion
@@ -317,6 +319,7 @@ namespace _365Drive.Office365
                     Communications.CurrentState = States.UserAction;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
                     return;
                 }
                 else
@@ -344,6 +347,7 @@ namespace _365Drive.Office365
                     Communications.CurrentState = States.Stopped;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Error);
+                    busy = false;
                     return;
                 }
 
@@ -362,6 +366,7 @@ namespace _365Drive.Office365
                     Communications.CurrentState = States.Stopped;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Error);
+                    busy = false;
                     return;
                 }
                 else if (licenseValidationState == LicenseValidationState.LoginFailed)
@@ -376,6 +381,7 @@ namespace _365Drive.Office365
                     Communications.CurrentState = States.UserAction;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
                     return;
                 }
                 else if (licenseValidationState == LicenseValidationState.Expired || licenseValidationState == LicenseValidationState.Exceeded)
@@ -390,6 +396,7 @@ namespace _365Drive.Office365
                     Communications.CurrentState = States.Hold;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Error);
+                    busy = false;
                     return;
                 }
                 else
@@ -441,6 +448,14 @@ namespace _365Drive.Office365
                 });
 
                 LogManager.Verbose("Mapping drives");
+
+                //if the user has passed any document library INSIDE their OneDrive site collection, we need to pass onedrive cookies
+                //userCookies.Add(new Cookie("FedAuth", fedAuth, "/", DriveManager.oneDriveHostSiteUrl));
+                //userCookies.Add(new Cookie("rtFa", rtFA, "/", DriveManager.oneDriveHostSiteUrl));
+
+                userCookies.Add(new Uri("https://" + new Uri(DriveManager.oneDriveHostSiteUrl).Authority), new Cookie("FedAuth", fedAuth));
+                userCookies.Add(new Uri("https://" + new Uri(DriveManager.oneDriveHostSiteUrl).Authority), new Cookie("rtFA", rtFA));
+
                 DriveManager.mapDrives(userCookies, Globalization.GettingoneDriveUrl, currentDispatcher);
 
                 currentDispatcher.Invoke(() =>

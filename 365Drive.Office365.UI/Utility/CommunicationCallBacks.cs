@@ -32,6 +32,24 @@ namespace _365Drive.Office365.UI.Utility
             catch { }
         }
 
+        /// <summary>
+        /// Callback method to be called along with communication event
+        /// </summary>
+        /// <param name="callback">Method to be called</param>
+        public static void OpenWebClient()
+        {
+            _365Drive.Office365.UI.WebClientSupport.WebClientSupport wcSupport = new _365Drive.Office365.UI.WebClientSupport.WebClientSupport();
+            ElementHost.EnableModelessKeyboardInterop(wcSupport);
+
+
+            //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
+            try
+            {
+                wcSupport.Loaded += AboutForm_Loaded;
+                wcSupport.ShowDialog();
+            }
+            catch { }
+        }
 
         /// <summary>
         /// Display about form

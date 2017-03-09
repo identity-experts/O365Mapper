@@ -423,7 +423,8 @@ namespace _365Drive.Office365.CloudConnector
                         LogManager.Verbose(d.DriveLetter + " already exist, hence skipping the create drive but repairing...");
 
                         //Repair names (Some times it is buggy so lets repair them)
-                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive)
+                        //Skip deleted ones
+                        if (d.Drivestate != driveState.Deleted)
                         {
                             LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);
                             string psCommand = string.Empty;

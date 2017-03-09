@@ -75,6 +75,9 @@
     <Compile Include="CredentialManager.UI\Authenticate.xaml.cs">
       <DependentUpon>Authenticate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="HelpPages\WebClientSupport.xaml.cs">
+      <DependentUpon>WebClientSupport.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Notifications\Balloon.xaml.cs">
       <DependentUpon>Balloon.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,10 @@
     <Page Include="CredentialManager.UI\CredentialManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HelpPages\WebClientSupport.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -223,7 +223,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exiting application will unmap all mapped drives, are you sure you want to exit application? .
+        ///   Looks up a localized string similar to Exiting application will unmap (if any) all mapped drives, are you sure you want to exit application? .
         /// </summary>
         public static string ExitSure {
             get {
@@ -250,7 +250,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OneDrive for business found to be mapped. Getting its Url.
+        ///   Looks up a localized string similar to OneDrive for business found to be mapped, getting its url....
         /// </summary>
         public static string GettingoneDriveUrl {
             get {
@@ -331,7 +331,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We need to authenticate to get started.
+        ///   Looks up a localized string similar to We need to authenticate to get started. Click here to authenticate..
         /// </summary>
         public static string NocredMessage {
             get {
@@ -421,7 +421,23 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WebClient service is not running. Please start it..
+        ///   Looks up a localized string similar to Steps to automate WebClient service and start it{0}{0}
+        ///
+        ///1. Click Start, click in the Start Search box, type services.msc, and then press ENTER.{0}
+        ///2. Optionally, export and save a list of the existing settings. To do this, right-click Services, select Export List, and save the settings list.{0}
+        ///3. In the details pane, right-click the service that you want to configure, and then click Properties.{0}
+        ///4. On the General tab, in Startup type, click Automatic.{0}
+        ///5. Click on Start button to start it.{0}
+        ///6. [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string webClientHelp {
+            get {
+                return ResourceManager.GetString("webClientHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WebClient service is not running, click here for help starting it..
         /// </summary>
         public static string webClientNotRunning {
             get {

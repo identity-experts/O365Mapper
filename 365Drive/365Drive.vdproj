@@ -759,7 +759,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UI, Version=0.0.0.1, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UI, Version=0.0.1.2, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_8B30B14B3D48EA2E6220B3604E41FF7D"
@@ -1059,15 +1059,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:365Mapper"
-        "ProductCode" = "8:{406AD177-2FBD-4FC3-8767-1331772BB948}"
-        "PackageCode" = "8:{F658300E-ADAD-4194-8640-6D0513706EDE}"
+        "ProductCode" = "8:{BE4AB27B-6E0C-4E55-A105-D18627469E1E}"
+        "PackageCode" = "8:{5D86568C-BF1E-4A33-B740-7B4675467BA5}"
         "UpgradeCode" = "8:{C62FC6BD-1B7E-490D-A2AF-239104560CF1}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.0.2"
+        "ProductVersion" = "8:0.0.12"
         "Manufacturer" = "8:Identity Experts"
         "ARPHELPTELEPHONE" = "8:+44 (0) 3333 444950"
         "ARPHELPLINK" = "8:http://www.365mapper.com"

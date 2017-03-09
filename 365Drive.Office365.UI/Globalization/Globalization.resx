@@ -142,7 +142,7 @@
     <value>Save</value>
   </data>
   <data name="NocredMessage" xml:space="preserve">
-    <value>We need to authenticate to get started</value>
+    <value>We need to authenticate to get started. Click here to authenticate.</value>
   </data>
   <data name="CredentialNotPresent" xml:space="preserve">
     <value>Credentials not present, please authenticate to proceed.</value>
@@ -190,10 +190,10 @@
     <value>Exit</value>
   </data>
   <data name="ExitSure" xml:space="preserve">
-    <value>Exiting application will unmap all mapped drives, are you sure you want to exit application? </value>
+    <value>Exiting application will unmap (if any) all mapped drives, are you sure you want to exit application? </value>
   </data>
   <data name="GettingoneDriveUrl" xml:space="preserve">
-    <value>OneDrive for business found to be mapped. Getting its Url</value>
+    <value>OneDrive for business found to be mapped, getting its url...</value>
   </data>
   <data name="DotNetVersion" xml:space="preserve">
     <value>.NET Version</value>
@@ -226,7 +226,7 @@
     <value>WebClient Service</value>
   </data>
   <data name="webClientNotRunning" xml:space="preserve">
-    <value>WebClient service is not running. Please start it.</value>
+    <value>WebClient service is not running, click here for help starting it.</value>
   </data>
   <data name="AuthenticationTypeNotSupported" xml:space="preserve">
     <value>We do not support the authentication type set to your office 365 tenancy. please check with Identity Experts support team.</value>
@@ -239,5 +239,15 @@
   </data>
   <data name="SignOut" xml:space="preserve">
     <value>Signout</value>
+  </data>
+  <data name="webClientHelp" xml:space="preserve">
+    <value>Steps to automate WebClient service and start it{0}{0}
+
+1. Click Start, click in the Start Search box, type services.msc, and then press ENTER.{0}
+2. Optionally, export and save a list of the existing settings. To do this, right-click Services, select Export List, and save the settings list.{0}
+3. In the details pane, right-click the service that you want to configure, and then click Properties.{0}
+4. On the General tab, in Startup type, click Automatic.{0}
+5. Click on Start button to start it.{0}
+6. click OK</value>
   </data>
 </root>
