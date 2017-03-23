@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:tb="http://www.hardcodet.net/taskbar"
              x:Name="me"
-             Height="120"
-             Width="240">
+             Height="150"
+             Width="280">
     <UserControl.Resources>
         <Storyboard x:Key="FadeIn">
             <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"

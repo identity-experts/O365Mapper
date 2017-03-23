@@ -23,5 +23,21 @@ namespace _365Drive.Office365
         public static readonly string[] oneDriveIdentifier = { "odb", "onedrive", "onedrive for business", "mysite" };
         public static readonly string[] spDefaultDriveIdentifier = { "default", "sharepoint", "spo", "sponline" };
         public static readonly string[] deleteDriveIdentifier = { "x", "d", "r" };
+
+        #region licensing server
+        public const string licensingBaseDomain = "http://admin.identityexperts.co.uk";
+        public const string activationUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}";
+        public const string activationApiCode = "am-software-api";
+        public const string ieUserMappingApiCode = "user-key-mapping-api";
+        public const string ieDriveDetailsApiCode = "ie-drive-mapping-details";
+        public const string activationRequestName = "activation";
+        public const string statusRequestName = "status";
+        public const string ie365MapperProductName = "365Mapper";
+        public const string licenseuserMappingUrl = "{0}?wc-api={1}&tenancy={2}&user={3}";
+        public const string retrieveDriveMappingsUrl = "{0}?wc-api={1}&tenancy={2}";
+        public const string softwareVersion = "0.0.12";
+        public const int licenseCheckInterval = 24;
+        #endregion
+
     }
 }

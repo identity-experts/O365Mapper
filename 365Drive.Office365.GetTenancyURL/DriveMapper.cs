@@ -20,9 +20,9 @@ namespace _365Drive.Office365.CloudConnector
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static LicenseValidationState EnsureLicense(string userName, string password)
+        public static LicenseValidationState EnsureLicense(string userName, string password, CookieContainer userCookies)
         {
-            
+
 
             var licenseMode = LicenseValidationState.CouldNotVerify;
 
@@ -41,7 +41,7 @@ namespace _365Drive.Office365.CloudConnector
                 if (!string.IsNullOrEmpty(tenancyName))
                 {
                     LogManager.Verbose("call to license valid");
-                    LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName);
+                    LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName, userName,userCookies);
                     LogManager.Verbose("license validation result: " + Convert.ToString(state));
                     licenseMode = state;
                 }
@@ -59,6 +59,48 @@ namespace _365Drive.Office365.CloudConnector
             return licenseMode;
         }
 
+
+        /// <summary>
+        /// Ensures whether user has valid license or not
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static LicenseValidationState retrieveTenancyName(string userName, string password)
+        {
+
+
+            var licenseMode = LicenseValidationState.CouldNotVerify;
+
+            ///ONLY FOR TESTING STOP ICON
+            /// 
+            //return licenseMode;
+            try
+            {
+                if (!Utility.ready())
+                    return LicenseValidationState.CouldNotVerify;
+
+                LogManager.Verbose("ensuring license");
+
+                //get the tenancy name
+                string tenancyName = _365DriveTenancyURL.Get365TenancyName(userName, password);
+                if (string.IsNullOrEmpty(tenancyName))
+                {
+                    licenseMode = LicenseValidationState.LoginFailed;
+                }
+                else
+                {
+                    return LicenseValidationState.Ok;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return licenseMode;
+        }
 
         /// <summary>
         /// Ensure user has access, if yes then map it
@@ -116,6 +158,11 @@ namespace _365Drive.Office365.CloudConnector
                     catch (Exception ex)
                     {
                         if (ex.Message.Contains("403"))
+                        {
+                            responsereceived = false;
+                            return false;
+                        }
+                        if (ex.Message.Contains("404"))
                         {
                             responsereceived = false;
                             return false;

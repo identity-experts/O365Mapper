@@ -334,6 +334,7 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
+                #region Ensuring authentication type
                 //Mare sure the user authentication type is supported
                 LogManager.Verbose("Checking, does the user authentication type is supported");
                 if (!DriveManager.isAllowedFedType(CredentialManager.GetCredential().UserName))
@@ -350,10 +351,58 @@ namespace _365Drive.Office365
                     busy = false;
                     return;
                 }
+                #endregion
+
+                #region get and set tenancy name and urls
+                //as this is must in next calls, lets fetch the tenancy name here
+                LicenseValidationState tenancyNameState = DriveMapper.retrieveTenancyName(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
+                if (tenancyNameState == LicenseValidationState.LoginFailed)
+                {
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.LoginFailed);
+                    });
+                    LogManager.Verbose("credentials not valid or app isnt registered");
+                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    //reset the current state
+                    Communications.CurrentState = States.UserAction;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
+                    return;
+                }
+                else if (tenancyNameState == LicenseValidationState.CouldNotVerify)
+                {
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.LicenseValidationFailed);
+                    });
+                    LogManager.Verbose("License could not be verified");
+                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailed, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    //reset the current state
+                    Communications.CurrentState = States.Stopped;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Error);
+                    busy = false;
+                    return;
+                }
+                #endregion;
+
+          
+
+                #region getting cookies (used to setting in IE and authenticating for licensing)
+                //Get fedauth and rtfa cookies
+                LogManager.Verbose("getting cookies manager");
+                GlobalCookieManager cookieManager = new GlobalCookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
+                CookieContainer userCookies = cookieManager.getCookieContainer();
+                LogManager.Verbose("cookies found");
+                string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
+                string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
+                #endregion
 
                 #region Ensuring License
                 //make sure we have valid license
-                LicenseValidationState licenseValidationState = DriveMapper.EnsureLicense(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
+                LicenseValidationState licenseValidationState = DriveMapper.EnsureLicense(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password, userCookies);
                 if (licenseValidationState == LicenseValidationState.CouldNotVerify)
                 {
                     currentDispatcher.Invoke(() =>
@@ -368,6 +417,33 @@ namespace _365Drive.Office365
                     Animation.Animate(AnimationTheme.Error);
                     busy = false;
                     return;
+                }
+                else if (licenseValidationState == LicenseValidationState.ActivationFailed)
+                {
+                    string notificationMessage = string.Format(Globalization.LicenseActivationFailed, LicenseManager.lastActivationMessage);
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(notificationMessage);
+                    });
+                    LogManager.Verbose("License could not be verified");
+                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailed, notificationMessage, ToolTipIcon.Error);
+                    //reset the current state
+                    Communications.CurrentState = States.Stopped;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Error);
+                    busy = false;
+                    return;
+                }
+                else if (licenseValidationState == LicenseValidationState.ActivatedFirstTime)
+                {
+                    LogManager.Verbose("License first time activated");
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage);
+                    });
+                    NotificationManager.NotificationManager.notify(Globalization.License, Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage, ToolTipIcon.Info);
+                    //set it to running
+                    Communications.CurrentState = States.Running;
                 }
                 else if (licenseValidationState == LicenseValidationState.LoginFailed)
                 {
@@ -391,7 +467,23 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.LicenseExpired);
                     });
                     LogManager.Verbose("License has been expired or exceeded limit");
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LicenseExpired, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    NotificationManager.NotificationManager.notify(Globalization.License, Globalization.LicenseExpired, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    //reset the current state
+                    Communications.CurrentState = States.Hold;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Error);
+                    busy = false;
+                    return;
+                }
+                else if (licenseValidationState == LicenseValidationState.TenancyNotExist)
+                {
+                    string TenancyNotRegistered = String.Format(Globalization.TenancyNotRegistered, Constants.licensingBaseDomain);
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(TenancyNotRegistered);
+                    });
+                    LogManager.Verbose("Tenancy has not been signed up with us");
+                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, TenancyNotRegistered, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.Hold;
                     Animation.Stop();
@@ -411,26 +503,8 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
-                #region Getting mappable drive details
-                LogManager.Verbose("Trying to get all drive details");
-                //get drive details
-                LicenseManager.populateDrives();
-                currentDispatcher.Invoke(() =>
-                {
-                    Communications.updateStatus(Globalization.DriveDetailsFound);
-                });
-                #endregion
 
-                #region Getting auth cookies and setting them to IE
-                //Get fedauth and rtfa cookies
-                LogManager.Verbose("getting cookies manager");
-                GlobalCookieManager cookieManager = new GlobalCookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
-                CookieContainer userCookies = cookieManager.getCookieContainer();
-                LogManager.Verbose("cookies found");
-
-                string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
-                string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
-
+                #region setting cookies to IE (already retrieved above)
                 //set cookie in IE
                 LogManager.Verbose("setting cookies to IE");
                 DriveManager.setCookiestoIE(fedAuth, rtFA, DriveManager.rootSiteUrl);
@@ -438,6 +512,16 @@ namespace _365Drive.Office365
                 //set cookie in IE
                 LogManager.Verbose("setting cookies to IE for oneDriveHostUrl");
                 DriveManager.setCookiestoIE(fedAuth, rtFA, DriveManager.oneDriveHostSiteUrl);
+                #endregion
+
+                #region Getting mappable drive details
+                LogManager.Verbose("Trying to get all drive details");
+                //get drive details
+                LicenseManager.populateDrives(userCookies);
+                currentDispatcher.Invoke(() =>
+                {
+                    Communications.updateStatus(Globalization.DriveDetailsFound);
+                });
                 #endregion
 
                 #region mapping drives
@@ -470,6 +554,7 @@ namespace _365Drive.Office365
             }
             catch (Exception ex)
             {
+                Animation.Stop();
                 busy = false;
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);

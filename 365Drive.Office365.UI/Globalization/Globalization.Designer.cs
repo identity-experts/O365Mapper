@@ -277,6 +277,33 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to License.
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your license has been activated..
+        /// </summary>
+        public static string LicenseActivatedFirstTime {
+            get {
+                return ResourceManager.GetString("LicenseActivatedFirstTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to License activation or verification failed ({0})..
+        /// </summary>
+        public static string LicenseActivationFailed {
+            get {
+                return ResourceManager.GetString("LicenseActivationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to We could not verify the license details, 365Mapper will attempt again in few seconds.
         /// </summary>
         public static string LicenseCouldNotVerified {
@@ -286,7 +313,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your license has been expired or limit exceeded, kindly contact your administrator.
+        ///   Looks up a localized string similar to Licenses expired or exceeded limit. Contact IT team..
         /// </summary>
         public static string LicenseExpired {
             get {
@@ -309,6 +336,15 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string LicenseValidationFailed {
             get {
                 return ResourceManager.GetString("LicenseValidationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to License.
+        /// </summary>
+        public static string LicenseValidationFailedHeading {
+            get {
+                return ResourceManager.GetString("LicenseValidationFailedHeading", resourceCulture);
             }
         }
         
@@ -399,6 +435,15 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string Submit {
             get {
                 return ResourceManager.GetString("Submit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You need to register at Identity Experts to get started with 365Mapper..
+        /// </summary>
+        public static string TenancyNotRegistered {
+            get {
+                return ResourceManager.GetString("TenancyNotRegistered", resourceCulture);
             }
         }
         

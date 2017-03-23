@@ -186,7 +186,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 LogManager.Verbose("office api call finished");
                 LogManager.Verbose("tenancy name: " + tenancyUniqueName + StringConstants.rootUrltobeReplacedWith);
-                tenancyUniqueName += tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
+                tenancyUniqueName = tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
 
             }
             //}

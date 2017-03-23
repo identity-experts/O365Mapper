@@ -211,7 +211,7 @@
     <value>We could not verify the license details, 365Mapper will attempt again in few seconds</value>
   </data>
   <data name="LicenseExpired" xml:space="preserve">
-    <value>Your license has been expired or limit exceeded, kindly contact your administrator</value>
+    <value>Licenses expired or exceeded limit. Contact IT team.</value>
   </data>
   <data name="LicenseValidationFailed" xml:space="preserve">
     <value>License Validation Failed</value>
@@ -249,5 +249,20 @@
 4. On the General tab, in Startup type, click Automatic.{0}
 5. Click on Start button to start it.{0}
 6. click OK</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>License</value>
+  </data>
+  <data name="LicenseActivatedFirstTime" xml:space="preserve">
+    <value>Your license has been activated.</value>
+  </data>
+  <data name="LicenseValidationFailedHeading" xml:space="preserve">
+    <value>Failed to License</value>
+  </data>
+  <data name="TenancyNotRegistered" xml:space="preserve">
+    <value>You need to register at Identity Experts to get started with 365Mapper.</value>
+  </data>
+  <data name="LicenseActivationFailed" xml:space="preserve">
+    <value>License activation or verification failed ({0}).</value>
   </data>
 </root>

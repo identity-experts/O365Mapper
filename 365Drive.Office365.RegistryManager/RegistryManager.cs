@@ -20,7 +20,8 @@ namespace _365Drive.Office365
         BalloonNotification = 1,
         TenancyName = 2,
         RootSiteUrl = 3,
-        MySiteUrl = 4
+        MySiteUrl = 4,
+        LastLicenseChecked = 5
     }
 
 
@@ -158,6 +159,7 @@ namespace _365Drive.Office365
             Set(RegistryKeys.TenancyName, string.Empty);
             Set(RegistryKeys.RootSiteUrl, string.Empty);
             Set(RegistryKeys.MySiteUrl, string.Empty);
+            Set(RegistryKeys.LastLicenseChecked, string.Empty);
         }
 
         /// <summary>
