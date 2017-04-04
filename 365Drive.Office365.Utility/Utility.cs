@@ -58,6 +58,16 @@ namespace _365Drive.Office365
             bool webClientRunning = false;
             try
             {
+                //now lets do the other registry settings if the user has rights
+                try
+                {
+                    RegistryManager.ConfigRegistry();
+                }
+                catch
+                {
+                    //intentionally left unattempted as this is not something we should break
+                }
+
                 using (ServiceController wcService = new ServiceController("WebClient"))
                 {
                     if (wcService.Status != ServiceControllerStatus.Running)
@@ -79,7 +89,7 @@ namespace _365Drive.Office365
                             LogManager.Exception(method, ex);
                             webClientRunning = false;
                         }
-
+                     
                     }
                     else
                     {

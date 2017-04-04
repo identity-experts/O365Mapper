@@ -118,10 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="credentials" xml:space="preserve">
-    <value>Credential</value>
+    <value>Sign In</value>
   </data>
   <data name="credential_page_header" xml:space="preserve">
     <value>Manage Credentials (Default)</value>
+    <comment>Not used anywhere.</comment>
   </data>
   <data name="credential_password" xml:space="preserve">
     <value>Password</value>
@@ -130,58 +131,60 @@
     <value>Username</value>
   </data>
   <data name="emailvalidation" xml:space="preserve">
-    <value>Please enter valid email address</value>
+    <value>Please enter a valid email address</value>
   </data>
   <data name="passwordcannotbeblank" xml:space="preserve">
-    <value>Password cannot be blank</value>
+    <value>Please enter your password</value>
   </data>
   <data name="ProductName" xml:space="preserve">
     <value>365Mapper</value>
   </data>
   <data name="Submit" xml:space="preserve">
-    <value>Save</value>
+    <value>Sign in</value>
   </data>
   <data name="NocredMessage" xml:space="preserve">
-    <value>We need to authenticate to get started. Click here to authenticate.</value>
+    <value>Please click here to Sign in</value>
   </data>
   <data name="CredentialNotPresent" xml:space="preserve">
-    <value>Credentials not present, please authenticate to proceed.</value>
+    <value>Please sign in to continue</value>
   </data>
   <data name="CredentialsPresent" xml:space="preserve">
-    <value>Credentials present, moving to verify license</value>
+    <value>Verifying licence</value>
   </data>
   <data name="EnsuringCredential" xml:space="preserve">
-    <value>Ensuring credentials exist or not. If not, will propmt for it</value>
+    <value>Validating credentials</value>
   </data>
   <data name="GettingDriveDetails" xml:space="preserve">
-    <value>Fetching mappable drive details</value>
+    <value>Fetching drive details</value>
   </data>
   <data name="Initializing" xml:space="preserve">
     <value>Intializing 365Mapper</value>
   </data>
   <data name="LoginFailed" xml:space="preserve">
     <value>Either credentials not valid or your IT admin has not granted 365 Access to 365Mapper app</value>
+    <comment>Message1: Sign In failed    Message 2: Tenancy access failed, please contact your IT department</comment>
   </data>
   <data name="About" xml:space="preserve">
     <value>About: </value>
   </data>
   <data name="Copyright" xml:space="preserve">
-    <value>© Identity Experts Software Ltd.</value>
+    <value>© Identity Experts Software Limited</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Version: </value>
   </data>
   <data name="DriveDetailsFound" xml:space="preserve">
     <value>Drive details fetched from IE licensing server</value>
+    <comment>Pending</comment>
   </data>
   <data name="LicenseFoundOK" xml:space="preserve">
-    <value>Your license information found OK</value>
+    <value>Licence validated</value>
   </data>
   <data name="MappingDrives" xml:space="preserve">
     <value>Mapping drives....</value>
   </data>
   <data name="AllDrivesMapped" xml:space="preserve">
-    <value>All drives mapped</value>
+    <value>{0} drives mapped</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
@@ -190,79 +193,80 @@
     <value>Exit</value>
   </data>
   <data name="ExitSure" xml:space="preserve">
-    <value>Exiting application will unmap (if any) all mapped drives, are you sure you want to exit application? </value>
+    <value>Exiting application will unmap 365Mapper drives, are you sure?</value>
   </data>
   <data name="GettingoneDriveUrl" xml:space="preserve">
-    <value>OneDrive for business found to be mapped, getting its url...</value>
+    <value>Getting OneDrive for Business URL</value>
   </data>
   <data name="DotNetVersion" xml:space="preserve">
     <value>.NET Version</value>
   </data>
   <data name="EnsuringInternet" xml:space="preserve">
-    <value>Ensuring internet access..</value>
+    <value>Checking connectivity</value>
   </data>
   <data name="EnsuringwebClient" xml:space="preserve">
-    <value>Ensuring webClient service is running or not..</value>
+    <value>Checking WebClient service is running</value>
   </data>
   <data name="InternetConnection" xml:space="preserve">
     <value>Internet</value>
   </data>
   <data name="LicenseCouldNotVerified" xml:space="preserve">
-    <value>We could not verify the license details, 365Mapper will attempt again in few seconds</value>
+    <value>Unable to verify the licence details, retrying...</value>
   </data>
   <data name="LicenseExpired" xml:space="preserve">
-    <value>Licenses expired or exceeded limit. Contact IT team.</value>
+    <value>Licences expired or exceeded, please contact your IT department</value>
   </data>
   <data name="LicenseValidationFailed" xml:space="preserve">
-    <value>License Validation Failed</value>
+    <value>Licence validation failed, retrying...</value>
   </data>
   <data name="Nodotnet45" xml:space="preserve">
-    <value>We need .NET framework 4.5 or higher to proceed.</value>
+    <value>.NET framework 4.5 or higher required</value>
   </data>
   <data name="NoInternet" xml:space="preserve">
-    <value>Oops! looks like you don't have working internet connection, waiting to get back...</value>
+    <value>No internet connectivity found</value>
   </data>
   <data name="webClient" xml:space="preserve">
     <value>WebClient Service</value>
   </data>
   <data name="webClientNotRunning" xml:space="preserve">
-    <value>WebClient service is not running, click here for help starting it.</value>
+    <value>WebClient service is not running, click here for help starting it</value>
   </data>
   <data name="AuthenticationTypeNotSupported" xml:space="preserve">
-    <value>We do not support the authentication type set to your office 365 tenancy. please check with Identity Experts support team.</value>
+    <value>365mapper does not support the authentication method used by your Office 365 tenancy</value>
   </data>
   <data name="Federation" xml:space="preserve">
     <value>Authentication Method</value>
   </data>
   <data name="SignoutSure" xml:space="preserve">
-    <value>Signing out application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?</value>
+    <value>Signing out will unmap 365Mapper drives, are you sure?</value>
   </data>
   <data name="SignOut" xml:space="preserve">
-    <value>Signout</value>
+    <value>Sign out</value>
   </data>
   <data name="webClientHelp" xml:space="preserve">
-    <value>Steps to automate WebClient service and start it{0}{0}
+    <value>How to automate and start the WebClient service{0}{0}
 
 1. Click Start, click in the Start Search box, type services.msc, and then press ENTER.{0}
 2. Optionally, export and save a list of the existing settings. To do this, right-click Services, select Export List, and save the settings list.{0}
 3. In the details pane, right-click the service that you want to configure, and then click Properties.{0}
 4. On the General tab, in Startup type, click Automatic.{0}
 5. Click on Start button to start it.{0}
-6. click OK</value>
+6. Click OK</value>
   </data>
   <data name="License" xml:space="preserve">
-    <value>License</value>
+    <value>Licence</value>
   </data>
   <data name="LicenseActivatedFirstTime" xml:space="preserve">
-    <value>Your license has been activated.</value>
+    <value>Your licence has been activated.</value>
+    <comment>Commented, not used anymore</comment>
   </data>
   <data name="LicenseValidationFailedHeading" xml:space="preserve">
-    <value>Failed to License</value>
+    <value>Licence error</value>
   </data>
   <data name="TenancyNotRegistered" xml:space="preserve">
-    <value>You need to register at Identity Experts to get started with 365Mapper.</value>
+    <value>Your Office 365 tenancy is not registered with 365Mapper</value>
   </data>
   <data name="LicenseActivationFailed" xml:space="preserve">
-    <value>License activation or verification failed ({0}).</value>
+    <value>Licence activation or verification failed ({0}).</value>
   </data>
 </root>

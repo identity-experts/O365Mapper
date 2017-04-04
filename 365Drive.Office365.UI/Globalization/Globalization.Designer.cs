@@ -70,7 +70,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All drives mapped.
+        ///   Looks up a localized string similar to {0} drives mapped.
         /// </summary>
         public static string AllDrivesMapped {
             get {
@@ -79,7 +79,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We do not support the authentication type set to your office 365 tenancy. please check with Identity Experts support team..
+        ///   Looks up a localized string similar to 365mapper does not support the authentication method used by your Office 365 tenancy.
         /// </summary>
         public static string AuthenticationTypeNotSupported {
             get {
@@ -97,7 +97,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to © Identity Experts Software Ltd..
+        ///   Looks up a localized string similar to © Identity Experts Software Limited.
         /// </summary>
         public static string Copyright {
             get {
@@ -133,7 +133,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Credentials not present, please authenticate to proceed..
+        ///   Looks up a localized string similar to Please sign in to continue.
         /// </summary>
         public static string CredentialNotPresent {
             get {
@@ -142,7 +142,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Credential.
+        ///   Looks up a localized string similar to Sign In.
         /// </summary>
         public static string credentials {
             get {
@@ -151,7 +151,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Credentials present, moving to verify license.
+        ///   Looks up a localized string similar to Verifying licence.
         /// </summary>
         public static string CredentialsPresent {
             get {
@@ -178,7 +178,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please enter valid email address.
+        ///   Looks up a localized string similar to Please enter a valid email address.
         /// </summary>
         public static string emailvalidation {
             get {
@@ -187,7 +187,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ensuring credentials exist or not. If not, will propmt for it.
+        ///   Looks up a localized string similar to Validating credentials.
         /// </summary>
         public static string EnsuringCredential {
             get {
@@ -196,7 +196,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ensuring internet access...
+        ///   Looks up a localized string similar to Checking connectivity.
         /// </summary>
         public static string EnsuringInternet {
             get {
@@ -205,7 +205,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ensuring webClient service is running or not...
+        ///   Looks up a localized string similar to Checking WebClient service is running.
         /// </summary>
         public static string EnsuringwebClient {
             get {
@@ -223,7 +223,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exiting application will unmap (if any) all mapped drives, are you sure you want to exit application? .
+        ///   Looks up a localized string similar to Exiting application will unmap 365Mapper drives, are you sure?.
         /// </summary>
         public static string ExitSure {
             get {
@@ -241,7 +241,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fetching mappable drive details.
+        ///   Looks up a localized string similar to Fetching drive details.
         /// </summary>
         public static string GettingDriveDetails {
             get {
@@ -250,7 +250,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OneDrive for business found to be mapped, getting its url....
+        ///   Looks up a localized string similar to Getting OneDrive for Business URL.
         /// </summary>
         public static string GettingoneDriveUrl {
             get {
@@ -277,7 +277,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to License.
+        ///   Looks up a localized string similar to Licence.
         /// </summary>
         public static string License {
             get {
@@ -286,7 +286,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your license has been activated..
+        ///   Looks up a localized string similar to Your licence has been activated..
         /// </summary>
         public static string LicenseActivatedFirstTime {
             get {
@@ -295,7 +295,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to License activation or verification failed ({0})..
+        ///   Looks up a localized string similar to Licence activation or verification failed ({0})..
         /// </summary>
         public static string LicenseActivationFailed {
             get {
@@ -304,7 +304,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We could not verify the license details, 365Mapper will attempt again in few seconds.
+        ///   Looks up a localized string similar to Unable to verify the licence details, retrying....
         /// </summary>
         public static string LicenseCouldNotVerified {
             get {
@@ -313,7 +313,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Licenses expired or exceeded limit. Contact IT team..
+        ///   Looks up a localized string similar to Licences expired or exceeded, please contact your IT department.
         /// </summary>
         public static string LicenseExpired {
             get {
@@ -322,7 +322,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your license information found OK.
+        ///   Looks up a localized string similar to Licence validated.
         /// </summary>
         public static string LicenseFoundOK {
             get {
@@ -331,7 +331,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to License Validation Failed.
+        ///   Looks up a localized string similar to Licence validation failed, retrying....
         /// </summary>
         public static string LicenseValidationFailed {
             get {
@@ -340,7 +340,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to License.
+        ///   Looks up a localized string similar to Licence error.
         /// </summary>
         public static string LicenseValidationFailedHeading {
             get {
@@ -367,7 +367,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We need to authenticate to get started. Click here to authenticate..
+        ///   Looks up a localized string similar to Please click here to Sign in.
         /// </summary>
         public static string NocredMessage {
             get {
@@ -376,7 +376,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We need .NET framework 4.5 or higher to proceed..
+        ///   Looks up a localized string similar to .NET framework 4.5 or higher required.
         /// </summary>
         public static string Nodotnet45 {
             get {
@@ -385,7 +385,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oops! looks like you don&apos;t have working internet connection, waiting to get back....
+        ///   Looks up a localized string similar to No internet connectivity found.
         /// </summary>
         public static string NoInternet {
             get {
@@ -394,7 +394,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Password cannot be blank.
+        ///   Looks up a localized string similar to Please enter your password.
         /// </summary>
         public static string passwordcannotbeblank {
             get {
@@ -412,7 +412,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Signout.
+        ///   Looks up a localized string similar to Sign out.
         /// </summary>
         public static string SignOut {
             get {
@@ -421,7 +421,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Signing out application will unmap all mapped drives and clear all locally saved settings, are you sure you want to signout?.
+        ///   Looks up a localized string similar to Signing out will unmap 365Mapper drives, are you sure?.
         /// </summary>
         public static string SignoutSure {
             get {
@@ -430,7 +430,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save.
+        ///   Looks up a localized string similar to Sign in.
         /// </summary>
         public static string Submit {
             get {
@@ -439,7 +439,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You need to register at Identity Experts to get started with 365Mapper..
+        ///   Looks up a localized string similar to Your Office 365 tenancy is not registered with 365Mapper.
         /// </summary>
         public static string TenancyNotRegistered {
             get {
@@ -466,14 +466,14 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Steps to automate WebClient service and start it{0}{0}
+        ///   Looks up a localized string similar to How to automate and start the WebClient service{0}{0}
         ///
         ///1. Click Start, click in the Start Search box, type services.msc, and then press ENTER.{0}
         ///2. Optionally, export and save a list of the existing settings. To do this, right-click Services, select Export List, and save the settings list.{0}
         ///3. In the details pane, right-click the service that you want to configure, and then click Properties.{0}
         ///4. On the General tab, in Startup type, click Automatic.{0}
         ///5. Click on Start button to start it.{0}
-        ///6. [rest of string was truncated]&quot;;.
+        ///6.  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string webClientHelp {
             get {
@@ -482,7 +482,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WebClient service is not running, click here for help starting it..
+        ///   Looks up a localized string similar to WebClient service is not running, click here for help starting it.
         /// </summary>
         public static string webClientNotRunning {
             get {

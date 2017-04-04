@@ -12,6 +12,10 @@ namespace _365Drive.Office365
         /// Registry constants
         /// </summary>
         public const string registryRoot = @"software\Identity Experts\365Drive";
+
+        public const string fileUploadLimitKey = @"SYSTEM\CurrentControlSet\Services\WebClient\Parameters";
+        public const string enableLinkedConnectionsKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+
         public const string mappingregKey = @"mappings";
         public const string exeName = "365Drive.Office365.NotificationManager.exe";
         public const string regStartupAppName = "365Drive";

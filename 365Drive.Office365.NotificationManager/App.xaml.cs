@@ -49,6 +49,12 @@ namespace _365Drive.Office365.NotificationManager
         protected override void OnExit(ExitEventArgs e)
         {
             notifyIcon.Dispose(); //the icon would clean up automatically, but this is cleaner
+
+            //make sure IE thing are cleaned 
+            _365Drive.Office365.CloudConnector.DriveManager.unmapAllDrives();
+            _365Drive.Office365.CloudConnector.DriveManager.clearCookies();
+
+            //finally exit
             base.OnExit(e);
         }
     }

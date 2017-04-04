@@ -53,6 +53,10 @@
       <Project>{6e11fc57-7171-4860-b0d2-9bf5ec4e3d2e}</Project>
       <Name>365Drive.Office365.LogManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.RegistryManager\365Drive.Office365.RegistryManager.csproj">
+      <Project>{991255a3-816f-4c88-9d55-21909ea37874}</Project>
+      <Name>365Drive.Office365.RegistryManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

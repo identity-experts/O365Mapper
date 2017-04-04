@@ -439,9 +439,9 @@ namespace _365Drive.Office365
                     LogManager.Verbose("License first time activated");
                     currentDispatcher.Invoke(() =>
                     {
-                        Communications.updateStatus(Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage);
+                        //Communications.updateStatus(Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage);
                     });
-                    NotificationManager.NotificationManager.notify(Globalization.License, Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage, ToolTipIcon.Info);
+                    //NotificationManager.NotificationManager.notify(Globalization.License, Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage, ToolTipIcon.Info);
                     //set it to running
                     Communications.CurrentState = States.Running;
                 }

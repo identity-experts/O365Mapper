@@ -163,6 +163,29 @@ namespace _365Drive.Office365
         }
 
         /// <summary>
+        /// Admin settings (One time)
+        /// </summary>
+        public static void ConfigRegistry()
+        {
+
+            try
+            {
+                //set file size limit
+                RegistryKey fileUploadLimitKey = Registry.LocalMachine.OpenSubKey(Constants.fileUploadLimitKey, RegistryKeyPermissionCheck.ReadWriteSubTree);
+                fileUploadLimitKey.SetValue("FileSizeLimitInBytes", unchecked((int)0xffffffff), RegistryValueKind.DWord);
+
+                //set file size limit
+                RegistryKey enableLinkedConnectionsKey = Registry.LocalMachine.OpenSubKey(Constants.enableLinkedConnectionsKey, RegistryKeyPermissionCheck.ReadWriteSubTree);
+                enableLinkedConnectionsKey.SetValue("EnableLinkedConnections", unchecked((int)0x00000001), RegistryValueKind.DWord);
+            }
+            catch (Exception ex)
+            {
+                //ignore
+            }
+
+        }
+
+        /// <summary>
         /// incase if its Dev environment, we can use below method to set hardcoded values.
         /// </summary>
         public static void SetDevEnvironmnet()
