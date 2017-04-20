@@ -60,7 +60,7 @@ namespace _365Drive.Office365.CloudConnector
     /// </summary>
     public class ActivationResult
     {
-        public bool activated { get; set; }
+        public string activated { get; set; }
         public string message { get; set; }
 
         //incase of error
@@ -74,6 +74,66 @@ namespace _365Drive.Office365.CloudConnector
     {
         public static string lastActivationMessage { get; set; }
 
+        /// <summary>
+        /// Last checked time
+        /// </summary>
+        public static DateTime? lastLicenseChecked { get; set; }
+
+        public static bool licenseCheckTimeNow
+        {
+            get
+            {
+                if (lastLicenseChecked == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    TimeSpan diff = DateTime.Now - Convert.ToDateTime(lastLicenseChecked);
+                    double hours = diff.TotalHours;
+                    if (hours < Constants.localLicenseCheckLimit)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Last checked time
+        /// </summary>
+        public static DateTime? lastDriveFetched { get; set; }
+
+        public static bool driveFetchTimeNow
+        {
+            get
+            {
+                if (lastDriveFetched == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    TimeSpan diff = DateTime.Now - Convert.ToDateTime(lastDriveFetched);
+                    double hours = diff.TotalHours;
+                    if (hours < Constants.localDriveFetchLimit)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+
         public static LicenseValidationState isLicenseValid(string tenancyName, string userName, CookieContainer userCookies)
         {
 
@@ -83,21 +143,6 @@ namespace _365Drive.Office365.CloudConnector
             {
                 if (!Utility.ready())
                     return LicenseValidationState.CouldNotVerify;
-
-                //Only check after every fixed hours
-                var lastLicensechecked = RegistryManager.Get(RegistryKeys.LastLicenseChecked);
-                if (lastLicensechecked != null)
-                {
-                    long lastChecked = 0;
-                    if (long.TryParse(lastLicensechecked, out lastChecked))
-                    {
-                        DateTime LicenseChecked = new DateTime(lastChecked);
-                        TimeSpan diff = DateTime.Now - LicenseChecked;
-                        double hours = diff.TotalHours;
-                        if (hours < Constants.licenseCheckInterval)
-                            return LicenseValidationState.Ok;
-                    }
-                }
 
                 ///Get the license key, email and status of license for given user
                 string licensingusermappingUrl = String.Format(Constants.licenseuserMappingUrl, Constants.licensingBaseDomain, Constants.ieUserMappingApiCode, tenancyName, userName);
@@ -119,11 +164,14 @@ namespace _365Drive.Office365.CloudConnector
 
                 LicenseUserMappingResult userLicenseMapresult = JsonConvert.DeserializeObject<LicenseUserMappingResult>(licenseUserMappingResult);
 
+                ///set the last checked time 
+                lastLicenseChecked = DateTime.Now;
+
                 //if we get the key, proceed or check for why its failed
                 if (userLicenseMapresult.success)
                 {
                     string uniqueMachineID = ThumbPrint.Value();
-                    string licenseStatusUrl = String.Format(Constants.activationUrl, Constants.licensingBaseDomain, Constants.activationApiCode, encode(userLicenseMapresult.data.email), userLicenseMapresult.data.key, Constants.statusRequestName, encode(Constants.ie365MapperProductName), uniqueMachineID, encode(userName), System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                    string licenseStatusUrl = String.Format(Constants.statusCheckUrl, Constants.licensingBaseDomain, Constants.activationApiCode, encode(userLicenseMapresult.data.email), userLicenseMapresult.data.key, Constants.statusRequestName, encode(Constants.ie365MapperProductName), uniqueMachineID, encode(userName), System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
                     //check the license status 
                     LogManager.Verbose("Checking license status url (html encoded): " + licenseStatusUrl);
 
@@ -132,9 +180,10 @@ namespace _365Drive.Office365.CloudConnector
                     licensestatusCheckresult.Wait();
 
                     LicenseCheckResult licenseCheckResult = JsonConvert.DeserializeObject<LicenseCheckResult>(licensestatusCheckresult.Result);
+
                     if (licenseCheckResult.status_check == "inactive")
                     {
-                        string licenseActivationUrl = String.Format(Constants.activationUrl, Constants.licensingBaseDomain, Constants.activationApiCode, encode(userLicenseMapresult.data.email), userLicenseMapresult.data.key, Constants.activationRequestName, encode(Constants.ie365MapperProductName), uniqueMachineID, encode(userName), System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                        string licenseActivationUrl = String.Format(Constants.activationUrl, Constants.licensingBaseDomain, Constants.activationApiCode, encode(userLicenseMapresult.data.email), userLicenseMapresult.data.key, Constants.activationRequestName, encode(Constants.ie365MapperProductName), uniqueMachineID, encode(userName), System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(), tenancyName);
                         //check the license status 
                         LogManager.Verbose("Activating license status url (html encoded): " + licenseActivationUrl);
 
@@ -144,7 +193,7 @@ namespace _365Drive.Office365.CloudConnector
 
                         //activation result 
                         ActivationResult activationResult = JsonConvert.DeserializeObject<ActivationResult>(licenseActivationCheckresult.Result);
-                        if (activationResult.activated)
+                        if (activationResult.activated == "true")
                         {
                             lastActivationMessage = activationResult.message;
                             RegistryManager.Set(RegistryKeys.LastLicenseChecked, DateTime.Now.Ticks.ToString());
@@ -192,6 +241,23 @@ namespace _365Drive.Office365.CloudConnector
             {
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);
+
+                //Only check after every fixed hours
+                var lastLicensechecked = RegistryManager.Get(RegistryKeys.LastLicenseChecked);
+                if (lastLicensechecked != null)
+                {
+                    long lastChecked = 0;
+                    if (long.TryParse(lastLicensechecked, out lastChecked))
+                    {
+                        DateTime LicenseChecked = new DateTime(lastChecked);
+                        TimeSpan diff = DateTime.Now - LicenseChecked;
+                        double hours = diff.TotalHours;
+                        if (hours < Constants.licenseCheckInterval)
+                            return LicenseValidationState.Ok;
+                        else
+                            return LicenseValidationState.CouldNotVerify;
+                    }
+                }
             }
             return licenseState;
         }
@@ -201,7 +267,7 @@ namespace _365Drive.Office365.CloudConnector
         /// </summary>
         /// <param name="encodeString"></param>
         /// <returns></returns>
-        static string encode(string encodeString)
+        public static string encode(string encodeString)
         {
             return WebUtility.UrlEncode(encodeString);
         }
@@ -310,77 +376,83 @@ namespace _365Drive.Office365.CloudConnector
                 //Prio 3:
                 else
                 {
-                    ///Get the license key, email and status of license for given user
 
-                    string tenancyName = RegistryManager.Get(RegistryKeys.TenancyName);
-                    string licensingusermappingUrl = String.Format(Constants.retrieveDriveMappingsUrl, Constants.licensingBaseDomain, Constants.ieDriveDetailsApiCode, tenancyName);
-                    LogManager.Verbose("Get the details about license : " + licensingusermappingUrl);
-
-                    //poll end cookie container
-                    CookieContainer userMappingCookieContainer = new CookieContainer();
-                    string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
-                    string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
-                    userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("FedAuth", encode(fedAuth)));
-                    userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("rtFA", encode(rtFA)));
-
-
-                    //get the initial license details
-                    Task<string> call1Result = HttpClientHelper.GetAsync(licensingusermappingUrl, userMappingCookieContainer);
-                    call1Result.Wait();
-
-                    string licenseUserMappingResult = call1Result.Result;
-
-                    DriveMappingDetailsResult userLicenseMapresult = JsonConvert.DeserializeObject<DriveMappingDetailsResult>(licenseUserMappingResult);
-                    if (userLicenseMapresult.data.Count > 0)
+                    //is it time to re-populate? lets see
+                    if (driveFetchTimeNow || DriveManager.mappableDrives.Count == 0)
                     {
-                        foreach (DriveMappingDetail drive in userLicenseMapresult.data)
+                        ///Get the license key, email and status of license for given user
+
+                        string tenancyName = RegistryManager.Get(RegistryKeys.TenancyName);
+                        string licensingusermappingUrl = String.Format(Constants.retrieveDriveMappingsUrl, Constants.licensingBaseDomain, Constants.ieDriveDetailsApiCode, tenancyName);
+                        LogManager.Verbose("Get the details about license : " + licensingusermappingUrl);
+
+                        //poll end cookie container
+                        CookieContainer userMappingCookieContainer = new CookieContainer();
+                        string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
+                        string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
+                        userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("FedAuth", encode(fedAuth)));
+                        userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("rtFA", encode(rtFA)));
+
+
+                        //get the initial license details
+                        Task<string> call1Result = HttpClientHelper.GetAsync(licensingusermappingUrl, userMappingCookieContainer);
+                        call1Result.Wait();
+
+                        string licenseUserMappingResult = call1Result.Result;
+
+                        DriveMappingDetailsResult userLicenseMapresult = JsonConvert.DeserializeObject<DriveMappingDetailsResult>(licenseUserMappingResult);
+                        if (userLicenseMapresult.data.Count > 0)
                         {
-                            string driveLetter = drive.drive_letter;
-                            string driveUrl = drive.drive_url;
-                            string driveName = drive.drive_label;
-                            driveState driveState = driveState.Active;
-                            if (drive.drive_deleted == "1")
-                                driveState = driveState.Deleted;
-                            driveType driveType = getDriveType(driveUrl);
-
-
-                            if (driveType == driveType.DocLib)
+                            foreach (DriveMappingDetail drive in userLicenseMapresult.data)
                             {
-                                Uri uriResult;
-                                bool isValidUrl = Uri.TryCreate(driveUrl, UriKind.Absolute, out uriResult)
-                                    && uriResult.Scheme == Uri.UriSchemeHttps;
-                                if (isValidUrl)
+                                string driveLetter = drive.drive_letter;
+                                string driveUrl = drive.drive_url;
+                                string driveName = drive.drive_label;
+                                driveState driveState = driveState.Active;
+                                if (drive.drive_deleted == "1")
+                                    driveState = driveState.Deleted;
+                                driveType driveType = getDriveType(driveUrl);
+
+
+                                if (driveType == driveType.DocLib)
                                 {
-                                    DriveManager.addDrive(driveLetter, driveName, uriResult.ToString(), driveState, driveType);
+                                    Uri uriResult;
+                                    bool isValidUrl = Uri.TryCreate(driveUrl, UriKind.Absolute, out uriResult)
+                                        && uriResult.Scheme == Uri.UriSchemeHttps;
+                                    if (isValidUrl)
+                                    {
+                                        DriveManager.addDrive(driveLetter, driveName, uriResult.ToString(), driveState, driveType);
+                                    }
+                                }
+                                else if (driveType == driveType.OneDrive)
+                                {
+                                    DriveManager.addDrive(driveLetter, driveName, string.Empty, driveState, driveType);
+                                }
+                                else if (driveType == driveType.SharePoint)
+                                {
+                                    string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
+                                    DriveManager.addDrive(driveLetter, driveName, rootSitedocLibUrl, driveState, driveType);
                                 }
                             }
-                            else if (driveType == driveType.OneDrive)
-                            {
-                                DriveManager.addDrive(driveLetter, driveName, string.Empty, driveState, driveType);
-                            }
-                            else if (driveType == driveType.SharePoint)
-                            {
-                                string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
-                                DriveManager.addDrive(driveLetter, driveName, rootSitedocLibUrl, driveState, driveType);
-                            }
                         }
-                    }
 
-                    //Last: Get value from users' profile and Priority 3: get from app value
-                    else
-                    {
-                        //Call to Azure AD, user profile and registry to fetch and populate drive
+                        //Last: Get value from users' profile and Priority 3: get from app value
+                        else
+                        {
+                            //Call to Azure AD, user profile and registry to fetch and populate drive
 
-                        //for now hardcoding
-                        string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
+                            //for now hardcoding
+                            string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
 
-                        //Add this to mappable drives
-                        LogManager.Verbose("Adding default site to mappable drive. Url: " + rootSitedocLibUrl);
-                        DriveManager.addDrive("S", "SharePoint", rootSitedocLibUrl);
-                        DriveManager.addDrive("O", "OneDrive", string.Empty, driveType.OneDrive);
+                            //Add this to mappable drives
+                            LogManager.Verbose("Adding default site to mappable drive. Url: " + rootSitedocLibUrl);
+                            DriveManager.addDrive("S", "SharePoint", rootSitedocLibUrl);
+                            DriveManager.addDrive("O", "OneDrive", string.Empty, driveType.OneDrive);
 
-                        //ONLY FOR TESTING HARDCODED VALUE
-                        //DriveManager.addDrive("M", "Map2", "https://gloiretech.sharepoint.com/Map2");
+                            //ONLY FOR TESTING HARDCODED VALUE
+                            //DriveManager.addDrive("M", "Map2", "https://gloiretech.sharepoint.com/Map2");
+                        }
+                        lastDriveFetched = DateTime.Now;
                     }
                 }
             }

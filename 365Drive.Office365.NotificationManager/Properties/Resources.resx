@@ -122,16 +122,19 @@
     <value>..\Resources\Hang.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="IE_ProgressAnimation1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\IE-ProgressAnimation1.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Resources\IE_ProgressAnimation1.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="IE_ProgressAnimation11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\IE_ProgressAnimation1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="IE_ProgressAnimation2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\IE-ProgressAnimation2.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Resources\IE_ProgressAnimation2.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="IE_ProgressAnimation3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\IE-ProgressAnimation3.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Resources\IE_ProgressAnimation3.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="IE_ProgressAnimation4" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\IE-ProgressAnimation4.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Resources\IE_ProgressAnimation4.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Wait1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Wait1.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -143,6 +146,6 @@
     <value>..\Resources\Wait3.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="_365Drive" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\365Drive.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Resources\_365Drive.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

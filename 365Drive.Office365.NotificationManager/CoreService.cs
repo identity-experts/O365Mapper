@@ -21,6 +21,10 @@ namespace _365Drive.Office365
     public class Core
     {
 
+        /// <summary>
+        /// Instance of current class, so the ticker can be initiated from signin form
+        /// </summary>
+        public static Core coreInstance;
 
         /// <summary>
         /// Global settings / variables
@@ -68,6 +72,9 @@ namespace _365Drive.Office365
                 //initialize icon timer
                 iconTimer = new DispatcherTimer();
                 currentDispatcher = Dispatcher.CurrentDispatcher;
+
+                //set the static variable to this
+                coreInstance = this;
 
             }
             catch (Exception ex)
@@ -388,7 +395,7 @@ namespace _365Drive.Office365
                 }
                 #endregion;
 
-          
+
 
                 #region getting cookies (used to setting in IE and authenticating for licensing)
                 //Get fedauth and rtfa cookies
@@ -544,7 +551,8 @@ namespace _365Drive.Office365
 
                 currentDispatcher.Invoke(() =>
                 {
-                    Communications.updateStatus(Globalization.AllDrivesMapped);
+                    var totalMappedDrives = DriveManager.mappableDrives.FindAll(d => d.Drivestate != driveState.Deleted).Count.ToString();
+                    Communications.updateStatus(string.Format(Globalization.AllDrivesMapped, totalMappedDrives));
                 });
                 #endregion
 

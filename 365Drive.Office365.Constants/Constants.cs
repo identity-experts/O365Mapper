@@ -30,7 +30,8 @@ namespace _365Drive.Office365
 
         #region licensing server
         public const string licensingBaseDomain = "http://admin.identityexperts.co.uk";
-        public const string activationUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}";
+        public const string statusCheckUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}";
+        public const string activationUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}&tenancy={9}";
         public const string activationApiCode = "am-software-api";
         public const string ieUserMappingApiCode = "user-key-mapping-api";
         public const string ieDriveDetailsApiCode = "ie-drive-mapping-details";
@@ -40,7 +41,9 @@ namespace _365Drive.Office365
         public const string licenseuserMappingUrl = "{0}?wc-api={1}&tenancy={2}&user={3}";
         public const string retrieveDriveMappingsUrl = "{0}?wc-api={1}&tenancy={2}";
         public const string softwareVersion = "0.0.12";
-        public const int licenseCheckInterval = 24;
+        public const int licenseCheckInterval = 120;
+        public const int localLicenseCheckLimit = 24;
+        public const int localDriveFetchLimit = 24;
         #endregion
 
     }

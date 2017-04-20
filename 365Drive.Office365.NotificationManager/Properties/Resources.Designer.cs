@@ -91,6 +91,16 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap IE_ProgressAnimation11 {
+            get {
+                object obj = ResourceManager.GetObject("IE_ProgressAnimation11", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon IE_ProgressAnimation2 {

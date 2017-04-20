@@ -124,7 +124,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Username.
+        ///   Looks up a localized string similar to Username (Email).
         /// </summary>
         public static string credential_username {
             get {

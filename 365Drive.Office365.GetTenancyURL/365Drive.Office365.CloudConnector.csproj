@@ -64,6 +64,9 @@
     <Compile Include="365DriveTenancyURL.cs" />
     <Compile Include="AADJWTToken.cs" />
     <Compile Include="CookieManager\AADConnect\AADConnectCookieManager.cs" />
+    <Compile Include="CookieManager\ADFS\SamlSecurityToken.cs" />
+    <Compile Include="CookieManager\ADFS\SharePointAuth.cs" />
+    <Compile Include="CookieManager\ADFS\SPOAuthCookies.cs" />
     <Compile Include="CookieManager\CloudIdentity\CloudIdentityCookieManager.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="CookieManager\CloudIdentity\WcfClientContracts.cs" />

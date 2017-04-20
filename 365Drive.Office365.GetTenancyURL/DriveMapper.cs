@@ -41,9 +41,16 @@ namespace _365Drive.Office365.CloudConnector
                 if (!string.IsNullOrEmpty(tenancyName))
                 {
                     LogManager.Verbose("call to license valid");
-                    LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName, userName,userCookies);
-                    LogManager.Verbose("license validation result: " + Convert.ToString(state));
-                    licenseMode = state;
+                    if (LicenseManager.licenseCheckTimeNow)
+                    {
+                        LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName, userName, userCookies);
+                        LogManager.Verbose("license validation result: " + Convert.ToString(state));
+                        licenseMode = state;
+                    }
+                    else
+                    {
+                        licenseMode = LicenseValidationState.Ok;
+                    }
                 }
                 else
                 {

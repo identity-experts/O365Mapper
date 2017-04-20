@@ -84,6 +84,9 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 LogManager.Verbose("Setting username password");
                 _365Drive.Office365.CredentialManager.SetCredentials(userName.Text, password.Password);
                 this.Close();
+
+                //restart the ticker
+                
             }
         }
 

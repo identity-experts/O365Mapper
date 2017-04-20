@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 using System.Security;
 using System.Collections;
 using System.Text;
+using System.Linq;
+
 namespace _365Drive.Office365.GetTenancyURL.LicenseHelper
 {
     /// <summary>
@@ -19,7 +21,26 @@ namespace _365Drive.Office365.GetTenancyURL.LicenseHelper
             {
                 fingerPrint = GetHash(cpuId() + biosId() + baseId());
             }
-            return fingerPrint;
+
+            string machineName = string.Empty, OSName = string.Empty;
+
+            try
+            {
+                //Get machine name which is easy to trace for admin
+                machineName = System.Environment.MachineName;
+
+                //get OS family name
+                var name = (from x in new ManagementObjectSearcher("SELECT Caption FROM Win32_OperatingSystem").Get().Cast<ManagementObject>()
+                            select x.GetPropertyValue("Caption")).FirstOrDefault();
+                OSName = name != null ? name.ToString() : "Unknown";
+            }
+            catch
+            {
+                //do nothing
+            }
+            string instance = machineName + "`;" + OSName + "`;" + fingerPrint;
+
+            return instance;
         }
         private static string GetHash(string s)
         {

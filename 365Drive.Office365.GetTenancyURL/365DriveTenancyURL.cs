@@ -1,4 +1,5 @@
 ﻿using _365Drive.Office365.GetTenancyURL;
+using _365Drive.Office365.GetTenancyURL.CookieManager;
 using CsQuery;
 using Newtonsoft.Json;
 using System;
@@ -43,6 +44,10 @@ namespace _365Drive.Office365.CloudConnector
                 else if (DriveManager.FederationType == FedType.AAD)
                 {
                     TenancyName = aadConnectTenancy(upn, password);
+                }
+                else if (DriveManager.FederationType == FedType.ADFS)
+                {
+                    TenancyName = adfsConnectTenancy(upn, password);
                 }
             }
 
@@ -128,7 +133,7 @@ namespace _365Drive.Office365.CloudConnector
                 MSloginpostHeader.Add("User-Agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729)");
                 MSloginpostHeader.Add("Host", "login.microsoftonline.com");
                 MSloginpostHeader.Add("Accept", "application/json");
-                Task<HttpResponseMessage> msLoginPostResponse = HttpClientHelper.PostAsyncFullResponse(StringConstants.AzureActivateUserStep2, MSloginpostData, "application/x-www-form-urlencoded", MSloginpostHeader);
+                Task<HttpResponseMessage> msLoginPostResponse = HttpClientHelper.PostAsyncFullResponse(StringConstants.AzureActivateUserStep2, MSloginpostData, "application/x-www-form-urlencoded", authorizeCookies, MSloginpostHeader);
                 msLoginPostResponse.Wait();
 
                 if (msLoginPostResponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
@@ -201,7 +206,7 @@ namespace _365Drive.Office365.CloudConnector
         }
 
         /// <summary>
-        /// Get tnancy url for cloud identity 
+        /// Get tnancy url for aad connect tenancy type
         /// </summary>
         /// <returns></returns>
         public static string aadConnectTenancy(string upn, string password)
@@ -428,325 +433,8 @@ namespace _365Drive.Office365.CloudConnector
 
                 LogManager.Verbose("office api call finished");
                 LogManager.Verbose("tenancy name: " + tenancyUniqueName + StringConstants.rootUrltobeReplacedWith);
-                tenancyUniqueName += tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
+                tenancyUniqueName = tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
 
-                //__________________________________________________________________________________________________
-                //using (var postBodyHandler = new HttpClientHandler() { CookieContainer = postBodyContainer })
-
-                //using (HttpClient request = new HttpClient(handler))
-                //{
-
-                //    LogManager.Verbose("Get request: " + String.Format(StringConstants.AzureActivateUserStep1, upn));
-                //    Task<HttpResponseMessage> response = request.GetAsync(String.Format(StringConstants.AzureActivateUserStep1, upn));
-                //    response.Wait();
-
-                //    if (response.Result.Content != null)
-                //    {
-
-                //        using (HttpContent content = response.Result.Content)
-                //        {
-                //            //read all cookies
-
-                //            // ... Read the string.
-                //            Task<string> result = content.ReadAsStringAsync();
-                //            authorizeCall = result.Result;
-                //            CQ htmlparser = CQ.Create(result.Result);
-                //            var items = htmlparser["input"];
-                //            foreach (var li in items)
-                //            {
-                //                if (li.Name == "ctx")
-                //                {
-                //                    ctx = li.Value;
-                //                }
-                //                if (li.Name == "flowToken")
-                //                {
-                //                    flowtoken = li.Value;
-                //                }
-                //            }
-                //        }
-
-                //    }
-                //}
-
-
-
-                //AAD connect 
-                //if (isItmodernAuth(call2result))
-                //{
-                // LogManager.Verbose("Its not a normal cloud auth. Moving for AAD connect auth as realM suggests its cloud identity, it must be Modern Auth");
-
-
-
-
-
-
-
-                //append cookies
-                //var cookieContainer = new CookieContainer();
-                //using (var pollHandler = new HttpClientHandler() { CookieContainer = cookieContainer })
-                ////call 2 again as per AAD connect
-                //using (HttpClient request = new HttpClient(pollHandler))
-                //{
-                //    Uri uri = new Uri(StringConstants.AzureActivateUserStep1);
-                //    IEnumerable<Cookie> responseCookies = authorizeCookies.GetCookies(uri).Cast<Cookie>();
-
-                //    foreach (Cookie cookie in responseCookies)
-                //    {
-                //        cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie(cookie.Name, cookie.Value));
-                //    }
-                //    cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
-                //    cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSSOTILES", "1"));
-                //    cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("AADSSOTILES", "1"));
-                //    cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSAUTHLIGHT", "+"));
-                //    cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSC", "00"));
-                //    //cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie("ESTSAUTHPERSISTENT", "AQABAAEAAADRNYRQ3dhRSrm-4K-adpCJR9-o-mKIab1XFlLX2Zww26R14c1SK-Gm5sq3ndf9emPSk_6z5Ib1YTUqKNPivt5mDP5aYI9p4W8XB4BsyERuUIFJH55ZCeL4swr2ahRa6i4S5_B_dNzRPl_UwMCrd1vwZ-LUntw681RRCn-v2gETJSAHYGPiq3erAZq1SI1Q8dA2BV8el8uQaH0_hKotDq11X9tsMwGBVHb4UGvr9cqen6UWS0uD2kTy9LNTvkljzOSvqEh4eHBH_u4Uns4_Zta2uVBTepCuHJj1d2wo2JdbIX350QlfqMqMSBWCe9xInHJhnidbz_FyBlivwxYUjXfstU8Lain_kZDJoFBl_Kek0CB5WlgGQtn1GxOIqDo6EVM4ljvSOMS9fbnDfUlWWKfMblPl5SlXPmJ5E0b5T_K4PdXO8YjU6lROwxXxdvXAVi3HFbwtDjqDGe_1HXDH6jaXgiVIm3QONQvuuC8IyIRE4KvVKvKGKYIh-gs_abvrVC0BRclt7kGmMIAcaLx41WNzxnsCjVf4ibTeXHpll5zXLa9ljdMnypVsH9LgMArcQe2F1zvwahexikfvuNE60CP9IAA"));
-                //    //cookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie("ESTSAUTH", "QVFBQkFBRUFBQURSTllSUTNkaFJTcm0tNEstYWRwQ0pCcnJLM3J0VzZrZzdZcURYdy1NeFZ0SHl4UVVXdmdaRVg5Ukg2NVZWejVhdk9EVExwLWFLV256UjVDdGdyOU1DTU13Zy15d0dFcDhNSE1NZDNyWldwQ0FB"));
-
-                //    //string aadPollpostData = String.Format(StringConstants.AADPollBody, Authorizeflowtoken, Authorizectx);
-                //    //LogManager.Verbose("Call AAD poll  postdata:" + aadPollpostData);
-                //    // request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
-
-                //    request.DefaultRequestHeaders.Add("canary", AuthorizeCanary);
-                //    request.DefaultRequestHeaders.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                //    request.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                //    request.DefaultRequestHeaders.Add("client-request-id", AuthorizeclientRequestID);
-                //    request.DefaultRequestHeaders.Add("Accept", "application/json");
-                //    request.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-                //    request.DefaultRequestHeaders.Add("hpgid", Authorizehpgid);
-                //    request.DefaultRequestHeaders.Add("hpgact", Authorizehpgact);
-                //    //request.DefaultRequestHeaders.Add("Content-Length", aadPollpostData.Length.ToString());
-
-
-                //    Task<HttpResponseMessage> response = request.PostAsync((StringConstants.dssoPoll), new StringContent(StringConstants.dssoPollBody, Encoding.UTF8, "application/json"));
-                //    response.Wait();
-
-                //    if (response.Result.Content != null)
-                //    {
-                //        using (HttpContent content = response.Result.Content)
-                //        {
-                //            Task<string> result = content.ReadAsStringAsync();
-                //            apiCanaryResponse apiCanaryResponse = JsonConvert.DeserializeObject<apiCanaryResponse>(result.Result);
-                //            dssoCanary = apiCanaryResponse.apiCanary;
-                //        }
-                //    }
-                //}
-
-                //append cookies
-                //var postBodyContainer = new CookieContainer();
-                //using (var postBodyHandler = new HttpClientHandler() { CookieContainer = postBodyContainer })
-                ////call 2 again as per AAD connect
-                //using (HttpClient postBodyrequest = new HttpClient(postBodyHandler))
-
-                //{
-
-                //    string call1Canary = getCanary2(authorizeCall);
-                //    string postData = String.Format(StringConstants.loginPostData, upn, password, Authorizectx, Authorizeflowtoken, call1Canary);
-                //    LogManager.Verbose("Call 3 postdata:" + postData);
-                //    // request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
-
-
-                //    //request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
-
-                //    Task<HttpResponseMessage> postCalresponse = postBodyrequest.PostAsync((StringConstants.loginPost), new StringContent(postData, Encoding.UTF8, "application/x-www-form-urlencoded"));
-                //    postCalresponse.Wait();
-
-                //    if (postCalresponse.Result.Content != null)
-                //    {
-                //        using (HttpContent content = postCalresponse.Result.Content)
-                //        {
-                //            Task<string> result = content.ReadAsStringAsync();
-                //            call3result = result.Result;
-                //            CQ htmlparser = CQ.Create(result.Result);
-                //            var items = htmlparser["input"];
-                //            foreach (var li in items)
-                //            {
-                //                if (li.Name == "ctx")
-                //                {
-                //                    if (!string.IsNullOrEmpty(li.Value))
-                //                        msPostCtx = li.Value;
-                //                }
-                //                if (li.Name == "flowToken")
-                //                {
-                //                    msPostFlow = li.Value;
-                //                }
-                //            }
-
-                //            msPostHpgact = getHPGact(call3result);
-                //            msPostHpgid = getHPGId(call3result);
-                //            msPostCanary = getapiCanary(call3result);
-
-                //        }
-                //    }
-                //}
-                //pollResponse pollStartresponse = new pollResponse();
-                //var pollCookies = new CookieContainer();
-                //using (var pollHandler = new HttpClientHandler() { CookieContainer = pollCookies })
-                ////call 2 again as per AAD connect
-                //using (HttpClient request = new HttpClient(pollHandler))
-                //{
-
-                //    string postData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
-                //    LogManager.Verbose("Call 3 postdata:" + postData);
-                //    // request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
-                //    Uri uri = new Uri(StringConstants.loginPost);
-                //    IEnumerable<Cookie> responseCookies = postBodyContainer.GetCookies(uri).Cast<Cookie>();
-
-                //    foreach (Cookie cookie in responseCookies)
-                //    {
-                //        pollCookies.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
-                //    }
-                //    pollCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
-                //    //pollCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSSOTILES", "1"));
-                //    //pollCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("AADSSOTILES", "1"));
-                //    //pollCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSAUTHLIGHT", "+"));
-                //    //pollCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSC", "00"));
-
-                //    request.DefaultRequestHeaders.Add("canary", msPostCanary);
-                //    request.DefaultRequestHeaders.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                //    request.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                //    request.DefaultRequestHeaders.Add("client-request-id", AuthorizeclientRequestID);
-                //    request.DefaultRequestHeaders.Add("Accept", "application/json");
-                //    request.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-                //    request.DefaultRequestHeaders.Add("hpgid", msPostHpgid);
-                //    request.DefaultRequestHeaders.Add("hpgact", msPostHpgact);
-
-                //    Task<HttpResponseMessage> response = request.PostAsync((StringConstants.AADPoll), new StringContent(postData, Encoding.UTF8, "application/json"));
-
-
-                //    response.Wait();
-
-                //    if (response.Result.Content != null)
-                //    {
-                //        using (HttpContent content = response.Result.Content)
-                //        {
-                //            Task<string> result = content.ReadAsStringAsync();
-                //            pollStartresponse = JsonConvert.DeserializeObject<pollResponse>(result.Result);
-                //            //AADJWTToken tokenresponse = JsonConvert.DeserializeObject<AADJWTToken>(result.Result);
-                //            //   var token = JsonConvert.SerializeObject( result.Result);
-                //            //access_token = tokenresponse.AccessToken;
-                //        }
-                //    }
-                //}
-
-                ////call 2 again as per AAD connect
-                //var pollendCookies = new CookieContainer();
-
-                //using (var pollHandler = new HttpClientHandler() { CookieContainer = pollendCookies })
-                //using (HttpClient request = new HttpClient(pollHandler))
-                //{
-
-                //    string postData = String.Format(StringConstants.AADPollEndBody, pollStartresponse.flowToken, pollStartresponse.ctx);
-                //    LogManager.Verbose("Call 3 postdata:" + postData);
-                //    // request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
-                //    Uri uri = new Uri(StringConstants.loginPost);
-                //    IEnumerable<Cookie> responseCookies = postBodyContainer.GetCookies(uri).Cast<Cookie>();
-
-                //    foreach (Cookie cookie in responseCookies)
-                //    {
-                //        pollendCookies.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
-                //    }
-                //    pollendCookies.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
-
-                //    request.DefaultRequestHeaders.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                //    request.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                //    request.DefaultRequestHeaders.Add("Accept", "application/json");
-                //    request.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-
-                //    Task<HttpResponseMessage> response = request.PostAsync((StringConstants.AADPollEnd), new StringContent(postData, Encoding.UTF8, "application/x-www-form-urlencoded"));
-
-
-                //    response.Wait();
-
-                //    if (response.Result.Content != null)
-                //    {
-                //        using (HttpContent content = response.Result.Content)
-                //        {
-                //            Task<string> result = content.ReadAsStringAsync();
-                //            //call2result = result.Result;
-
-                //            // Make sure its authenticated
-                //            if (response.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
-                //            {
-                //                //LogManager.Verbose("Login failed :(");
-                //                //return string.Empty;
-                //            }
-                //            // ... Read the string.
-
-                //            NameValueCollection qscoll = HttpUtility.ParseQueryString(response.Result.RequestMessage.RequestUri.Query);
-                //            if (qscoll.Count > 0)
-                //                code = qscoll[0];
-
-
-                //            //AADJWTToken tokenresponse = JsonConvert.DeserializeObject<AADJWTToken>(result.Result);
-                //            //   var token = JsonConvert.SerializeObject( result.Result);
-                //            //access_token = tokenresponse.AccessToken;
-                //        }
-                //    }
-                //}
-
-
-                //string access_token = string.Empty;
-                //using (HttpClient request = new HttpClient())
-                //{
-
-                //    string postData = String.Format(StringConstants.AzureActivationUserToken, code);
-                //    LogManager.Verbose("Call 3 postdata:" + postData);
-                //    // request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
-
-                //    Task<HttpResponseMessage> response = request.PostAsync((StringConstants.AzureActivateUserStep3), new StringContent(postData, Encoding.UTF8, "application/x-www-form-urlencoded"));
-
-
-                //    response.Wait();
-
-                //    if (response.Result.Content != null)
-                //    {
-                //        using (HttpContent content = response.Result.Content)
-                //        {
-                //            Task<string> result = content.ReadAsStringAsync();
-
-                //            AADJWTToken tokenresponse = JsonConvert.DeserializeObject<AADJWTToken>(result.Result);
-                //            //   var token = JsonConvert.SerializeObject( result.Result);
-                //            access_token = tokenresponse.AccessToken;
-                //        }
-                //    }
-                //}
-
-
-                //using (HttpClient request = new HttpClient())
-                //{
-                //    LogManager.Verbose("Call 3 url: " + String.Format(StringConstants.AzureActivateUserStep4, upn));
-                //    request.DefaultRequestHeaders.Add("authorization", "bearer " + access_token);
-                //    Task<HttpResponseMessage> response = request.GetAsync(String.Format(StringConstants.AzureActivateUserStep4, upn));
-                //    response.Wait();
-
-                //    if (response.Result.Content != null)
-                //    {
-                //        using (HttpContent content = response.Result.Content)
-                //        {
-                //            Task<string> result = content.ReadAsStringAsync();
-                //            MysiteResponse tokenresponse = JsonConvert.DeserializeObject<MysiteResponse>(result.Result);
-                //            string rootSiteURL = tokenresponse.value.FirstOrDefault(u => (u.entityKey.ToLower().Contains(StringConstants.rootUrlFinder))).serviceResourceId;
-
-                //            string rootSitedocLibUrl = rootSiteURL.EndsWith("/") ? rootSiteURL + "Shared Documents" : rootSiteURL + "/Shared Documents";
-
-                //            //as this is going to be needed at many places, we will save it 
-                //            DriveManager.rootSiteUrl = rootSiteURL;
-
-                //            if (!string.IsNullOrEmpty(rootSiteURL))
-                //            {
-                //                Uri url = new Uri(rootSiteURL);
-                //                tenancyUniqueName = url.Host.ToLower().Replace(StringConstants.rootUrltobeRemoved, "");
-                //            }
-
-                //            //Set onedrive host
-                //            DriveManager.oneDriveHostSiteUrl = "https://" + tenancyUniqueName + "-my.sharepoint.com";
-                //        }
-                //    }
-                //}
-
-                //LogManager.Verbose("Call 4 finished");
-                //LogManager.Verbose("tenancy name: " + tenancyUniqueName + StringConstants.rootUrltobeReplacedWith);
-                //tenancyUniqueName += tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
             }
 
             catch (Exception ex)
@@ -758,6 +446,130 @@ namespace _365Drive.Office365.CloudConnector
             return tenancyUniqueName;
 
         }
+
+
+        public static string adfsConnectTenancy(string upn, string password)
+        {
+            string tenancyUniqueName = string.Empty;
+            try
+            {
+                //are we ready?
+                if (!Utility.ready())
+                    return string.Empty;
+
+
+                //ADFS tenancy name get code goes here
+
+                CookieContainer authorizeCookies = new CookieContainer();
+
+                ///Making call 1, this will be an initial call to microsoftonline to get the apiCananary, flow and ctx values
+                LogManager.Verbose("Get request: " + String.Format(StringConstants.AzureActivateUserStep1, upn, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri));
+                string call1Url = String.Format(StringConstants.AzureActivateUserStep1, upn, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri);
+                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, authorizeCookies);
+                call1Result.Wait();
+                string authorizeCall = call1Result.Result;
+
+
+                ////retrieving ctx
+                string MSctx = string.Empty, flowToken = string.Empty, canary = string.Empty;
+                CQ msPOSTcq = CQ.Create(authorizeCall);
+                var msPOSTcqItems = msPOSTcq["input"];
+                foreach (var li in msPOSTcqItems)
+                {
+                    if (li.Name == "ctx")
+                    {
+                        if (!string.IsNullOrEmpty(li.Value))
+                            MSctx = li.Value;
+                    }
+                }
+
+
+                //call 2 ADFS
+                //string adfsPostUrl = string.Format(StringConstants.AdfsPost, DriveManager.ADFSAuthURL, upn, MSctx);
+                string adfsPostUrl = DriveManager.ADFSAuthURL+ MSctx;
+                string adfsPostBody = string.Format(StringConstants.AdfsPostBody, upn, password);
+                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(adfsPostUrl, adfsPostBody, "application/x-www-form-urlencoded", authorizeCookies);
+                adfsloginPostBodyResult.Wait();
+
+
+                //retrieving rst
+                string rst = string.Empty;
+                CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                var adfsPostResponseItems = adfsPostResponse["input"];
+                foreach (var li in adfsPostResponseItems)
+                {
+                    if (li.Name == "wresult")
+                    {
+                        if (!string.IsNullOrEmpty(li.Value))
+                            rst = li.Value;
+                    }
+                }
+
+                string authCode = string.Empty, accessToken = string.Empty;
+                //post rst to microsoft
+                string strrstPostBody = string.Format(StringConstants.ADFSrstPostBody,LicenseManager.encode(rst),MSctx);
+                Task<HttpResponseMessage> ADFSrstPostResult = HttpClientHelper.PostAsyncFullResponse(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", authorizeCookies,new NameValueCollection());
+                ADFSrstPostResult.Wait();
+
+                NameValueCollection pollEndRedirect = HttpUtility.ParseQueryString(ADFSrstPostResult.Result.RequestMessage.RequestUri.Query);
+                if (pollEndRedirect.Count > 0)
+                    authCode = pollEndRedirect[0];
+
+                LogManager.Verbose("Poll end call finished. Code: " + authCode);
+
+                //get access token from auth code
+                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, StringConstants.clientSecret, StringConstants.appRedirectURL, StringConstants.appResourceUri);
+                LogManager.Verbose("Access Token postdata:" + accessTokenpostData);
+
+                Task<String> accessTokenResponse = HttpClientHelper.PostAsync((StringConstants.AzureActivateUserStep3), accessTokenpostData, "application/x-www-form-urlencoded");
+                accessTokenResponse.Wait();
+                AADJWTToken tokenresponse = JsonConvert.DeserializeObject<AADJWTToken>(accessTokenResponse.Result);
+                accessToken = tokenresponse.AccessToken;
+                LogManager.Verbose("Access Token received:" + accessToken);
+
+                //get the tenancy URL
+                LogManager.Verbose("heading for get defaultURL call: " + String.Format(StringConstants.AzureActivateUserStep4, upn));
+                NameValueCollection officeAPICallHeader = new NameValueCollection();
+                officeAPICallHeader.Add("authorization", "bearer " + accessToken);
+                Task<string> officeAPIcallResponse = HttpClientHelper.GetAsync(String.Format(StringConstants.AzureActivateUserStep4, upn), officeAPICallHeader);
+                officeAPIcallResponse.Wait();
+
+                MysiteResponse userSiteResponse = JsonConvert.DeserializeObject<MysiteResponse>(officeAPIcallResponse.Result);
+                string rootSiteURL = userSiteResponse.value.FirstOrDefault(u => (u.entityKey.ToLower().Contains(StringConstants.rootUrlFinder))).serviceResourceId;
+
+                string rootSitedocLibUrl = rootSiteURL.EndsWith("/") ? rootSiteURL + "Shared Documents" : rootSiteURL + "/Shared Documents";
+
+                //as this is going to be needed at many places, we will save it 
+                DriveManager.rootSiteUrl = rootSiteURL;
+                RegistryManager.Set(RegistryKeys.RootSiteUrl, DriveManager.rootSiteUrl);
+
+                if (!string.IsNullOrEmpty(rootSiteURL))
+                {
+                    Uri url = new Uri(rootSiteURL);
+                    tenancyUniqueName = url.Host.ToLower().Replace(StringConstants.rootUrltobeRemoved, "");
+                }
+
+                //Set onedrive host
+                DriveManager.oneDriveHostSiteUrl = "https://" + tenancyUniqueName + "-my.sharepoint.com";
+                RegistryManager.Set(RegistryKeys.MySiteUrl, DriveManager.oneDriveHostSiteUrl);
+
+                LogManager.Verbose("office api call finished");
+                LogManager.Verbose("tenancy name: " + tenancyUniqueName + StringConstants.rootUrltobeReplacedWith);
+                tenancyUniqueName = tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
+
+
+            }
+
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+
+            return tenancyUniqueName;
+
+        }
+
         /// <summary>
         /// checks a fixed value in response. This is NOT the best way but for now, that sounds the way
         /// </summary>

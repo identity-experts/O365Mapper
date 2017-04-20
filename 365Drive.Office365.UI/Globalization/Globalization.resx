@@ -128,7 +128,7 @@
     <value>Password</value>
   </data>
   <data name="credential_username" xml:space="preserve">
-    <value>Username</value>
+    <value>Username (Email)</value>
   </data>
   <data name="emailvalidation" xml:space="preserve">
     <value>Please enter a valid email address</value>

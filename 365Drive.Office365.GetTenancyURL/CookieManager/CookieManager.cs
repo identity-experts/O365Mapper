@@ -50,6 +50,12 @@ namespace _365Drive.Office365.GetTenancyURL
                 userCookies = cookieManager.getCookieContainer();
             }
 
+            else if (DriveManager.FederationType == FedType.ADFS)
+            {
+                ADFSAuth cookieManager = new ADFSAuth(new Uri(_host.ToString()), _username, _password,false);
+                userCookies = cookieManager.Authenticate();
+            }
+
             return userCookies;
         }
     }

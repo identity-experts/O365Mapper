@@ -32,7 +32,7 @@ namespace _365Drive.Office365.CloudConnector
 
         ///Allowed federation types
         /// 
-        static FedType?[] AllowedAuthenticationTypes = { FedType.Cloud, FedType.AAD };
+        static FedType?[] AllowedAuthenticationTypes = { FedType.Cloud, FedType.AAD, FedType.ADFS };
 
         /// <summary>
         /// Collection of all mappable drives
