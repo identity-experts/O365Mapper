@@ -239,21 +239,6 @@
     <None Include="Resources\IE_ProgressAnimation1.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\IE_ProgressAnimation1.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\IE_ProgressAnimation4.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\IE_ProgressAnimation2.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\IE_ProgressAnimation3.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\_365Drive.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Wait3.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +246,34 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Wait2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\3ms.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\3mxs.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hold.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\IE_ProgressAnimation3.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\IE_ProgressAnimation4.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\_365Drive.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\IE_ProgressAnimation1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\IE_ProgressAnimation2.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Hang.ico" />

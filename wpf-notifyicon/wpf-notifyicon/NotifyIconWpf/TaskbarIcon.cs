@@ -465,41 +465,45 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// <param name="visible">Whether to show or hide the tooltip.</param>
         private void OnToolTipChange(bool visible)
         {
-            //if we don't have a tooltip, there's nothing to do here...
-            if (TrayToolTipResolved == null) return;
-
-            if (visible)
+            try
             {
-                if (IsPopupOpen)
+                //if we don't have a tooltip, there's nothing to do here...
+                if (TrayToolTipResolved == null) return;
+
+                if (visible)
                 {
-                    //ignore if we are already displaying something down there
-                    return;
+                    if (IsPopupOpen)
+                    {
+                        //ignore if we are already displaying something down there
+                        return;
+                    }
+
+                    var args = RaisePreviewTrayToolTipOpenEvent();
+                    if (args.Handled) return;
+
+                    TrayToolTipResolved.IsOpen = true;
+
+                    //raise attached event first
+                    if (TrayToolTip != null) RaiseToolTipOpenedEvent(TrayToolTip);
+
+                    //bubble routed event
+                    RaiseTrayToolTipOpenEvent();
                 }
+                else
+                {
+                    var args = RaisePreviewTrayToolTipCloseEvent();
+                    if (args.Handled) return;
 
-                var args = RaisePreviewTrayToolTipOpenEvent();
-                if (args.Handled) return;
+                    //raise attached event first
+                    if (TrayToolTip != null) RaiseToolTipCloseEvent(TrayToolTip);
 
-                TrayToolTipResolved.IsOpen = true;
+                    TrayToolTipResolved.IsOpen = false;
 
-                //raise attached event first
-                if (TrayToolTip != null) RaiseToolTipOpenedEvent(TrayToolTip);
-
-                //bubble routed event
-                RaiseTrayToolTipOpenEvent();
+                    //bubble event
+                    RaiseTrayToolTipCloseEvent();
+                }
             }
-            else
-            {
-                var args = RaisePreviewTrayToolTipCloseEvent();
-                if (args.Handled) return;
-
-                //raise attached event first
-                if (TrayToolTip != null) RaiseToolTipCloseEvent(TrayToolTip);
-
-                TrayToolTipResolved.IsOpen = false;
-
-                //bubble event
-                RaiseTrayToolTipCloseEvent();
-            }
+            catch { }
         }
 
 
@@ -670,7 +674,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
                 if (TrayPopupResolved.Child != null)
                 {
                     //try to get a handle on the popup itself (via its child)
-                    HwndSource source = (HwndSource) PresentationSource.FromVisual(TrayPopupResolved.Child);
+                    HwndSource source = (HwndSource)PresentationSource.FromVisual(TrayPopupResolved.Child);
                     if (source != null) handle = source.Handle;
                 }
 
@@ -720,7 +724,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
                 IntPtr handle = IntPtr.Zero;
 
                 //try to get a handle on the context itself
-                HwndSource source = (HwndSource) PresentationSource.FromVisual(ContextMenu);
+                HwndSource source = (HwndSource)PresentationSource.FromVisual(ContextMenu);
                 if (source != null)
                 {
                     handle = source.Handle;
@@ -865,18 +869,18 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// </summary>
         private void SetVersion()
         {
-            iconData.VersionOrTimeout = (uint) NotifyIconVersion.Vista;
+            iconData.VersionOrTimeout = (uint)NotifyIconVersion.Vista;
             bool status = WinApi.Shell_NotifyIcon(NotifyCommand.SetVersion, ref iconData);
 
             if (!status)
             {
-                iconData.VersionOrTimeout = (uint) NotifyIconVersion.Win2000;
+                iconData.VersionOrTimeout = (uint)NotifyIconVersion.Win2000;
                 status = Util.WriteIconData(ref iconData, NotifyCommand.SetVersion);
             }
 
             if (!status)
             {
-                iconData.VersionOrTimeout = (uint) NotifyIconVersion.Win95;
+                iconData.VersionOrTimeout = (uint)NotifyIconVersion.Win95;
                 status = Util.WriteIconData(ref iconData, NotifyCommand.SetVersion);
             }
 
@@ -928,7 +932,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
 
                     //set to most recent version
                     SetVersion();
-                    messageSink.Version = (NotifyIconVersion) iconData.VersionOrTimeout;
+                    messageSink.Version = (NotifyIconVersion)iconData.VersionOrTimeout;
 
                     IsTaskbarIconCreated = true;
                 }
@@ -973,14 +977,14 @@ namespace Hardcodet.Wpf.TaskbarNotification
                 else
                 {
                     var transform = presentationSource.CompositionTarget.TransformToDevice;
-                    scalingFactor = 1/transform.M11;
+                    scalingFactor = 1 / transform.M11;
                 }
             }
 
             //on standard DPI settings, just return the point
             if (scalingFactor == 1.0) return point;
 
-            return new Point() {X = (int) (point.X*scalingFactor), Y = (int) (point.Y*scalingFactor)};
+            return new Point() { X = (int)(point.X * scalingFactor), Y = (int)(point.Y * scalingFactor) };
         }
 
         #region Dispose / Exit

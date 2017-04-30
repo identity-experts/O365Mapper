@@ -19,6 +19,8 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
         Uri adfsIntegratedAuthUrl;
         Uri adfsAuthUrl;
         bool useIntegratedWindowsAuth;
+        public static CookieContainer _cachedCookieContainer = null;
+        public static DateTime _expires = DateTime.MinValue;
 
         const string msoStsUrl = "https://login.microsoftonline.com/extSTS.srf";
         const string msoLoginUrl = "https://login.microsoftonline.com/login.srf";
@@ -51,22 +53,26 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
         public CookieContainer Authenticate()
         {
-            CookieContainer cookieContainer = GetCookieContainer();
-
-            if (cookieContainer != null && cookieContainer.Count > 0)
+            if (_cachedCookieContainer == null || DateTime.Now > _expires)
             {
-                var cookies = from Cookie cookie in cookieContainer.GetCookies(spSiteUrl)
-                              where cookie.Name == "FedAuth"
-                              select cookie;
+                CookieContainer cookieContainer = GetCookieContainer();
 
-                if (cookies.Any())
+                if (cookieContainer != null && cookieContainer.Count > 0)
                 {
-                    return cookieContainer;
-                }
-                //throw new Exception("Could not retrieve Auth cookies");
-            }
-            return null;
+                    var cookies = from Cookie cookie in cookieContainer.GetCookies(spSiteUrl)
+                                  where cookie.Name == "FedAuth"
+                                  select cookie;
 
+                    if (cookies.Any())
+                    {
+                        _cachedCookieContainer = cookieContainer;
+                        //return cookieContainer;
+                    }
+                    //throw new Exception("Could not retrieve Auth cookies");
+                }
+                return null;
+            }
+            return _cachedCookieContainer;
         }
 
         public CookieContainer GetCookieContainer()
@@ -101,7 +107,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             HttpOnly = true,
                             Domain = cookies.Host.Host
                         };
-
+                        _expires = this.stsAuthToken.Expires;
                         cc.Add(spSiteUrl, rtFACookie);
 
                         return cc;

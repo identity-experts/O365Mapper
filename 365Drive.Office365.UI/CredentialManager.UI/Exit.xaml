@@ -6,15 +6,14 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
                   mc:Ignorable="d" 
-                  d:DesignHeight="300" d:DesignWidth="300"
-                  Title="{x:Static p:Globalization.ProductName}" Width="400px" >
+                  d:DesignHeight="200" d:DesignWidth="300"
+                  Title="{x:Static p:Globalization.Exit}" Width="400px" >
 
     <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
 
-    <Grid Margin="10" Width="400px">
+    <Grid  Width="400px">
         <Grid.Resources>
             <Style TargetType="{x:Type Image}">
-                <Setter Property="Margin" Value="4,4,4,20" />
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
@@ -24,12 +23,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Grid.Row="0" Grid.ColumnSpan="2" Width="300" Source="../images/IE-White.png"/>
-        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Width="250px" TextWrapping="WrapWithOverflow" Text="{x:Static p:Globalization.ExitSure}" FontFamily="Lato" FontSize="14" Foreground="Gray">
-        </TextBlock>
+        <Image Source="/365Drive.Office365.UI;component/Images/3mxs.png" Width="110" Height="111" Grid.RowSpan="2" />
+        <TextBlock Width="250px" TextWrapping="WrapWithOverflow" FontFamily="Lato" FontSize="14" Foreground="Gray" Grid.RowSpan="2" Grid.Column="1"><Run Text="Exiting application will unmap "/><InlineUIContainer>
+        	</InlineUIContainer><Run Text="365mapper drives, are you sure?"/></TextBlock>
     </Grid>
-    
+
 </mui:ModernDialog>

@@ -31,7 +31,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             customOK.Click += OkButton_Click;
             customOK.Content = "Save";
             customOK.IsCancel = false;
-            customOK.IsDefault = false;
+            customOK.IsDefault = true;
 
             this.CancelButton.IsCancel = true;
             this.OkButton.IsDefault = true;

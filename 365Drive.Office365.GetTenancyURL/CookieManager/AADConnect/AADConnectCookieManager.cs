@@ -23,8 +23,8 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
         readonly bool _useRtfa;
         readonly Uri _host;
 
-        CookieContainer _cachedCookieContainer = null;
-        DateTime _expires = DateTime.MinValue;
+        public static CookieContainer _cachedCookieContainer = null;
+        public static DateTime _expires = DateTime.MinValue;
 
         #endregion
 
@@ -155,7 +155,13 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 // LogManager.Verbose("Get request: " + String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.sharepointClientID, _host, _host));
                 //string call1Url = String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.sharepointClientID, "http://office.microsoft.com/sharepoint", _host);
                 string call1Url = String.Format(StringConstants.getAADCookieStep1, _host, nonce);
-                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, authorizeCookies);
+
+                //foreach (Cookie cookie in AuthrequestCookies.GetCookies(new Uri(AuthrequestUrl)))
+                //{
+                //    authorizeCookies.Add(new Uri("https://" + new Uri(call1Url).Authority), new Cookie(cookie.Name, cookie.Value));
+                //}
+
+                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies);
                 call1Result.Wait();
                 authorizeCall = call1Result.Result;
 
@@ -203,6 +209,11 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 authorizeCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSC", "00"));
 
 
+                foreach(Cookie cookie in AuthrequestCookies.GetCookies(new Uri(StringConstants.dssoPoll)))
+                {
+                    authorizeCookies.Add(cookie);
+                }
+
                 ///Heading for call 2 which is desktop SSO
                 /// 
                 Task<String> dSSOresponse = HttpClientHelper.PostAsync((StringConstants.dssoPoll), StringConstants.dssoPollBody, "application/json", authorizeCookies, dSSOHeader);
@@ -229,8 +240,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 msLoginPostCookies.Add(new Uri("https://" + new Uri(StringConstants.loginPost).Authority), new Cookie("ESTSAUTHLIGHT", "+"));
                 msLoginPostCookies.Add(new Uri("https://" + new Uri(StringConstants.loginPost).Authority), new Cookie("ESTSSC", "00"));
 
-
-                string msLoginPostData = String.Format(StringConstants.loginPostData, _username, _password, Authorizectx, Authorizeflowtoken, authorizeCanary);
+                string msLoginPostData = String.Format(StringConstants.loginPostData, _username, _password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
                 Task<String> postCalresponse = HttpClientHelper.PostAsync((StringConstants.AADConnectCookieloginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies);
                 postCalresponse.Wait();
 
@@ -339,6 +349,9 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 ret.FedAuth = spCookies["FedAuth"].Value;
                 ret.rtFa = spCookies["rtFa"].Value;
                 ret.Host = _host;
+
+                //setting expiry
+                ret.Expires = DateTime.Now.AddHours(10);
 
                 return ret;
             }

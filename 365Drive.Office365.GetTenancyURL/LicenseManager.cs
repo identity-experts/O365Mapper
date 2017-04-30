@@ -103,6 +103,10 @@ namespace _365Drive.Office365.CloudConnector
             }
         }
 
+        public static LicenseValidationState? lastLicenseState
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Last checked time

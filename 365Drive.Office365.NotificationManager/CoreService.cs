@@ -322,11 +322,18 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.CredentialNotPresent);
                     });
                     LogManager.Verbose("credentials not present");
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication,true);
                     Communications.CurrentState = States.UserAction;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
                     busy = false;
+                    //if (!alreadyNotified)
+                    //{
+                    //    currentDispatcher.Invoke(() =>
+                    //    {
+                    //        CommunicationCallBacks.AskAuthentication();
+                    //    });
+                    //}
                     return;
                 }
                 else

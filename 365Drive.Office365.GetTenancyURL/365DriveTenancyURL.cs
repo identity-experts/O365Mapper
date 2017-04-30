@@ -153,7 +153,7 @@ namespace _365Drive.Office365.CloudConnector
 
 
                 //Getting user activation step 3
-                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, StringConstants.clientSecret, StringConstants.appRedirectURL, StringConstants.appResourceUri);
+                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, LicenseManager.encode(StringConstants.clientSecret), StringConstants.appRedirectURL, StringConstants.appResourceUri);
                 LogManager.Verbose("Access Token postdata:" + accessTokenpostData);
 
                 Task<String> accessTokenResponse = HttpClientHelper.PostAsync((StringConstants.AzureActivateUserStep3), accessTokenpostData, "application/x-www-form-urlencoded");
@@ -396,7 +396,7 @@ namespace _365Drive.Office365.CloudConnector
                 LogManager.Verbose("Poll end call finished. Code: " + authCode);
 
                 //get access token from auth code
-                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, StringConstants.clientSecret, StringConstants.appRedirectURL, StringConstants.appResourceUri);
+                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, LicenseManager.encode(StringConstants.clientSecret), StringConstants.appRedirectURL, StringConstants.appResourceUri);
                 LogManager.Verbose("Access Token postdata:" + accessTokenpostData);
 
                 Task<String> accessTokenResponse = HttpClientHelper.PostAsync((StringConstants.AzureActivateUserStep3), accessTokenpostData, "application/x-www-form-urlencoded");
@@ -518,7 +518,7 @@ namespace _365Drive.Office365.CloudConnector
                 LogManager.Verbose("Poll end call finished. Code: " + authCode);
 
                 //get access token from auth code
-                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, StringConstants.clientSecret, StringConstants.appRedirectURL, StringConstants.appResourceUri);
+                string accessTokenpostData = String.Format(StringConstants.AzureActivationUserToken, authCode, StringConstants.clientID, LicenseManager.encode(StringConstants.clientSecret), StringConstants.appRedirectURL, StringConstants.appResourceUri);
                 LogManager.Verbose("Access Token postdata:" + accessTokenpostData);
 
                 Task<String> accessTokenResponse = HttpClientHelper.PostAsync((StringConstants.AzureActivateUserStep3), accessTokenpostData, "application/x-www-form-urlencoded");

@@ -106,9 +106,9 @@
             </Border.Background>
         </Border>
         <Image HorizontalAlignment="Left"
-               Margin="8,15,0,0"
+               Margin="10,22,0,0"
                Width="70"
-               Source="/Images/IE-Orange.png"
+               Source="/Images/3mxs.png"
                Stretch="Fill"
                Height="69"
                VerticalAlignment="Top" />

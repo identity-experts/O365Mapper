@@ -80,6 +80,18 @@ namespace _365Drive.Office365.NotificationManager
         /// <summary>
         /// Shuts down the application.
         /// </summary>
+        public ICommand RefreshSettingsCommand
+        {
+            get
+            {
+                //return new DelegateCommand {CommandAction = () => Application.Current.Shutdown()};
+                return new DelegateCommand { CommandAction = () => CommunicationCallBacks.RefreshSettings() };
+            }
+        }
+
+        /// <summary>
+        /// Shuts down the application.
+        /// </summary>
         public ICommand ExitApplicationCommand
         {
             get

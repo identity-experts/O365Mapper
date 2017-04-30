@@ -124,11 +124,11 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Username (Email).
+        ///   Looks up a localized string similar to Username (Office 365 Logon).
         /// </summary>
-        public static string credential_username {
+        public static string credential_signinname {
             get {
-                return ResourceManager.GetString("credential_username", resourceCulture);
+                return ResourceManager.GetString("credential_signinname", resourceCulture);
             }
         }
         
@@ -223,7 +223,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exiting application will unmap 365Mapper drives, are you sure?.
+        ///   Looks up a localized string similar to Exiting application will unmap 365mapper drives, are you sure?.
         /// </summary>
         public static string ExitSure {
             get {
@@ -259,7 +259,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Intializing 365Mapper.
+        ///   Looks up a localized string similar to Intializing 365mapper.
         /// </summary>
         public static string Initializing {
             get {
@@ -349,7 +349,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Either credentials not valid or your IT admin has not granted 365 Access to 365Mapper app.
+        ///   Looks up a localized string similar to Either credentials not valid or your IT admin has not granted 365 Access to 365mapper app.
         /// </summary>
         public static string LoginFailed {
             get {
@@ -403,11 +403,20 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 365Mapper.
+        ///   Looks up a localized string similar to 365mapper.
         /// </summary>
         public static string ProductName {
             get {
                 return ResourceManager.GetString("ProductName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in.
+        /// </summary>
+        public static string SignInPageheader {
+            get {
+                return ResourceManager.GetString("SignInPageheader", resourceCulture);
             }
         }
         
@@ -421,7 +430,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Signing out will unmap 365Mapper drives, are you sure?.
+        ///   Looks up a localized string similar to Signing out will unmap 365mapper drives, are you sure?.
         /// </summary>
         public static string SignoutSure {
             get {
@@ -439,7 +448,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your Office 365 tenancy is not registered with 365Mapper.
+        ///   Looks up a localized string similar to Your Office 365 tenancy is not registered with 365mapper.
         /// </summary>
         public static string TenancyNotRegistered {
             get {

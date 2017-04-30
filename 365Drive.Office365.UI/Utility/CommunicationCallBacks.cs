@@ -1,4 +1,5 @@
-﻿using FirstFloor.ModernUI.Windows.Controls;
+﻿using _365Drive.Office365.CloudConnector;
+using FirstFloor.ModernUI.Windows.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,6 +93,20 @@ namespace _365Drive.Office365.UI.Utility
             catch { }
         }
 
+
+        /// <summary>
+        /// Clear local variable values about last drive settings fetched and last license checked
+        /// </summary>
+        public static void RefreshSettings()
+        {
+            try
+            {
+                LicenseManager.lastLicenseChecked = null;
+                LicenseManager.lastDriveFetched = null;
+                LicenseManager.lastLicenseState = null;
+            }
+            catch { }
+        }
         /// <summary>
         /// Display about form
         /// </summary>

@@ -127,8 +127,8 @@
   <data name="credential_password" xml:space="preserve">
     <value>Password</value>
   </data>
-  <data name="credential_username" xml:space="preserve">
-    <value>Username (Email)</value>
+  <data name="credential_signinname" xml:space="preserve">
+    <value>Username (Office 365 Logon)</value>
   </data>
   <data name="emailvalidation" xml:space="preserve">
     <value>Please enter a valid email address</value>
@@ -137,7 +137,7 @@
     <value>Please enter your password</value>
   </data>
   <data name="ProductName" xml:space="preserve">
-    <value>365Mapper</value>
+    <value>365mapper</value>
   </data>
   <data name="Submit" xml:space="preserve">
     <value>Sign in</value>
@@ -158,10 +158,10 @@
     <value>Fetching drive details</value>
   </data>
   <data name="Initializing" xml:space="preserve">
-    <value>Intializing 365Mapper</value>
+    <value>Intializing 365mapper</value>
   </data>
   <data name="LoginFailed" xml:space="preserve">
-    <value>Either credentials not valid or your IT admin has not granted 365 Access to 365Mapper app</value>
+    <value>Either credentials not valid or your IT admin has not granted 365 Access to 365mapper app</value>
     <comment>Message1: Sign In failed    Message 2: Tenancy access failed, please contact your IT department</comment>
   </data>
   <data name="About" xml:space="preserve">
@@ -193,7 +193,7 @@
     <value>Exit</value>
   </data>
   <data name="ExitSure" xml:space="preserve">
-    <value>Exiting application will unmap 365Mapper drives, are you sure?</value>
+    <value>Exiting application will unmap 365mapper drives, are you sure?</value>
   </data>
   <data name="GettingoneDriveUrl" xml:space="preserve">
     <value>Getting OneDrive for Business URL</value>
@@ -238,7 +238,7 @@
     <value>Authentication Method</value>
   </data>
   <data name="SignoutSure" xml:space="preserve">
-    <value>Signing out will unmap 365Mapper drives, are you sure?</value>
+    <value>Signing out will unmap 365mapper drives, are you sure?</value>
   </data>
   <data name="SignOut" xml:space="preserve">
     <value>Sign out</value>
@@ -264,9 +264,12 @@
     <value>Licence error</value>
   </data>
   <data name="TenancyNotRegistered" xml:space="preserve">
-    <value>Your Office 365 tenancy is not registered with 365Mapper</value>
+    <value>Your Office 365 tenancy is not registered with 365mapper</value>
   </data>
   <data name="LicenseActivationFailed" xml:space="preserve">
     <value>Licence activation or verification failed ({0}).</value>
+  </data>
+  <data name="SignInPageheader" xml:space="preserve">
+    <value>Sign in</value>
   </data>
 </root>

@@ -58,6 +58,8 @@
         <MenuItem Header="Sign in" Command="{Binding ShowAuthForm}" CommandParameter="{Binding}" />
         <MenuItem Header="Sign out" Command="{Binding SignOutApplicationCommand}" CommandParameter="{Binding}" />
         <Separator />
+        <MenuItem Header="Update Drive Mappings" Command="{Binding RefreshSettingsCommand}" CommandParameter="{Binding}" />
+        <Separator />
         <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" />
     </ContextMenu>
     <tb:TaskbarIcon x:Key="NotifyIcon"

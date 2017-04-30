@@ -11,7 +11,7 @@ namespace _365Drive.Office365
         /// <summary>
         /// Registry constants
         /// </summary>
-        public const string registryRoot = @"software\Identity Experts\365Drive";
+        public const string registryRoot = @"software\Identity Experts\365mapper";
 
         public const string fileUploadLimitKey = @"SYSTEM\CurrentControlSet\Services\WebClient\Parameters";
         public const string enableLinkedConnectionsKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
