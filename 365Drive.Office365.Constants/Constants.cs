@@ -40,7 +40,10 @@ namespace _365Drive.Office365
         public const string ie365MapperProductName = "365Mapper";
         public const string licenseuserMappingUrl = "{0}?wc-api={1}&tenancy={2}&user={3}";
         public const string retrieveDriveMappingsUrl = "{0}?wc-api={1}&tenancy={2}";
-        public const string softwareVersion = "0.0.12";
+
+        //beta
+        public const string softwareVersion = "0.1.0";
+
         public const int licenseCheckInterval = 120;
         public const int localLicenseCheckLimit = 24;
         public const int localDriveFetchLimit = 24;

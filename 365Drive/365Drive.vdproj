@@ -15,20 +15,74 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_1B2832627169D30F82EA46FDE74EF719"
+        "MsmKey" = "8:_0344E111AAE4BFE14FC93F23911DA6BA"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0344E111AAE4BFE14FC93F23911DA6BA"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
+        "MsmKey" = "8:_119D6C207D9EAE758F9D9D9B0956FFA9"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
+        "MsmKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "OwnerKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3BF80A60EDCA7BCA498E5CBB24751005"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "OwnerKey" = "8:_F4BE9A14DF6F1D93DEA61D2027C04A81"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "OwnerKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "OwnerKey" = "8:_DDC822605405D5037C5482E25296DFC5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "OwnerKey" = "8:_B9B6F8CF029685893260962C02E6012F"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -39,133 +93,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_53F6C8807A5F1947E129F964502FBECF"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_53F6C8807A5F1947E129F964502FBECF"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6587B17E002677E2D520AC6E6E46C99D"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_6587B17E002677E2D520AC6E6E46C99D"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_77FF624C2772CF96DD5793F401AC72B0"
-        "OwnerKey" = "8:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_77FF624C2772CF96DD5793F401AC72B0"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_77FF624C2772CF96DD5793F401AC72B0"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78B7B64FA8FB6E1EB429EE3430E0F98E"
-        "OwnerKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78B7B64FA8FB6E1EB429EE3430E0F98E"
-        "OwnerKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78B7B64FA8FB6E1EB429EE3430E0F98E"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78B7B64FA8FB6E1EB429EE3430E0F98E"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "OwnerKey" = "8:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "OwnerKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "OwnerKey" = "8:_85F70F2AFE8A3095A7D7983D6CE8F918"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "OwnerKey" = "8:_77FF624C2772CF96DD5793F401AC72B0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7969727958EC7072B9A474FEBACBE27F"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7969727958EC7072B9A474FEBACBE27F"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_85F70F2AFE8A3095A7D7983D6CE8F918"
-        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_85F70F2AFE8A3095A7D7983D6CE8F918"
-        "OwnerKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
+        "MsmKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -177,80 +105,158 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_97F59AD070FE508360711B96DD8C4B0D"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_97F59AD070FE508360711B96DD8C4B0D"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ACF22ABBCFD75F9BD81D41C60776064E"
+        "OwnerKey" = "8:_F4BE9A14DF6F1D93DEA61D2027C04A81"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ACF22ABBCFD75F9BD81D41C60776064E"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B20636EB3A44B6ABBAB681CB476FDAD9"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_B20636EB3A44B6ABBAB681CB476FDAD9"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B9B6F8CF029685893260962C02E6012F"
+        "OwnerKey" = "8:_F4BE9A14DF6F1D93DEA61D2027C04A81"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B9B6F8CF029685893260962C02E6012F"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B4435F370B19DC3EA5761CDFC5380C46"
+        "MsmKey" = "8:_B9B6F8CF029685893260962C02E6012F"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CE022AED73D284F88C8F9B8E30D9FDE2"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B4435F370B19DC3EA5761CDFC5380C46"
-        "OwnerKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
+        "MsmKey" = "8:_CE022AED73D284F88C8F9B8E30D9FDE2"
+        "OwnerKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B46456179C8F1092D630D581E8D86833"
+        "MsmKey" = "8:_DAA1259133E00744DAC6209ADCC97FDC"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DAA1259133E00744DAC6209ADCC97FDC"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B46456179C8F1092D630D581E8D86833"
-        "OwnerKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B7802C77A4FB2503F95F5C9A80864321"
-        "OwnerKey" = "8:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B7802C77A4FB2503F95F5C9A80864321"
+        "MsmKey" = "8:_DDC822605405D5037C5482E25296DFC5"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B7F6BB3E2AB35711B331D75B8C3BD4B0"
-        "OwnerKey" = "8:_85F70F2AFE8A3095A7D7983D6CE8F918"
+        "MsmKey" = "8:_DDC822605405D5037C5482E25296DFC5"
+        "OwnerKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B7F6BB3E2AB35711B331D75B8C3BD4B0"
+        "MsmKey" = "8:_E8B78363CB07A0352C0E5DA405ABEEB0"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E8B78363CB07A0352C0E5DA405ABEEB0"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BDB9A25FC02580C1B728BC3AC9E54417"
+        "MsmKey" = "8:_F21E21C100F273539FA0C3611793E556"
+        "OwnerKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F21E21C100F273539FA0C3611793E556"
+        "OwnerKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F21E21C100F273539FA0C3611793E556"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_E1FEA76861B48E07112A99D7679032F2"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
+        "MsmKey" = "8:_F21E21C100F273539FA0C3611793E556"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_E1FEA76861B48E07112A99D7679032F2"
+        "MsmKey" = "8:_F21E21C100F273539FA0C3611793E556"
+        "OwnerKey" = "8:_B9B6F8CF029685893260962C02E6012F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F335F74371024EB8D6D84C1B5747238C"
+        "OwnerKey" = "8:_DDC822605405D5037C5482E25296DFC5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F335F74371024EB8D6D84C1B5747238C"
         "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F4BE9A14DF6F1D93DEA61D2027C04A81"
+        "OwnerKey" = "8:_917B0843D75C40CC9DD7D4771EA90E53"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F4BE9A14DF6F1D93DEA61D2027C04A81"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -262,103 +268,103 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BDB9A25FC02580C1B728BC3AC9E54417"
+        "OwnerKey" = "8:_3BF80A60EDCA7BCA498E5CBB24751005"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8B30B14B3D48EA2E6220B3604E41FF7D"
+        "OwnerKey" = "8:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B4435F370B19DC3EA5761CDFC5380C46"
+        "OwnerKey" = "8:_CE022AED73D284F88C8F9B8E30D9FDE2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1B2832627169D30F82EA46FDE74EF719"
+        "OwnerKey" = "8:_119D6C207D9EAE758F9D9D9B0956FFA9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B46456179C8F1092D630D581E8D86833"
+        "OwnerKey" = "8:_27F333265784BA2C6C5E4591DC50D0C2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_E8B78363CB07A0352C0E5DA405ABEEB0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_DAA1259133E00744DAC6209ADCC97FDC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_0344E111AAE4BFE14FC93F23911DA6BA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_DDC822605405D5037C5482E25296DFC5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F335F74371024EB8D6D84C1B5747238C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_97F59AD070FE508360711B96DD8C4B0D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F4BE9A14DF6F1D93DEA61D2027C04A81"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_ACF22ABBCFD75F9BD81D41C60776064E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_B9B6F8CF029685893260962C02E6012F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5064CF103637429F262CD6025553AF92"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F21E21C100F273539FA0C3611793E556"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_B20636EB3A44B6ABBAB681CB476FDAD9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7969727958EC7072B9A474FEBACBE27F"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E1FEA76861B48E07112A99D7679032F2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6587B17E002677E2D520AC6E6E46C99D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_85F70F2AFE8A3095A7D7983D6CE8F918"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B7F6BB3E2AB35711B331D75B8C3BD4B0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_53F6C8807A5F1947E129F964502FBECF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B7802C77A4FB2503F95F5C9A80864321"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_77FF624C2772CF96DD5793F401AC72B0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_78F48AB8438889E5F2701497423FEB85"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_78B7B64FA8FB6E1EB429EE3430E0F98E"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -456,14 +462,45 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1B2832627169D30F82EA46FDE74EF719"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0344E111AAE4BFE14FC93F23911DA6BA"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CsQuery, Version=1.3.3.5, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_0344E111AAE4BFE14FC93F23911DA6BA"
+                    {
+                    "Name" = "8:CsQuery.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CsQuery.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_119D6C207D9EAE758F9D9D9B0956FFA9"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:365Drive.Office365.MutexManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_1B2832627169D30F82EA46FDE74EF719"
+                    "_119D6C207D9EAE758F9D9D9B0956FFA9"
                     {
                     "Name" = "8:365Drive.Office365.MutexManager.dll"
                     "Attributes" = "3:512"
@@ -487,20 +524,82 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1B9A4EFDCBA70F40507BC02DD8FB75CD"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_27F333265784BA2C6C5E4591DC50D0C2"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CommunicationManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.GetTenancyURL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_1B9A4EFDCBA70F40507BC02DD8FB75CD"
+                    "_27F333265784BA2C6C5E4591DC50D0C2"
                     {
-                    "Name" = "8:365Drive.Office365.CommunicationManager.dll"
+                    "Name" = "8:365Drive.Office365.GetTenancyURL.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:365Drive.Office365.CommunicationManager.dll"
+            "SourcePath" = "8:365Drive.Office365.GetTenancyURL.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3BF80A60EDCA7BCA498E5CBB24751005"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UpdateManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_3BF80A60EDCA7BCA498E5CBB24751005"
+                    {
+                    "Name" = "8:365Drive.Office365.UpdateManager.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:365Drive.Office365.UpdateManager.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5064CF103637429F262CD6025553AF92"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.LogManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_5064CF103637429F262CD6025553AF92"
+                    {
+                    "Name" = "8:365Drive.Office365.LogManager.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:365Drive.Office365.LogManager.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
@@ -538,14 +637,45 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_53F6C8807A5F1947E129F964502FBECF"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UI, Version=0.0.1.2, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_61F4ABB3F9B4B2E9F8B725BEA6E9BB38"
+                    {
+                    "Name" = "8:365Drive.Office365.UI.exe"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:365Drive.Office365.UI.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_97F59AD070FE508360711B96DD8C4B0D"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:365Drive.Office365.Constants, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_53F6C8807A5F1947E129F964502FBECF"
+                    "_97F59AD070FE508360711B96DD8C4B0D"
                     {
                     "Name" = "8:365Drive.Office365.Constants.dll"
                     "Attributes" = "3:512"
@@ -569,206 +699,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6587B17E002677E2D520AC6E6E46C99D"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_ACF22ABBCFD75F9BD81D41C60776064E"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CsQuery, Version=1.3.3.5, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_6587B17E002677E2D520AC6E6E46C99D"
+                    "_ACF22ABBCFD75F9BD81D41C60776064E"
                     {
-                    "Name" = "8:CsQuery.dll"
+                    "Name" = "8:Hardcodet.Wpf.TaskbarNotification.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:CsQuery.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_77FF624C2772CF96DD5793F401AC72B0"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.Utility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_77FF624C2772CF96DD5793F401AC72B0"
-                    {
-                    "Name" = "8:365Drive.Office365.Utility.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:365Drive.Office365.Utility.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_78B7B64FA8FB6E1EB429EE3430E0F98E"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.RegistryManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_78B7B64FA8FB6E1EB429EE3430E0F98E"
-                    {
-                    "Name" = "8:365Drive.Office365.RegistryManager.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:365Drive.Office365.RegistryManager.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_78F48AB8438889E5F2701497423FEB85"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.LogManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_78F48AB8438889E5F2701497423FEB85"
-                    {
-                    "Name" = "8:365Drive.Office365.LogManager.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:365Drive.Office365.LogManager.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7969727958EC7072B9A474FEBACBE27F"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_7969727958EC7072B9A474FEBACBE27F"
-                    {
-                    "Name" = "8:System.Management.Automation.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:System.Management.Automation.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_85F70F2AFE8A3095A7D7983D6CE8F918"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CredentialManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_85F70F2AFE8A3095A7D7983D6CE8F918"
-                    {
-                    "Name" = "8:365Drive.Office365.CredentialManager.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:365Drive.Office365.CredentialManager.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8B30B14B3D48EA2E6220B3604E41FF7D"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UI, Version=0.0.1.2, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_8B30B14B3D48EA2E6220B3604E41FF7D"
-                    {
-                    "Name" = "8:365Drive.Office365.UI.exe"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:365Drive.Office365.UI.exe"
+            "SourcePath" = "8:Hardcodet.Wpf.TaskbarNotification.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
@@ -817,14 +761,45 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B4435F370B19DC3EA5761CDFC5380C46"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B9B6F8CF029685893260962C02E6012F"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.Utility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_B9B6F8CF029685893260962C02E6012F"
+                    {
+                    "Name" = "8:365Drive.Office365.Utility.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:365Drive.Office365.Utility.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CE022AED73D284F88C8F9B8E30D9FDE2"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:FirstFloor.ModernUI, Version=1.0.9.0, Culture=neutral, PublicKeyToken=bc9b0c37bf06c6a9, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_B4435F370B19DC3EA5761CDFC5380C46"
+                    "_CE022AED73D284F88C8F9B8E30D9FDE2"
                     {
                     "Name" = "8:FirstFloor.ModernUI.dll"
                     "Attributes" = "3:512"
@@ -848,20 +823,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B46456179C8F1092D630D581E8D86833"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DAA1259133E00744DAC6209ADCC97FDC"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.GetTenancyURL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_B46456179C8F1092D630D581E8D86833"
+                    "_DAA1259133E00744DAC6209ADCC97FDC"
                     {
-                    "Name" = "8:365Drive.Office365.GetTenancyURL.dll"
+                    "Name" = "8:Newtonsoft.Json.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:365Drive.Office365.GetTenancyURL.dll"
+            "SourcePath" = "8:Newtonsoft.Json.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
@@ -879,20 +854,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B7802C77A4FB2503F95F5C9A80864321"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DDC822605405D5037C5482E25296DFC5"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CredentialManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_B7802C77A4FB2503F95F5C9A80864321"
+                    "_DDC822605405D5037C5482E25296DFC5"
                     {
-                    "Name" = "8:Hardcodet.Wpf.TaskbarNotification.dll"
+                    "Name" = "8:365Drive.Office365.CredentialManager.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Hardcodet.Wpf.TaskbarNotification.dll"
+            "SourcePath" = "8:365Drive.Office365.CredentialManager.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
@@ -910,14 +885,76 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B7F6BB3E2AB35711B331D75B8C3BD4B0"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E8B78363CB07A0352C0E5DA405ABEEB0"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_E8B78363CB07A0352C0E5DA405ABEEB0"
+                    {
+                    "Name" = "8:System.Management.Automation.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.Management.Automation.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F21E21C100F273539FA0C3611793E556"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.RegistryManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_F21E21C100F273539FA0C3611793E556"
+                    {
+                    "Name" = "8:365Drive.Office365.RegistryManager.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:365Drive.Office365.RegistryManager.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F335F74371024EB8D6D84C1B5747238C"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:CredentialManagement, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_B7F6BB3E2AB35711B331D75B8C3BD4B0"
+                    "_F335F74371024EB8D6D84C1B5747238C"
                     {
                     "Name" = "8:CredentialManagement.dll"
                     "Attributes" = "3:512"
@@ -941,51 +978,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BDB9A25FC02580C1B728BC3AC9E54417"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F4BE9A14DF6F1D93DEA61D2027C04A81"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UpdateManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CommunicationManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_BDB9A25FC02580C1B728BC3AC9E54417"
+                    "_F4BE9A14DF6F1D93DEA61D2027C04A81"
                     {
-                    "Name" = "8:365Drive.Office365.UpdateManager.dll"
+                    "Name" = "8:365Drive.Office365.CommunicationManager.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:365Drive.Office365.UpdateManager.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E1FEA76861B48E07112A99D7679032F2"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_E1FEA76861B48E07112A99D7679032F2"
-                    {
-                    "Name" = "8:Newtonsoft.Json.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Newtonsoft.Json.dll"
+            "SourcePath" = "8:365Drive.Office365.CommunicationManager.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CBAC8A97F1984BD18423FC9A0A7D77AC"
@@ -1058,16 +1064,16 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:365Mapper"
-        "ProductCode" = "8:{BE4AB27B-6E0C-4E55-A105-D18627469E1E}"
-        "PackageCode" = "8:{5D86568C-BF1E-4A33-B740-7B4675467BA5}"
+        "ProductName" = "8:365mapper"
+        "ProductCode" = "8:{41CC6FD8-1BF1-404C-9A9C-C74E868AE1C7}"
+        "PackageCode" = "8:{1D07A6AE-ABC3-438B-BA82-A65A36669F4B}"
         "UpgradeCode" = "8:{C62FC6BD-1B7E-490D-A2AF-239104560CF1}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.0.12"
+        "ProductVersion" = "8:0.1.00"
         "Manufacturer" = "8:Identity Experts"
         "ARPHELPTELEPHONE" = "8:+44 (0) 3333 444950"
         "ARPHELPLINK" = "8:http://www.365mapper.com"
