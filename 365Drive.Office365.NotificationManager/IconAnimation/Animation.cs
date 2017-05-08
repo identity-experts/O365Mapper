@@ -97,19 +97,23 @@ namespace _365Drive.Office365.NotificationManager
         /// </summary>
         public static void Stop()
         {
-            ///reset the icon
-            notifyIcon.Icon = _365Drive.Office365.NotificationManager.Properties.Resources._365Drive;
-
             //Clear tickers
             var eventField = animatedIcontimer.GetType().GetField("Tick", BindingFlags.NonPublic | BindingFlags.Instance);
             var eventDelegate = (Delegate)eventField.GetValue(animatedIcontimer);
-            var invocatationList = eventDelegate.GetInvocationList();
+            if (eventDelegate != null)
+            {
+                var invocatationList = eventDelegate.GetInvocationList();
 
-            foreach (var handler in invocatationList)
-                animatedIcontimer.Tick -= ((EventHandler)handler);
+                foreach (var handler in invocatationList)
+                    animatedIcontimer.Tick -= ((EventHandler)handler);
 
-            //stop the timer
-            animatedIcontimer.Stop();
+                //stop the timer
+                animatedIcontimer.Stop();
+            }
+
+            ///reset the icon
+            notifyIcon.Icon = _365Drive.Office365.NotificationManager.Properties.Resources._365Drive;
+
         }
 
         public static void animateInProgress(object sender, EventArgs e)

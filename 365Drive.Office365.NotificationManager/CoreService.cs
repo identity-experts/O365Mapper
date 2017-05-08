@@ -265,8 +265,12 @@ namespace _365Drive.Office365
                 Animation.animatedIcontimer = iconTimer;
                 Animation.notifyIcon = notifyIcon;
 
+                //first stop animation to clear all previous steps
+                Animation.Stop();
+
                 ///start the inprogress
                 Animation.Animate(AnimationTheme.Inprogress);
+
 
                 #region Ensuring Internet
                 currentDispatcher.Invoke(() =>
@@ -322,10 +326,10 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.CredentialNotPresent);
                     });
                     LogManager.Verbose("credentials not present");
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication,true);
-                    Communications.CurrentState = States.UserAction;
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
+                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication,true);
+                    Communications.CurrentState = States.UserAction;
                     busy = false;
                     //if (!alreadyNotified)
                     //{

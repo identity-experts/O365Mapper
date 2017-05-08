@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace _365Drive.Office365.UI.CredentialManager.UI
 {
@@ -35,10 +36,69 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
 
             this.CancelButton.IsCancel = true;
             this.OkButton.IsDefault = true;
+
+            //ShowPass.MouseDown += ShowPass_MouseDown;
+            //ShowPass.PreviewMouseDown += ShowPass_MouseDown;
+            //ShowPass.MouseUp += ShowPass_MouseUp;
+            //ShowPass.PreviewMouseUp += ShowPass_MouseUp;
+
+
+            ShowPass.AddHandler(UIElement.MouseDownEvent, new MouseButtonEventHandler(ShowPass_MouseDown), true);
+            //AddHandler(FrameworkElement.MouseDownEvent, new MouseButtonEventHandler(ShowPass_MouseUp), true);
+
             //set existing 
             setExistingCredentials();
+
+            //Bring to front
+            if (this.WindowState == WindowState.Minimized)
+            {
+                this.WindowState = WindowState.Normal;
+            }
+
+            this.Activate();
         }
 
+        private void ShowPass_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            //throw new NotImplementedException();
+            //password.Visibility = System.Windows.Visibility.Visible;
+            //MyTextBox.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private void ShowPass_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DispatcherTimer _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(2);
+
+            _timer.Tick += new EventHandler(delegate (object s, EventArgs a)
+            {
+                password.Visibility = System.Windows.Visibility.Visible;
+                MyTextBox.Visibility = System.Windows.Visibility.Collapsed;
+                _timer.Stop();
+            });
+
+            //throw new NotImplementedException();
+            password.Visibility = System.Windows.Visibility.Collapsed;
+            MyTextBox.Visibility = System.Windows.Visibility.Visible;
+            MyTextBox.Text = password.Password;
+            MyTextBox.IsEnabled = false;
+            MyTextBox.Focus();
+
+            _timer.Start();
+        }
+
+        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+         
+        }
+
+        private void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            password.Visibility = System.Windows.Visibility.Visible;
+            MyTextBox.Visibility = System.Windows.Visibility.Collapsed;
+            MyTextBox.Text = password.Password;
+            password.Focus();
+        }
 
         /// <summary>
         /// Save the credentials to cred store

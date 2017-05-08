@@ -22,7 +22,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("_365Drive.Office365.NotificationManager.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon _365Drive {
+        public static System.Drawing.Icon _365Drive {
             get {
                 object obj = ResourceManager.GetObject("_365Drive", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -73,7 +73,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Hang {
+        public static System.Drawing.Icon Hang {
             get {
                 object obj = ResourceManager.GetObject("Hang", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -83,7 +83,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon IE_ProgressAnimation1 {
+        public static System.Drawing.Icon IE_ProgressAnimation1 {
             get {
                 object obj = ResourceManager.GetObject("IE_ProgressAnimation1", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -93,7 +93,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap IE_ProgressAnimation11 {
+        public static System.Drawing.Bitmap IE_ProgressAnimation11 {
             get {
                 object obj = ResourceManager.GetObject("IE_ProgressAnimation11", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -103,7 +103,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon IE_ProgressAnimation2 {
+        public static System.Drawing.Icon IE_ProgressAnimation2 {
             get {
                 object obj = ResourceManager.GetObject("IE_ProgressAnimation2", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -113,7 +113,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon IE_ProgressAnimation3 {
+        public static System.Drawing.Icon IE_ProgressAnimation3 {
             get {
                 object obj = ResourceManager.GetObject("IE_ProgressAnimation3", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -123,7 +123,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon IE_ProgressAnimation4 {
+        public static System.Drawing.Icon IE_ProgressAnimation4 {
             get {
                 object obj = ResourceManager.GetObject("IE_ProgressAnimation4", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -133,7 +133,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Wait1 {
+        public static System.Drawing.Icon Wait1 {
             get {
                 object obj = ResourceManager.GetObject("Wait1", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -143,7 +143,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Wait2 {
+        public static System.Drawing.Icon Wait2 {
             get {
                 object obj = ResourceManager.GetObject("Wait2", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -153,7 +153,7 @@ namespace _365Drive.Office365.NotificationManager.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Wait3 {
+        public static System.Drawing.Icon Wait3 {
             get {
                 object obj = ResourceManager.GetObject("Wait3", resourceCulture);
                 return ((System.Drawing.Icon)(obj));

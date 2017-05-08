@@ -29,7 +29,8 @@ namespace _365Drive.Office365
         public static readonly string[] deleteDriveIdentifier = { "x", "d", "r" };
 
         #region licensing server
-        public const string licensingBaseDomain = "http://admin.identityexperts.co.uk";
+        //public const string licensingBaseDomain = "http://admin.identityexperts.co.uk";
+        public const string licensingBaseDomain = "https://store.identityexperts.co.uk";
         public const string statusCheckUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}";
         public const string activationUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}&tenancy={9}";
         public const string activationApiCode = "am-software-api";

@@ -20,17 +20,33 @@ namespace _365Drive.Office365.UI.Utility
         /// <param name="callback">Method to be called</param>
         public static void AskAuthentication()
         {
-            CredentialManager.UI.Authenticate credForm = new CredentialManager.UI.Authenticate();
-            ElementHost.EnableModelessKeyboardInterop(credForm);
+            //Make sure the auth form is NOT already open
+            bool isWindowOpen = false;
 
-
-            //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
-            try
+            foreach (Window w in System.Windows.Application.Current.Windows)
             {
-                credForm.Loaded += AboutForm_Loaded;
-                credForm.ShowDialog();
+                if (w is CredentialManager.UI.Authenticate)
+                {
+                    isWindowOpen = true;
+                    w.Activate();
+                }
             }
-            catch { }
+
+            if (!isWindowOpen)
+            {
+                CredentialManager.UI.Authenticate credForm = new CredentialManager.UI.Authenticate();
+                ElementHost.EnableModelessKeyboardInterop(credForm);
+
+
+                //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
+                try
+                {
+
+                    credForm.Loaded += AboutForm_Loaded;
+                    credForm.ShowDialog();
+                }
+                catch { }
+            }
         }
 
         /// <summary>

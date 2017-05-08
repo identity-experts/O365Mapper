@@ -25,6 +25,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"  />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Image Grid.RowSpan="3" Grid.Column="0" Source="../images/3mxs.png" Width="110" Height="111" />
@@ -32,8 +33,20 @@
         <TextBox Grid.Row="1" Name="userName" Grid.Column="1" TextChanged="userName_TextChanged" Width="300px" Height="30px" />
         <Label Grid.Row="2" Content="{x:Static p:Globalization.credential_password}" Grid.Column="1" />
         <!--<TextBox Grid.Row="2" Name="password" Grid.Column="1" Margin="0,0,0,10" TextChanged="password_TextChanged"  />-->
-        <PasswordBox Grid.Row="3" Name="password" Grid.Column="1" PasswordChar="*" TextInput="password_TextInput" Height="30px" />
-        <TextBlock TextWrapping="Wrap" Grid.Row="4" Grid.Column="1" Name="validationSummary" Foreground="#FFB03030" ></TextBlock>
+        <PasswordBox Grid.Row="3" Name="password" Grid.Column="1" PasswordChar="*" TextInput="password_TextInput" Height="30px" 
+                      />
+        <TextBox x:Name="MyTextBox" Grid.Row="3" Height="30px" Grid.Column="1" Visibility="Collapsed" />
+        <!--<CheckBox x:Name="ShowPasswordCharsCheckBox"  Grid.Row="4" Grid.Column="1" Content="Show password" Checked="ShowPasswordCharsCheckBox_Checked" 
+                  Unchecked="ShowPasswordCharsCheckBox_Unchecked" Visibility="Collapsed" />-->
+        <DockPanel Grid.Row="4" Grid.Column="1" >
+            <Button Name="ShowPass" Grid.Row="4" Grid.Column="1" Width="150px" Background="Transparent"
+        BorderBrush="Transparent" 
+        BorderThickness="0" Cursor="Hand"
+        Padding="-4" FontStyle="Oblique" Height="30px" >
+                <Image Source="../images/ShowPassword.png" />
+            </Button>
+            <TextBlock TextWrapping="Wrap" Grid.Row="5" Grid.Column="1" Name="validationSummary" Foreground="#FFB03030" />
+        </DockPanel>
     </Grid>
 
 </mui:ModernDialog>
