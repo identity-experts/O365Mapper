@@ -154,8 +154,8 @@ namespace _365Drive.Office365.CloudConnector
 
                 //poll end cookie container
                 CookieContainer userMappingCookieContainer = new CookieContainer();
-                string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
-                string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
+                string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedAuth"].Value;
+                string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["rtfa"].Value;
                 userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("FedAuth", encode(fedAuth)));
                 userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("rtFA", encode(rtFA)));
 
@@ -392,8 +392,8 @@ namespace _365Drive.Office365.CloudConnector
 
                         //poll end cookie container
                         CookieContainer userMappingCookieContainer = new CookieContainer();
-                        string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
-                        string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
+                        string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedauth"].Value;
+                        string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["rtfa"].Value;
                         userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("FedAuth", encode(fedAuth)));
                         userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("rtFA", encode(rtFA)));
 

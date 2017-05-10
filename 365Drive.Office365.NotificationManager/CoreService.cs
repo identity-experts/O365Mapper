@@ -414,8 +414,8 @@ namespace _365Drive.Office365
                 GlobalCookieManager cookieManager = new GlobalCookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 CookieContainer userCookies = cookieManager.getCookieContainer();
                 LogManager.Verbose("cookies found");
-                string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[0].Value;
-                string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))[1].Value;
+                string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedauth"].Value;
+                string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["rtfa"].Value;
                 #endregion
 
                 #region Ensuring License
