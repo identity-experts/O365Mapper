@@ -160,6 +160,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thank you for signing in, we will attempt login shortly.
+        /// </summary>
+        public static string CredentialsReceived {
+            get {
+                return ResourceManager.GetString("CredentialsReceived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .NET Version.
         /// </summary>
         public static string DotNetVersion {
@@ -367,6 +376,24 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multi Factor Authentication.
+        /// </summary>
+        public static string MFA {
+            get {
+                return ResourceManager.GetString("MFA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your account has been configured by multi factor authentication with default authentication set to {0}..
+        /// </summary>
+        public static string MFAUserMessage {
+            get {
+                return ResourceManager.GetString("MFAUserMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please click here to Sign in.
         /// </summary>
         public static string NocredMessage {
@@ -435,6 +462,15 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string SignoutSure {
             get {
                 return ResourceManager.GetString("SignoutSure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You should have received SMS to your registered mobile number, please type that here:.
+        /// </summary>
+        public static string SMSReceivedMesSage {
+            get {
+                return ResourceManager.GetString("SMSReceivedMesSage", resourceCulture);
             }
         }
         

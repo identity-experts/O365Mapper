@@ -31,6 +31,16 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
         const string saml = "urn:oasis:names:tc:SAML:1.0:assertion";
         const string spowssigninUri = "_forms/default.aspx?wa=wsignin1.0";
 
+
+        /// <summary>
+        /// delete all cached cookies
+        /// </summary>
+        public static void signout()
+        {
+            _cachedCookieContainer = null;
+            _expires = DateTime.MinValue;
+        }
+
         public ADFSAuth(Uri spSiteUrl, string username, string password, bool useIntegratedWindowsAuth)
         {
             this.spSiteUrl = spSiteUrl;

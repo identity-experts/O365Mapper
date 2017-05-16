@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
         <Image Grid.RowSpan="3" Grid.Column="0" Source="../images/3mxs.png" Width="110" Height="111" />
         <Label Content="{x:Static p:Globalization.credential_signinname}" Grid.Row="0" Grid.Column="1"  />
-        <TextBox Grid.Row="1" Name="userName" Grid.Column="1" TextChanged="userName_TextChanged" Width="300px" Height="30px" />
+        <TextBox Grid.Row="1" Name="userName" Grid.Column="1" TextChanged="userName_TextChanged" Width="280px" Height="30px" />
         <Label Grid.Row="2" Content="{x:Static p:Globalization.credential_password}" Grid.Column="1" />
         <!--<TextBox Grid.Row="2" Name="password" Grid.Column="1" Margin="0,0,0,10" TextChanged="password_TextChanged"  />-->
         <PasswordBox Grid.Row="3" Name="password" Grid.Column="1" PasswordChar="*" TextInput="password_TextInput" Height="30px" 
@@ -43,9 +43,10 @@
         BorderBrush="Transparent" 
         BorderThickness="0" Cursor="Hand"
         Padding="-4" FontStyle="Oblique" Height="30px" >
-                <Image Source="../images/ShowPassword.png" />
+                <Image Source="../images/ShowPassword.png" Visibility="Hidden" />
             </Button>
             <TextBlock TextWrapping="Wrap" Grid.Row="5" Grid.Column="1" Name="validationSummary" Foreground="#FFB03030" />
+            <ProgressBar Name="SignInprogress" Minimum="0" Visibility="Hidden" Grid.Row="5" Grid.ColumnSpan="2"  Maximum="20" Height="16" IsIndeterminate="True" />
         </DockPanel>
     </Grid>
 

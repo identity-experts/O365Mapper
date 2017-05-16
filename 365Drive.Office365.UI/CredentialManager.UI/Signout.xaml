@@ -26,6 +26,7 @@
         <Image Source="/365Drive.Office365.UI;component/Images/3mxs.png" Width="110" Height="111" Grid.RowSpan="2" />
         <TextBlock Grid.RowSpan="2" Grid.Column="1" Width="250px" TextWrapping="WrapWithOverflow" Text="{x:Static p:Globalization.SignoutSure}" FontFamily="Lato" FontSize="14" Foreground="Gray" >
         </TextBlock>
+        <ProgressBar Name="SignInprogress" Minimum="0" Visibility="Hidden" Grid.Row="1" Grid.Column="1"  Maximum="20" Height="16" IsIndeterminate="True" />
     </Grid>
 
 </mui:ModernDialog>

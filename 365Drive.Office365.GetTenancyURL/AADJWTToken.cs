@@ -74,6 +74,44 @@ namespace _365Drive.Office365.CloudConnector
         public string serviceResourceId { get; set; }
     }
 
+
+    public class AuthResponse
+    {
+        public string Result { get; set; }
+        public string ResultValue { get; set; }
+        public object Message { get; set; }
+        public string AuthMethodId { get; set; }
+        public int ErrCode { get; set; }
+        public string Retry { get; set; }
+        public string FlowToken { get; set; }
+        public string Ctx { get; set; }
+        public string SessionId { get; set; }
+        public string CorrelationId { get; set; }
+    }
+
+    public class StrongAuthConstantResponse
+    {
+        public string SASControllerBeginAuthUrl { get; set; }
+        public string SASControllerProcessAuthUrl { get; set; }
+        public string SASControllerEndAuthUrl { get; set; }
+        public string FlowToken { get; set; }
+        public string Ctx { get; set; }
+    }
+
+    public class StrongAuthContextResponse
+    {
+        public string Result { get; set; }
+        public DefaultMethod DefaultMethod { get; set; }
+        //public List<Method> Methods { get; set; }
+    }
+
+    public class DefaultMethod
+    {
+        public string AuthMethodId { get; set; }
+        public string AuthMethodDeviceId { get; set; }
+        public string MethodDisplayString { get; set; }
+    }
+
     public class MysiteResponse
     {
         public List<MySiteMetadata> value { get; set; }

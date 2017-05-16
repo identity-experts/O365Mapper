@@ -1,4 +1,5 @@
 ﻿using _365Drive.Office365.CloudConnector;
+using _365Drive.Office365.GetTenancyURL.CookieManager;
 using FirstFloor.ModernUI.Windows.Controls;
 using System;
 using System.Collections.Generic;
@@ -55,9 +56,17 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         /// <param name="e"></param>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
+            SignInprogress.Visibility = Visibility.Visible;
+            //signout from application
+            appSignOut();
+            SignInprogress.Visibility = Visibility.Hidden;
+
+            this.Close();
+        }
 
 
-
+        public static void appSignOut()
+        {
             //unmap all drives
             DriveManager.unmapAllDrives();
 
@@ -76,10 +85,14 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             //Delete registrries
             RegistryManager.DeleteAllRegistry();
 
+            //clear cookie cache
+            AADConnectCookieManager.signout();
+            o365cookieManager.signout();
+            ADFSAuth.signout();
+
             ////exit
             //Application.Current.Shutdown();
         }
-
 
 
     }

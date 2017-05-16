@@ -35,6 +35,7 @@ namespace _365Drive.Office365
         ///We need to initialize a timer here which will make sure the sync happens every minute
         DispatcherTimer dispatcherTimer;
         DispatcherTimer iconTimer;
+        DispatcherTimer notificationTimer;
         //Declare current dispacher
         Dispatcher currentDispatcher;
 
@@ -73,6 +74,10 @@ namespace _365Drive.Office365
                 iconTimer = new DispatcherTimer();
                 currentDispatcher = Dispatcher.CurrentDispatcher;
 
+                //initiate notification timer
+                notificationTimer = new DispatcherTimer();
+                notificationTimer.Tick += NotificationTimer_Tick;
+
                 //set the static variable to this
                 coreInstance = this;
 
@@ -81,6 +86,24 @@ namespace _365Drive.Office365
             {
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);
+            }
+        }
+
+
+        /// <summary>
+        /// attempt all the pending notification queues
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NotificationTimer_Tick(object sender, EventArgs e)
+        {
+            Notification nextNotification = Communications.getNextNotificationQueueItem();
+            if (nextNotification != null)
+            {
+                currentDispatcher.Invoke(() =>
+                {
+                    NotificationManager.NotificationManager.notify(nextNotification.Heading, nextNotification.Message, ToolTipIcon.Warning);
+                });
             }
         }
 
@@ -183,6 +206,10 @@ namespace _365Drive.Office365
                         dispatcherTimer.Interval = new TimeSpan(0, 1, 0);
 
                     dispatcherTimer.Start();
+
+                    //start the notification timer too
+                    notificationTimer.Interval = new TimeSpan(0, 0, 2);
+                    notificationTimer.Start();
                 });
 
                 //Make sure the network is connected (always)
@@ -328,7 +355,7 @@ namespace _365Drive.Office365
                     LogManager.Verbose("credentials not present");
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication,true);
+                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication, true);
                     Communications.CurrentState = States.UserAction;
                     busy = false;
                     //if (!alreadyNotified)

@@ -42,6 +42,15 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
         }
 
 
+        /// <summary>
+        /// delete all cached cookies
+        /// </summary>
+        public static void signout()
+        {
+            _cachedCookieContainer = null;
+            _expires = DateTime.MinValue;
+        }
+
         class MsoCookies
         {
             public string FedAuth { get; set; }
@@ -277,7 +286,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
 
                 NameValueCollection pollStartHeader = new NameValueCollection();
-                pollStartHeader.Add("canary", msPostCanary);
+                pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
                 pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
                 pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
                 pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
@@ -335,6 +344,34 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     if (li.Name == "session_state")
                     {
                         session_state = li.Value;
+                    }
+                }
+
+
+                ///Check for MFA
+                if (string.IsNullOrEmpty(code))
+                {
+                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(pollEndResponse.Result, AuthrequestCookies);
+                    pollEndResponsecQ = CQ.Create(postResponse);
+                    pollEndResponses = pollEndResponsecQ["input"];
+                    foreach (var li in pollEndResponses)
+                    {
+                        if (li.Name == "code")
+                        {
+                            code = li.Value;
+                        }
+                        if (li.Name == "id_token")
+                        {
+                            id_token = li.Value;
+                        }
+                        if (li.Name == "state")
+                        {
+                            //state = li.Value;
+                        }
+                        if (li.Name == "session_state")
+                        {
+                            session_state = li.Value;
+                        }
                     }
                 }
 

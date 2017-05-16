@@ -35,7 +35,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             //this.OkButton.IsDefault = false;
 
             this.CancelButton.Content = Globalization.Globalization.Cancel;
-            this.CancelButton.Click += CancelButton_Click; ;
+            this.CancelButton.Click += CancelButton_Click;
             //this.CancelButton.IsCancel = true;
             //this.CancelButton.IsDefault = true;
         }

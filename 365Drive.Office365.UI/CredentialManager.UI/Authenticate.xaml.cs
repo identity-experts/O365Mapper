@@ -22,6 +22,8 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
     /// </summary>
     public partial class Authenticate : ModernDialog
     {
+        string currentUser;
+
         public Authenticate()
         {
             InitializeComponent();
@@ -30,6 +32,8 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             this.Buttons = new Button[] { customOK, this.CancelButton };
 
             customOK.Click += OkButton_Click;
+            this.OkButton.Click += OkButton_Click;
+
             customOK.Content = "Save";
             customOK.IsCancel = false;
             customOK.IsDefault = true;
@@ -89,7 +93,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
 
         private void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-         
+
         }
 
         private void OnMouseUp(object sender, MouseButtonEventArgs e)
@@ -109,8 +113,29 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         {
             if (ValidateEmailandPassword(true))
             {
+                SignInprogress.Visibility = Visibility.Visible;
+
+                string newuser = (this.userName.Text + ";!" + this.password.Password).ToLower();
+
+                if (currentUser != newuser)
+                {
+
+                    //To clear things, we fist need to signout existing user
+                    SignOut.appSignOut();
+                }
+
                 LogManager.Verbose("Setting username password");
                 _365Drive.Office365.CredentialManager.SetCredentials(userName.Text, password.Password);
+                if (currentUser != newuser)
+                {
+                    //set the password changed first time for the matter of MFA
+                    _365Drive.Office365.CloudConnector.LicenseManager.hasPasswordChangedOrFirstTime = true;
+
+                    //Notify the user that we will attempt the credentials shortly
+                    CommunicationManager.Communications.queueNotification(Globalization.Globalization.credentials, Globalization.Globalization.CredentialsReceived);
+                }
+
+                SignInprogress.Visibility = Visibility.Hidden;
                 this.Close();
             }
             else
@@ -130,25 +155,38 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 this.userName.Text = currentCreds.UserName;
                 this.password.Password = currentCreds.Password;
             }
+
+            //set current username and password to local variable
+            currentUser = (this.userName.Text + ";!" + this.password.Password).ToLower();
         }
 
-        /// <summary>
-        /// Save the credential to registry and restart the timer
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (ValidateEmailandPassword(true))
-            {
-                LogManager.Verbose("Setting username password");
-                _365Drive.Office365.CredentialManager.SetCredentials(userName.Text, password.Password);
-                this.Close();
+        ///// <summary>
+        ///// Save the credential to registry and restart the timer
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (ValidateEmailandPassword(true))
+        //    {
+        //        string newuser = (this.userName.Text + ";!" + this.password.Password).ToLower(); 
+        //        if(currentUser != newuser)
+        //        {
+        //            //set the password changed first time for the matter of MFA
+        //            _365Drive.Office365.CloudConnector.LicenseManager.hasPasswordChangedOrFirstTime = true;
 
-                //restart the ticker
-                
-            }
-        }
+        //            //Notify the user that we will attempt the credentials shortly
+        //            CommunicationManager.Communications.queueNotification(Globalization.Globalization.credentials, Globalization.Globalization.CredentialsReceived);
+        //        }
+
+        //        LogManager.Verbose("Setting username password");
+        //        _365Drive.Office365.CredentialManager.SetCredentials(userName.Text, password.Password);
+        //        this.Close();
+
+        //        //restart the ticker
+
+        //    }
+        //}
 
 
         /// <summary>

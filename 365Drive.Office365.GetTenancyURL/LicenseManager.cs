@@ -72,6 +72,16 @@ namespace _365Drive.Office365.CloudConnector
 
     public static class LicenseManager
     {
+        /// <summary>
+        /// This bool will be used for making sure whether we need to directly prompt for MFA or not
+        /// </summary>
+        public static bool hasPasswordChangedOrFirstTime { get; set; }
+
+        /// <summary>
+        /// THis will be true when user will say YES for MFA. We will keep it true for both Tenancy Name and auth cookies
+        /// </summary>
+        public static bool MFAConsent { get; set; }
+
         public static string lastActivationMessage { get; set; }
 
         /// <summary>
@@ -100,6 +110,33 @@ namespace _365Drive.Office365.CloudConnector
                         return true;
                     }
                 }
+            }
+        }
+
+
+
+        /// <summary>
+        /// Make sure whether we need to askfor user consent
+        /// </summary>
+        public static bool MFAConcentRequired
+        {
+            get
+            {
+                bool consentRequired = true;
+
+                //if this is first time user typed in credential, they would deffo expect the MFA so no need for user consent. And finally set it off.
+                if(hasPasswordChangedOrFirstTime)
+                {
+                    consentRequired = false;
+                    hasPasswordChangedOrFirstTime = false;
+                }
+                //if during tenancy name fetching user has already said yes, there is NO need to ask for it again in cookies get. However set it off next time.
+                if (MFAConsent)
+                {
+                    consentRequired = false;
+                    MFAConsent = false;
+                }
+                return consentRequired;
             }
         }
 

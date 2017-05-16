@@ -91,8 +91,14 @@ namespace _365Drive.Office365.CloudConnector
 
                 RealM userRealM = JsonConvert.DeserializeObject<RealM>(realM.Result);
 
+                //only for debug until we find way to differetiate cloud and AAD Connect
+                if (upn.ToLower() == "demo.mfa@identityexperts.co.uk" && RegistryManager.IsDev)
+                {
+                    FederationType = FedType.Cloud;
+                }
+
                 //AAD SSO
-                if (userRealM.is_dsso_enabled != null && userRealM.is_dsso_enabled == true)
+                else if (userRealM.is_dsso_enabled != null && userRealM.is_dsso_enabled == true)
                 {
                     LogManager.Verbose("AAD SSO auth found");
                     AADSSODomainName = userRealM.DomainName;
@@ -388,7 +394,23 @@ namespace _365Drive.Office365.CloudConnector
 
                     if (!isDriveExists(d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + @":\", webDavPath) && d.Drivestate == driveState.Active)
                     {
-                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies))
+                        bool userHasAccess = DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies);
+
+
+                        //If user doesnt have access, notify the user
+                        try
+                        {
+                            if (!userHasAccess)
+                            {
+                                //Notify user about no access
+                                CommunicationManager.Communications.queueNotification("Access Denied", "Unable to map drive " + d.DriveLetter + ". You do not have permission to '" + d.DriveName + "'");
+                            }
+                        }
+                        catch {
+                            //No need to act if it doesn't work
+                        }
+
+                        if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || userHasAccess)
                         {
                             LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);
                             string psCommand = string.Empty;

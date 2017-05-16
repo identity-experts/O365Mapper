@@ -1,0 +1,34 @@
+﻿<mui:ModernDialog x:Class="_365Drive.Office365.UI.MFA.MFAConfirmation"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                  mc:Ignorable="d" 
+                  d:DesignHeight="200" d:DesignWidth="300"
+                  Title="MFA Confirmation" Width="400px">
+
+    <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
+
+    <Grid Width="400px" >
+        <Grid.Resources>
+            <Style TargetType="{x:Type Image}">
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="134.4" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Image Source="Images/3mxs.png" Grid.RowSpan="2" Grid.Column="0" />
+        <TextBlock Name="Confirmation" Width="250px" Grid.RowSpan="2" Grid.Column="1" TextWrapping="WrapWithOverflow" 
+                       Text="Your account has been configured for Multi-factor authentication. Would you like us to initiate second factor authentication?" 
+                   FontFamily="Lato" FontSize="14" Foreground="Gray" HorizontalAlignment="Left" >
+        </TextBlock>
+     
+    </Grid>
+
+</mui:ModernDialog>

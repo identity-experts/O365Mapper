@@ -272,4 +272,16 @@
   <data name="SignInPageheader" xml:space="preserve">
     <value>Sign in</value>
   </data>
+  <data name="MFA" xml:space="preserve">
+    <value>Multi Factor Authentication</value>
+  </data>
+  <data name="MFAUserMessage" xml:space="preserve">
+    <value>Your account has been configured by multi factor authentication with default authentication set to {0}.</value>
+  </data>
+  <data name="SMSReceivedMesSage" xml:space="preserve">
+    <value>You should have received SMS to your registered mobile number, please type that here:</value>
+  </data>
+  <data name="CredentialsReceived" xml:space="preserve">
+    <value>Thank you for signing in, we will attempt login shortly</value>
+  </data>
 </root>

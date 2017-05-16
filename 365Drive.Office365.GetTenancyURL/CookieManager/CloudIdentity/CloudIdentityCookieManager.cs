@@ -9,6 +9,12 @@ using System.IO;
 using System.Xml.Linq;
 using System.IdentityModel.Protocols.WSTrust;
 using System.Reflection;
+using _365Drive.Office365.GetTenancyURL;
+using System.Threading.Tasks;
+using CsQuery;
+using System.Collections.Specialized;
+using System.Net.Http;
+using System.Web;
 
 namespace _365Drive.Office365.CloudConnector
 {
@@ -22,10 +28,19 @@ namespace _365Drive.Office365.CloudConnector
         readonly bool _useRtfa;
         readonly Uri _host;
 
-        CookieContainer _cachedCookieContainer = null;
-        DateTime _expires = DateTime.MinValue;
+        public static CookieContainer _cachedCookieContainer = null;
+        public static DateTime _expires = DateTime.MinValue;
 
         #endregion
+
+        /// <summary>
+        /// delete all cached cookies
+        /// </summary>
+        public static void signout()
+        {
+            _cachedCookieContainer = null;
+            _expires = DateTime.MinValue;
+        }
 
         #region Constructors
         public o365cookieManager(string host, string username, string password)
@@ -86,8 +101,9 @@ namespace _365Drive.Office365.CloudConnector
                 if (_cachedCookieContainer == null || DateTime.Now > _expires)
                 {
 
+                    MsoCookies cookies = getIECookies();
                     // Get the SAML tokens from SPO STS (via MSO STS) using fed auth passive approach
-                    MsoCookies cookies = getSamlToken();
+                    //MsoCookies cookies = getSamlToken();
 
                     if (!string.IsNullOrEmpty(cookies.FedAuth))
                     {
@@ -146,6 +162,187 @@ namespace _365Drive.Office365.CloudConnector
                 return _cachedCookieContainer;
             }
         }
+
+
+        /// <summary>
+        /// Below (getSAMlToken) is a bit older way to get token. Making a new way now.
+        /// </summary>
+        /// <returns></returns>
+        private MsoCookies getIECookies()
+        {
+
+            MsoCookies ret = new MsoCookies();
+
+            try
+            {
+                //are we ready?
+                if (!Utility.ready())
+                    return null;
+
+                //get nonse
+                string authorizeCall = string.Empty, Authorizectx = string.Empty, Authorizeflowtoken = string.Empty, authorizeCanary = string.Empty, nonce = string.Empty, clientRequestId = string.Empty;
+                string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
+                CookieContainer AuthrequestCookies = new CookieContainer();
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies, true);
+                AuthrequestResponse.Wait();
+
+                NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
+                if (qscoll.Count > 0)
+                { 
+                    nonce = qscoll["nonce"];
+                    clientRequestId = qscoll["client-request-id"];
+                }
+                //if (!String.IsNullOrEmpty(Convert.ToString(AuthrequestResponse.Result.Headers.GetValues("request-id"))))
+                //{
+                //    clientRequestId = Convert.ToString(AuthrequestResponse.Result.Headers.GetValues("request-id"));
+
+                //}
+                //get the host with url
+                var Wreply = _host.GetLeftPart(UriPartial.Authority) + "/_forms/default.aspx";
+
+                string WindowsoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep0, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                Task<string> call0Result = HttpClientHelper.GetAsync(WindowsoAuthCallUrl, AuthrequestCookies);
+                call0Result.Wait();
+
+                //first call to get flow token, ctx and canary
+                //CookieContainer AuthrequestCookies = new CookieContainer();
+                string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
+                call1Result.Wait();
+
+
+                authorizeCall = call1Result.Result;
+
+                ///Fetch the ctx and flow token and canary
+                CQ htmlparser = CQ.Create(authorizeCall);
+                var items = htmlparser["input"];
+                foreach (var li in items)
+                {
+                    if (li.Name == "ctx")
+                    {
+                        Authorizectx = li.Value;
+                    }
+                    if (li.Name == "flowToken")
+                    {
+                        Authorizeflowtoken = li.Value;
+                    }
+                }
+                authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
+
+                string loginPostBody = string.Format(StringConstants.CloudloginPostData, _username, _password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                NameValueCollection loginPostHeader = new NameValueCollection();
+                loginPostHeader.Add("Origin", "https://login.microsoftonline.com");
+                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                loginPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                loginPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+
+                Task<string> call2Result = HttpClientHelper.PostAsync(StringConstants.CloudloginPost, loginPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, loginPostHeader);
+                call2Result.Wait();
+
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+                ///Fetch the ctx and flow token and canary
+                CQ postBodyResponseParser = CQ.Create(call2Result.Result);
+                var postBodyResponseInputs = postBodyResponseParser["input"];
+                foreach (var li in postBodyResponseInputs)
+                {
+                    if (li.Name == "code")
+                    {
+                        code = li.Value;
+                    }
+                    if (li.Name == "id_token")
+                    {
+                        id_token = li.Value;
+                    }
+                    if (li.Name == "state")
+                    {
+                        state = li.Value;
+                    }
+                    if (li.Name == "session_state")
+                    {
+                        session_state = li.Value;
+                    }
+                }
+
+                ///Check for MFA
+                if(string.IsNullOrEmpty(code))
+                {
+                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(call2Result.Result, AuthrequestCookies);
+                    postBodyResponseParser = CQ.Create(postResponse);
+                    postBodyResponseInputs = postBodyResponseParser["input"];
+                    foreach (var li in postBodyResponseInputs)
+                    {
+                        if (li.Name == "code")
+                        {
+                            code = li.Value;
+                        }
+                        if (li.Name == "id_token")
+                        {
+                            id_token = li.Value;
+                        }
+                        if (li.Name == "state")
+                        {
+                            state = li.Value;
+                        }
+                        if (li.Name == "session_state")
+                        {
+                            session_state = li.Value;
+                        }
+                    }
+                }
+
+                //post everyhing to sharepoint
+                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
+                NameValueCollection SharePointPostHeader = new NameValueCollection();
+                loginPostHeader.Add("Origin", "https://login.microsoftonline.com");
+                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                loginPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                loginPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+                Task<HttpResponseMessage> SharePointPostResult = null;
+                try
+                {
+                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);
+                    SharePointPostResult.Wait();
+                }
+                catch(Exception ex)
+                {
+                    if(SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
+                    {
+
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
+                foreach (Cookie SPCookie in AuthrequestCookies.GetCookies(new Uri(Wreply)))
+                {
+                    if (SPCookie.Name.ToLower() == "fedauth")
+                    {
+                        ret.FedAuth = SPCookie.Value;
+                        ret.Expires = DateTime.Now.AddHours(10);
+                        ret.Host = new Uri(Wreply);
+                    }
+                    if (SPCookie.Name.ToLower() == "rtfa")
+                    {
+                        ret.rtFa = SPCookie.Value;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+
+            return ret;
+        }
+
+
+
+
 
         private MsoCookies getSamlToken()
         {

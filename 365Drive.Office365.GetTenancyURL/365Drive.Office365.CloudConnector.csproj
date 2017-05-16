@@ -29,9 +29,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsQuery, Version=1.3.3.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CsQuery.1.3.3\lib\net40\CsQuery.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FirstFloor.ModernUI, Version=1.0.9.0, Culture=neutral, PublicKeyToken=bc9b0c37bf06c6a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\ModernUI.WPF.1.0.9\lib\net45\FirstFloor.ModernUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -52,6 +59,7 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -59,6 +67,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="365DriveTenancyURL.cs" />
@@ -94,6 +103,10 @@
     <ProjectReference Include="..\365Drive.Office365.RegistryManager\365Drive.Office365.RegistryManager.csproj">
       <Project>{991255a3-816f-4c88-9d55-21909ea37874}</Project>
       <Name>365Drive.Office365.RegistryManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.UI.MFA\365Drive.Office365.UI.MFA.csproj">
+      <Project>{b7279763-d5ee-436c-ab1e-d0ad6ee6f5cc}</Project>
+      <Name>365Drive.Office365.UI.MFA</Name>
     </ProjectReference>
     <ProjectReference Include="..\365Drive.Office365.Utility\365Drive.Office365.Utility.csproj">
       <Project>{2a55bec8-5690-4ff9-95c0-29ac5c97ce35}</Project>

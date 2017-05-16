@@ -18,6 +18,7 @@
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"  />
             <ColumnDefinition Width="Auto" MinWidth="60" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
@@ -27,12 +28,14 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Grid.Row="0" Source="../images/IE-White.png" Grid.ColumnSpan="2" Width="200" />
-        <Label Grid.Row="1" Content="{x:Static p:Globalization.About}" Margin="0,1.4,4,14.6" Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
-        <Label Name="Software" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Content="{x:Static p:Globalization.ProductName}" Grid.RowSpan="2" FontFamily="Lato" FontSize="15"  />
-        <Label Grid.Row="2" Content="{x:Static p:Globalization.Version}" HorizontalAlignment="Left" Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
-        <Label Name="VersionNumber" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
-        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.ColumnSpan="2"
+        <Image Grid.Row="0" Source="../images/3mxs.png" Grid.Column="0" Grid.RowSpan="4" Width="111px" />
+        <Label Content="{x:Static p:Globalization.About}" Margin="0,1.4,4,14.6" Grid.Column="1" Grid.Row="0" FontFamily="Lato" FontSize="15" />
+        <Label Name="Software" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Content="{x:Static p:Globalization.ProductName}" 
+               FontFamily="Lato" FontSize="15"  />
+        <Label Grid.Row="1" Content="{x:Static p:Globalization.Version}" HorizontalAlignment="Left" Grid.Column="1" FontFamily="Lato" FontSize="15" />
+        <Label Name="VersionNumber" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
+        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
+               Grid.ColumnSpan="2"
                FontFamily="Lato" FontSize="13" Foreground="Gray" />
         
     </Grid>
