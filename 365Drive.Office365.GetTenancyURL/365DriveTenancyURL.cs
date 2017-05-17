@@ -373,6 +373,11 @@ namespace _365Drive.Office365.CloudConnector
                             return string.Empty;
                         }
 
+
+                    }
+                    else
+                    {
+                        return string.Empty;
                     }
                 }
             }
@@ -792,9 +797,16 @@ namespace _365Drive.Office365.CloudConnector
 
                 //call 2 ADFS
                 //string adfsPostUrl = string.Format(StringConstants.AdfsPost, DriveManager.ADFSAuthURL, upn, MSctx);
-                string adfsPostUrl = DriveManager.ADFSAuthURL + MSctx;
+                string ADFSRealM = String.Format(StringConstants.ADFSRealM, LicenseManager.encode(upn), MSctx);
+                Task<string> ADFSRealMResult = HttpClientHelper.GetAsync(ADFSRealM, authorizeCookies);
+                ADFSRealMResult.Wait();
+
+                RealM ADFSRealMresponse = JsonConvert.DeserializeObject<RealM>(ADFSRealMResult.Result);
+
+                //get the ADFS post URL
+                string strADFSPostUrl = ADFSRealMresponse.AuthURL;
                 string adfsPostBody = string.Format(StringConstants.AdfsPostBody, upn, password);
-                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(adfsPostUrl, adfsPostBody, "application/x-www-form-urlencoded", authorizeCookies);
+                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", authorizeCookies);
                 adfsloginPostBodyResult.Wait();
 
 
@@ -817,9 +829,29 @@ namespace _365Drive.Office365.CloudConnector
                 Task<HttpResponseMessage> ADFSrstPostResult = HttpClientHelper.PostAsyncFullResponse(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
                 ADFSrstPostResult.Wait();
 
-                NameValueCollection pollEndRedirect = HttpUtility.ParseQueryString(ADFSrstPostResult.Result.RequestMessage.RequestUri.Query);
-                if (pollEndRedirect.Count > 0)
-                    authCode = pollEndRedirect[0];
+                if (ADFSrstPostResult.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.ADFSailedLoginUrl.ToLower())
+                {
+                    string code = retrieveCodeFromMFA(ADFSrstPostResult.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                    if (string.IsNullOrEmpty(code))
+                    {
+                        return string.Empty;
+                    }
+                    else
+                    {
+                        authCode = code;
+                    }
+                }
+                else
+                {
+                    NameValueCollection qscoll = HttpUtility.ParseQueryString(ADFSrstPostResult.Result.RequestMessage.RequestUri.Query);
+                    if (qscoll.Count > 0)
+                        authCode = qscoll[0];
+                }
+
+
+                //NameValueCollection pollEndRedirect = HttpUtility.ParseQueryString(ADFSrstPostResult.Result.RequestMessage.RequestUri.Query);
+                //if (pollEndRedirect.Count > 0)
+                //    authCode = pollEndRedirect[0];
 
                 LogManager.Verbose("Poll end call finished. Code: " + authCode);
 

@@ -388,7 +388,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 ret.Host = _host;
 
                 //setting expiry
-                ret.Expires = DateTime.Now.AddHours(10);
+                ret.Expires = DateTime.Now.AddHours(Constants.AuthcookieExpiryHours);
 
                 return ret;
             }

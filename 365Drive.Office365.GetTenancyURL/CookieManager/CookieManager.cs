@@ -60,7 +60,11 @@ namespace _365Drive.Office365.GetTenancyURL
             else if (DriveManager.FederationType == FedType.ADFS)
             {
                 ADFSAuth cookieManager = new ADFSAuth(new Uri(_host.ToString()), _username, _password, false);
-                userCookies = cookieManager.Authenticate();
+                userCookies = cookieManager.getCookieContainer();
+            }
+            if (userCookies == null || userCookies.Count == 0)
+            {
+                return null;
             }
 
             return userCookies;
@@ -68,40 +72,47 @@ namespace _365Drive.Office365.GetTenancyURL
 
         public static bool MFAUserConsent()
         {
-            bool userConsent = false;
-            Application.Current.Dispatcher.Invoke((Action)delegate
+            if (LicenseManager.MFAConcentRequired)
             {
+                bool userConsent = false;
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
                 //Make sure the auth form is NOT already open
                 bool isWindowOpen = false;
 
-                foreach (Window w in System.Windows.Application.Current.Windows)
-                {
-                    if (w is _365Drive.Office365.UI.MFA.MFAConfirmation)
+                    foreach (Window w in System.Windows.Application.Current.Windows)
                     {
-                        isWindowOpen = true;
-                        w.Activate();
+                        if (w is _365Drive.Office365.UI.MFA.MFAConfirmation)
+                        {
+                            isWindowOpen = true;
+                            w.Activate();
+                        }
                     }
-                }
 
-                if (!isWindowOpen)
-                {
+                    if (!isWindowOpen)
+                    {
 
                     //your code
 
                     _365Drive.Office365.UI.MFA.MFAConfirmation mfaForm = new _365Drive.Office365.UI.MFA.MFAConfirmation();
 
-                    ElementHost.EnableModelessKeyboardInterop(mfaForm);
+                        ElementHost.EnableModelessKeyboardInterop(mfaForm);
                     //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
                     try
-                    {
-                        mfaForm.Loaded += AboutForm_Loaded;
-                        bool? dialogResult = mfaForm.ShowDialog();
-                        userConsent = mfaForm.proceed;
+                        {
+                            mfaForm.Loaded += AboutForm_Loaded;
+                            bool? dialogResult = mfaForm.ShowDialog();
+                            userConsent = mfaForm.proceed;
+                        }
+                        catch { }
                     }
-                    catch { }
-                }
-            });
-            return userConsent;
+                });
+                return userConsent;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public static string retrieveCodeFromMFA(string responseContent, CookieContainer authorizeCookies)
@@ -269,6 +280,10 @@ namespace _365Drive.Office365.GetTenancyURL
                             return string.Empty;
                         }
 
+                    }
+                    else
+                    {
+                        return string.Empty;
                     }
                 }
             }

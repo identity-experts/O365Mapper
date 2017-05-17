@@ -394,22 +394,24 @@ namespace _365Drive.Office365.CloudConnector
 
                     if (!isDriveExists(d.DriveLetter.EndsWith(":") ? d.DriveLetter : d.DriveLetter + @":\", webDavPath) && d.Drivestate == driveState.Active)
                     {
-                        bool userHasAccess = DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies);
-
-
-                        //If user doesnt have access, notify the user
-                        try
+                        bool userHasAccess = true;
+                        if (d.Drivestate != driveState.Deleted && d.Drivetype != driveType.OneDrive)
                         {
-                            if (!userHasAccess)
+                            userHasAccess = DriveMapper.userHasAccess(new Uri(d.DriveUrl), userCookies);
+                            //If user doesnt have access, notify the user
+                            try
                             {
-                                //Notify user about no access
-                                CommunicationManager.Communications.queueNotification("Access Denied", "Unable to map drive " + d.DriveLetter + ". You do not have permission to '" + d.DriveName + "'");
+                                if (!userHasAccess)
+                                {
+                                    //Notify user about no access
+                                    CommunicationManager.Communications.queueNotification("Access Denied", "Unable to map drive " + d.DriveLetter + ". You do not have permission to '" + d.DriveName + "'");
+                                }
+                            }
+                            catch
+                            {
+                                //No need to act if it doesn't work
                             }
                         }
-                        catch {
-                            //No need to act if it doesn't work
-                        }
-
                         if (d.Drivestate == driveState.Deleted || d.Drivetype == driveType.OneDrive || userHasAccess)
                         {
                             LogManager.Verbose("Its found that user has access OR drive is to be removed, continueing with mapping drive:" + d.DriveUrl);

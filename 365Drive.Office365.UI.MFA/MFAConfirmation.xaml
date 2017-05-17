@@ -25,7 +25,7 @@
         </Grid.RowDefinitions>
         <Image Source="Images/3mxs.png" Grid.RowSpan="2" Grid.Column="0" />
         <TextBlock Name="Confirmation" Width="250px" Grid.RowSpan="2" Grid.Column="1" TextWrapping="WrapWithOverflow" 
-                       Text="Your account has been configured for Multi-factor authentication. Would you like us to initiate second factor authentication?" 
+                       Text="Your account has been configured for Multi-factor authentication. Would you like us to initiate second factor authentication now?" 
                    FontFamily="Lato" FontSize="14" Foreground="Gray" HorizontalAlignment="Left" >
         </TextBlock>
      

@@ -50,5 +50,7 @@ namespace _365Drive.Office365
         public const int localDriveFetchLimit = 24;
         #endregion
 
+        //cookie expiry
+        public const int AuthcookieExpiryHours = 10;
     }
 }

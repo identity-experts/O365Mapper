@@ -440,6 +440,22 @@ namespace _365Drive.Office365
                 LogManager.Verbose("getting cookies manager");
                 GlobalCookieManager cookieManager = new GlobalCookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 CookieContainer userCookies = cookieManager.getCookieContainer();
+
+                if (userCookies == null)
+                {
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.LoginFailed);
+                    });
+                    LogManager.Verbose("credentials not valid or app isnt registered");
+                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    //reset the current state
+                    Communications.CurrentState = States.UserAction;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
+                    return;
+                }
                 LogManager.Verbose("cookies found");
                 string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedauth"].Value;
                 string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["rtfa"].Value;

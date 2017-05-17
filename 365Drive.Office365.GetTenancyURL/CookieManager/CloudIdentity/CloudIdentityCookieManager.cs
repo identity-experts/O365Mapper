@@ -294,11 +294,11 @@ namespace _365Drive.Office365.CloudConnector
                 //post everyhing to sharepoint
                 string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
                 NameValueCollection SharePointPostHeader = new NameValueCollection();
-                loginPostHeader.Add("Origin", "https://login.microsoftonline.com");
-                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-                loginPostHeader.Add("X-Requested-With", "XMLHttpRequest");
-                loginPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+                SharePointPostHeader.Add("Origin", "https://login.microsoftonline.com");
+                SharePointPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                SharePointPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                SharePointPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                SharePointPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
                 Task<HttpResponseMessage> SharePointPostResult = null;
                 try
                 {
@@ -321,7 +321,7 @@ namespace _365Drive.Office365.CloudConnector
                     if (SPCookie.Name.ToLower() == "fedauth")
                     {
                         ret.FedAuth = SPCookie.Value;
-                        ret.Expires = DateTime.Now.AddHours(10);
+                        ret.Expires = DateTime.Now.AddHours(Constants.AuthcookieExpiryHours);
                         ret.Host = new Uri(Wreply);
                     }
                     if (SPCookie.Name.ToLower() == "rtfa")

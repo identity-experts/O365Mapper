@@ -1,11 +1,18 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using _365Drive.Office365.CloudConnector;
+using CsQuery;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 
 namespace _365Drive.Office365.GetTenancyURL.CookieManager
@@ -58,6 +65,217 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
             this.useIntegratedWindowsAuth = useIntegratedWindowsAuth;
 
             stsAuthToken = new SamlSecurityToken();
+        }
+
+
+        public CookieContainer getCookieContainer()
+        {
+            if (_cachedCookieContainer == null || DateTime.Now > _expires)
+            {
+                //CookieContainer cookieContainer = GetCookieContainer();
+                CookieContainer cookieContainer = getIECookies();
+
+                if (cookieContainer != null && cookieContainer.Count > 0)
+                {
+                    var cookies = from Cookie cookie in cookieContainer.GetCookies(spSiteUrl)
+                                  where cookie.Name == "FedAuth"
+                                  select cookie;
+
+                    if (cookies.Any())
+                    {
+                        _cachedCookieContainer = cookieContainer;
+                        _expires = DateTime.Now.AddHours(Constants.AuthcookieExpiryHours);
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return _cachedCookieContainer;
+        }
+
+        /// <summary>
+        /// Retrieve cookies in new way
+        /// </summary>
+        /// <returns></returns>
+        public CookieContainer getIECookies()
+        {
+            CookieContainer ret = new CookieContainer();
+            try
+            {
+                //are we ready?
+                if (!Utility.ready())
+                    return null;
+
+                //get nonse
+                string authorizeCall = string.Empty, Authorizectx = string.Empty, Authorizeflowtoken = string.Empty, authorizeCanary = string.Empty, nonce = string.Empty, clientRequestId = string.Empty;
+                string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, spSiteUrl.ToString());
+                CookieContainer AuthrequestCookies = new CookieContainer();
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies, true);
+                AuthrequestResponse.Wait();
+
+                NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
+                if (qscoll.Count > 0)
+                {
+                    nonce = qscoll["nonce"];
+                    clientRequestId = qscoll["client-request-id"];
+                }
+
+                var Wreply = spSiteUrl.GetLeftPart(UriPartial.Authority) + "/_forms/default.aspx";
+
+                string WindowsoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep0, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                Task<string> call0Result = HttpClientHelper.GetAsync(WindowsoAuthCallUrl, AuthrequestCookies);
+                call0Result.Wait();
+
+                //first call to get flow token, ctx and canary
+                string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
+                call1Result.Wait();
+
+
+                authorizeCall = call1Result.Result;
+
+                ///Fetch the ctx and flow token and canary
+                CQ htmlparser = CQ.Create(authorizeCall);
+                var items = htmlparser["input"];
+                foreach (var li in items)
+                {
+                    if (li.Name == "ctx")
+                    {
+                        Authorizectx = li.Value;
+                    }
+                    if (li.Name == "flowToken")
+                    {
+                        Authorizeflowtoken = li.Value;
+                    }
+                }
+                authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
+
+
+                //get user realM
+                string ADFSRealM = String.Format(StringConstants.ADFSRealM, LicenseManager.encode(username), Authorizectx);
+                Task<string> ADFSRealMResult = HttpClientHelper.GetAsync(ADFSRealM, AuthrequestCookies);
+                ADFSRealMResult.Wait();
+
+                RealM ADFSRealMresponse = JsonConvert.DeserializeObject<RealM>(ADFSRealMResult.Result);
+
+                //get the ADFS post URL
+                string strADFSPostUrl = ADFSRealMresponse.AuthURL;
+
+
+                //post to ADFS now
+                string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
+                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                adfsloginPostBodyResult.Wait();
+
+
+                //retrieving rst
+                string rst = string.Empty;
+                CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                var adfsPostResponseItems = adfsPostResponse["input"];
+                foreach (var li in adfsPostResponseItems)
+                {
+                    if (li.Name == "wresult")
+                    {
+                        if (!string.IsNullOrEmpty(li.Value))
+                            rst = li.Value;
+                    }
+                }
+
+                //retrieve code, idtoken 
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+                //post rst to microsoft
+                string strrstPostBody = string.Format(StringConstants.ADFSrstPostBody, LicenseManager.encode(rst), Authorizectx);
+                Task<String> ADFSrstPostResult = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, new NameValueCollection());
+                ADFSrstPostResult.Wait();
+
+                CQ postBodyResponseParser = CQ.Create(ADFSrstPostResult.Result);
+                var postBodyResponseInputs = postBodyResponseParser["input"];
+                foreach (var li in postBodyResponseInputs)
+                {
+                    if (li.Name == "code")
+                    {
+                        code = li.Value;
+                    }
+                    if (li.Name == "id_token")
+                    {
+                        id_token = li.Value;
+                    }
+                    if (li.Name == "state")
+                    {
+                        state = li.Value;
+                    }
+                    if (li.Name == "session_state")
+                    {
+                        session_state = li.Value;
+                    }
+                }
+
+                ///Check for MFA
+                if (string.IsNullOrEmpty(code))
+                {
+                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(ADFSrstPostResult.Result, AuthrequestCookies);
+                    postBodyResponseParser = CQ.Create(postResponse);
+                    postBodyResponseInputs = postBodyResponseParser["input"];
+                    foreach (var li in postBodyResponseInputs)
+                    {
+                        if (li.Name == "code")
+                        {
+                            code = li.Value;
+                        }
+                        if (li.Name == "id_token")
+                        {
+                            id_token = li.Value;
+                        }
+                        if (li.Name == "state")
+                        {
+                            state = li.Value;
+                        }
+                        if (li.Name == "session_state")
+                        {
+                            session_state = li.Value;
+                        }
+                    }
+                }
+
+                //post everyhing to sharepoint
+                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
+                NameValueCollection SharePointPostHeader = new NameValueCollection();
+                SharePointPostHeader.Add("Origin", "https://login.microsoftonline.com");
+                SharePointPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                SharePointPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                SharePointPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                SharePointPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+                Task<HttpResponseMessage> SharePointPostResult = null;
+                try
+                {
+                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);
+                    SharePointPostResult.Wait();
+                }
+                catch (Exception ex)
+                {
+                    if (SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
+                    {
+
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
+                foreach (Cookie SPCookie in AuthrequestCookies.GetCookies(new Uri(Wreply)))
+                {
+                    ret.Add(SPCookie);
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+
+            return ret;
         }
 
 
@@ -373,8 +591,15 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
                 StreamReader sr = new StreamReader(new MemoryStream(response));
 
+
+                string strResponse = sr.ReadToEnd();
                 // the SAML security token is in the BinarySecurityToken element of the message body
-                XDocument xDoc = XDocument.Parse(sr.ReadToEnd());
+                XDocument xDoc = XDocument.Parse(strResponse);
+
+                //check error code
+
+
+
                 var binaryST = from e in xDoc.Descendants()
                                where e.Name == XName.Get("BinarySecurityToken", wsse)
                                select e;
@@ -534,7 +759,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
             return samlRTString;
         }
 
-        private string ParameterizeRST(string time,string token)
+        private string ParameterizeRST(string time, string token)
         {
             string samlRTString = "<t:RequestSecurityTokenResponse xmlns:t=\"http://schemas.xmlsoap.org/ws/2005/02/trust\" ><t:Lifetime><wsu:Created xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">2017-04-19T05:50:51.892Z</wsu:Created><wsu:Expires xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">[TIME]</wsu:Expires></t:Lifetime><wsp:AppliesTo xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" ><wsa:EndpointReference xmlns:wsa=\"http://www.w3.org/2005/08/addressing\" ><wsa:Address>urn:federation:MicrosoftOnline</wsa:Address></wsa:EndpointReference></wsp:AppliesTo><t:RequestedSecurityToken>[TOKEN]<t:TokenType>urn:oasis:names:tc:SAML:1.0:assertion</t:TokenType><t:RequestType>http://schemas.xmlsoap.org/ws/2005/02/trust/Issue</t:RequestType><t:KeyType>http://schemas.xmlsoap.org/ws/2005/05/identity/NoProofKey</t:KeyType></t:RequestSecurityTokenResponse>";
             samlRTString = samlRTString.Replace("[TIME]", time);

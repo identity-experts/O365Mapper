@@ -409,17 +409,26 @@ namespace _365Drive.Office365.CloudConnector
                                     DriveManager.addDrive(driveLetter, driveName, rootSitedocLibUrl, driveState, driveType);
                                 }
                             }
+                            else
+                            {
+                                //notify user about problem
+                                CommunicationManager.Communications.queueNotification("Drive Configuration", "Unable to get drive settings for drive '" + strkey + "'. Settings are not properly configured.");
+                            }
                         }
 
                     }
+                    if(DriveManager.mappableDrives == null || DriveManager.mappableDrives.Count == 0)
+                    {
+                        addDefaultDrives();
+                    }
                 }
                 //Prio 2:
-                //Prio 3:
+                //Prio 3: from portal
                 else
                 {
 
                     //is it time to re-populate? lets see
-                    if (driveFetchTimeNow || DriveManager.mappableDrives.Count == 0)
+                    if (driveFetchTimeNow || DriveManager.mappableDrives == null || DriveManager.mappableDrives.Count == 0)
                     {
                         ///Get the license key, email and status of license for given user
 
@@ -481,17 +490,8 @@ namespace _365Drive.Office365.CloudConnector
                         else
                         {
                             //Call to Azure AD, user profile and registry to fetch and populate drive
+                            addDefaultDrives();
 
-                            //for now hardcoding
-                            string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
-
-                            //Add this to mappable drives
-                            LogManager.Verbose("Adding default site to mappable drive. Url: " + rootSitedocLibUrl);
-                            DriveManager.addDrive("S", "SharePoint", rootSitedocLibUrl);
-                            DriveManager.addDrive("O", "OneDrive", string.Empty, driveType.OneDrive);
-
-                            //ONLY FOR TESTING HARDCODED VALUE
-                            //DriveManager.addDrive("M", "Map2", "https://gloiretech.sharepoint.com/Map2");
                         }
                         lastDriveFetched = DateTime.Now;
                     }
@@ -504,6 +504,21 @@ namespace _365Drive.Office365.CloudConnector
             }
 
 
+        }
+
+
+        public static void addDefaultDrives()
+        {
+            //for now hardcoding
+            string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
+
+            //Add this to mappable drives
+            LogManager.Verbose("Adding default site to mappable drive. Url: " + rootSitedocLibUrl);
+            DriveManager.addDrive("S", "SharePoint", rootSitedocLibUrl);
+            DriveManager.addDrive("O", "OneDrive for Business", string.Empty, driveType.OneDrive);
+
+            //ONLY FOR TESTING HARDCODED VALUE
+            //DriveManager.addDrive("M", "Map2", "https://gloiretech.sharepoint.com/Map2");
         }
     }
 }
