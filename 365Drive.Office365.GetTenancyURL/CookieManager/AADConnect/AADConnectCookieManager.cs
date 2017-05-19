@@ -68,7 +68,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 if (!Utility.ready())
                     return null;
 
-              
+
                 //Only retrieve cookies when its NULL or expired. otherwise get it from cache.
                 if (_cachedCookieContainer == null || DateTime.Now > _expires)
                 {
@@ -147,6 +147,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 string authCode = string.Empty;
                 string accessToken = string.Empty;
                 string nonce = string.Empty;
+                string code = string.Empty, id_token = string.Empty, session_state = string.Empty;
 
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
                 CookieContainer AuthrequestCookies = new CookieContainer();
@@ -218,7 +219,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 authorizeCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSC", "00"));
 
 
-                foreach(Cookie cookie in AuthrequestCookies.GetCookies(new Uri(StringConstants.dssoPoll)))
+                foreach (Cookie cookie in AuthrequestCookies.GetCookies(new Uri(StringConstants.dssoPoll)))
                 {
                     authorizeCookies.Add(cookie);
                 }
@@ -255,83 +256,8 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
                 CQ msPOSTcq = CQ.Create(postCalresponse.Result);
                 var msPOSTcqItems = msPOSTcq["input"];
+
                 foreach (var li in msPOSTcqItems)
-                {
-                    if (li.Name == "ctx")
-                    {
-                        if (!string.IsNullOrEmpty(li.Value))
-                            msPostCtx = li.Value;
-                    }
-                    if (li.Name == "flowToken")
-                    {
-                        msPostFlow = li.Value;
-                    }
-                }
-
-                msPostHpgact = _365DriveTenancyURL.getHPGact(postCalresponse.Result);
-                msPostHpgid = _365DriveTenancyURL.getHPGId(postCalresponse.Result);
-                msPostCanary = _365DriveTenancyURL.getapiCanary(postCalresponse.Result);
-                LogManager.Verbose("MS post call finished. Canary: " + msPostCanary);
-
-                //preparing for call 4 which is poll start
-
-                //poll start cookie container
-                CookieContainer pollStartCookieContainer = new CookieContainer();
-                Uri msLoginPosturi = new Uri(StringConstants.loginPost);
-                IEnumerable<Cookie> responseCookies = msLoginPostCookies.GetCookies(msLoginPosturi).Cast<Cookie>();
-                foreach (Cookie cookie in responseCookies)
-                {
-                    pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
-                }
-                pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
-
-                NameValueCollection pollStartHeader = new NameValueCollection();
-                pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
-                pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
-                pollStartHeader.Add("Accept", "application/json");
-                pollStartHeader.Add("X-Requested-With", "XMLHttpRequest");
-                pollStartHeader.Add("hpgid", msPostHpgid);
-                pollStartHeader.Add("hpgact", msPostHpgact);
-
-                string pollStartData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
-
-                //poll start heading
-                Task<String> pollStartResponse = HttpClientHelper.PostAsync((StringConstants.AADPoll), pollStartData, "application/json", pollStartCookieContainer, pollStartHeader);
-                pollStartResponse.Wait();
-
-                pollStartFlowToken = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).flowToken;
-                pollStartctx = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).ctx;
-                LogManager.Verbose("Poll start call finished. FlowToken: " + pollStartFlowToken + ", ctx: " + pollStartctx);
-
-
-                //poll end cookie container
-                CookieContainer pollEndCookieContainer = new CookieContainer();
-                foreach (Cookie cookie in responseCookies)
-                {
-                    pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
-                }
-                pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
-
-                NameValueCollection pollEndHeader = new NameValueCollection();
-                pollEndHeader.Add("Referrer", "https://login.microsoftonline.com/1d962d68-d448-4434-b62d-5660971874c4/login");
-                pollEndHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                pollEndHeader.Add("Accept", "application/json");
-                //pollEndHeader.Add("X-Requested-With", "XMLHttpRequest");
-                pollEndHeader.Add("DNT", "1");
-
-                string pollEndData = String.Format(StringConstants.AADPollEndBody, pollStartFlowToken, pollStartctx);
-
-                //poll start heading
-                Task<String> pollEndResponse = HttpClientHelper.PostAsync((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
-                pollEndResponse.Wait();
-
-                //var pollendResponse = await pollEndResponse.Content.ReadAsStringAsync();
-                CQ pollEndResponsecQ = CQ.Create(pollEndResponse.Result);
-                var pollEndResponses = pollEndResponsecQ["input"];
-                string code = string.Empty, id_token = string.Empty, session_state = string.Empty;
-                foreach (var li in pollEndResponses)
                 {
                     if (li.Name == "code")
                     {
@@ -347,30 +273,158 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                 }
 
-
-                ///Check for MFA
                 if (string.IsNullOrEmpty(code))
                 {
-                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(pollEndResponse.Result, AuthrequestCookies);
-                    pollEndResponsecQ = CQ.Create(postResponse);
-                    pollEndResponses = pollEndResponsecQ["input"];
-                    foreach (var li in pollEndResponses)
+
+                    string isPollingRequired = _365DriveTenancyURL.getpolingRequired(postCalresponse.Result);
+                    bool pollingRequired = false;
+                    bool.TryParse(isPollingRequired, out pollingRequired);
+
+                    if (pollingRequired)
                     {
-                        if (li.Name == "code")
+                        foreach (var li in msPOSTcqItems)
                         {
-                            code = li.Value;
+                            if (li.Name == "ctx")
+                            {
+                                if (!string.IsNullOrEmpty(li.Value))
+                                    msPostCtx = li.Value;
+                            }
+                            if (li.Name == "flowToken")
+                            {
+                                msPostFlow = li.Value;
+                            }
                         }
-                        if (li.Name == "id_token")
+
+                        msPostHpgact = _365DriveTenancyURL.getHPGact(postCalresponse.Result);
+                        msPostHpgid = _365DriveTenancyURL.getHPGId(postCalresponse.Result);
+                        msPostCanary = _365DriveTenancyURL.getapiCanary(postCalresponse.Result);
+                        LogManager.Verbose("MS post call finished. Canary: " + msPostCanary);
+
+                        //preparing for call 4 which is poll start
+
+                        //poll start cookie container
+                        CookieContainer pollStartCookieContainer = new CookieContainer();
+                        Uri msLoginPosturi = new Uri(StringConstants.loginPost);
+                        IEnumerable<Cookie> responseCookies = msLoginPostCookies.GetCookies(msLoginPosturi).Cast<Cookie>();
+                        foreach (Cookie cookie in responseCookies)
                         {
-                            id_token = li.Value;
+                            pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
                         }
-                        if (li.Name == "state")
+                        pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
+
+                        NameValueCollection pollStartHeader = new NameValueCollection();
+                        pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
+                        pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
+                        pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                        pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
+                        pollStartHeader.Add("Accept", "application/json");
+                        pollStartHeader.Add("X-Requested-With", "XMLHttpRequest");
+                        pollStartHeader.Add("hpgid", msPostHpgid);
+                        pollStartHeader.Add("hpgact", msPostHpgact);
+
+                        string pollStartData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
+
+                        //poll start heading
+                        Task<String> pollStartResponse = HttpClientHelper.PostAsync((StringConstants.AADPoll), pollStartData, "application/json", pollStartCookieContainer, pollStartHeader);
+                        pollStartResponse.Wait();
+
+                        pollStartFlowToken = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).flowToken;
+                        pollStartctx = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).ctx;
+                        LogManager.Verbose("Poll start call finished. FlowToken: " + pollStartFlowToken + ", ctx: " + pollStartctx);
+
+
+                        //poll end cookie container
+                        CookieContainer pollEndCookieContainer = new CookieContainer();
+                        foreach (Cookie cookie in responseCookies)
                         {
-                            //state = li.Value;
+                            pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
                         }
-                        if (li.Name == "session_state")
+                        pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
+
+                        NameValueCollection pollEndHeader = new NameValueCollection();
+                        pollEndHeader.Add("Referrer", "https://login.microsoftonline.com/1d962d68-d448-4434-b62d-5660971874c4/login");
+                        pollEndHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                        pollEndHeader.Add("Accept", "application/json");
+                        //pollEndHeader.Add("X-Requested-With", "XMLHttpRequest");
+                        pollEndHeader.Add("DNT", "1");
+
+                        string pollEndData = String.Format(StringConstants.AADPollEndBody, pollStartFlowToken, pollStartctx);
+
+                        //poll start heading
+                        Task<String> pollEndResponse = HttpClientHelper.PostAsync((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
+                        pollEndResponse.Wait();
+
+                        //var pollendResponse = await pollEndResponse.Content.ReadAsStringAsync();
+                        CQ pollEndResponsecQ = CQ.Create(pollEndResponse.Result);
+                        var pollEndResponses = pollEndResponsecQ["input"];
+
+                        foreach (var li in pollEndResponses)
                         {
-                            session_state = li.Value;
+                            if (li.Name == "code")
+                            {
+                                code = li.Value;
+                            }
+                            if (li.Name == "id_token")
+                            {
+                                id_token = li.Value;
+                            }
+                            if (li.Name == "session_state")
+                            {
+                                session_state = li.Value;
+                            }
+                        }
+
+
+                        ///Check for MFA
+                        if (string.IsNullOrEmpty(code))
+                        {
+                            string postResponse = GlobalCookieManager.retrieveCodeFromMFA(pollEndResponse.Result, AuthrequestCookies);
+                            pollEndResponsecQ = CQ.Create(postResponse);
+                            pollEndResponses = pollEndResponsecQ["input"];
+                            foreach (var li in pollEndResponses)
+                            {
+                                if (li.Name == "code")
+                                {
+                                    code = li.Value;
+                                }
+                                if (li.Name == "id_token")
+                                {
+                                    id_token = li.Value;
+                                }
+                                if (li.Name == "state")
+                                {
+                                    //state = li.Value;
+                                }
+                                if (li.Name == "session_state")
+                                {
+                                    session_state = li.Value;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string postResponse = GlobalCookieManager.retrieveCodeFromMFA(postCalresponse.Result, AuthrequestCookies);
+                        var pollEndResponsecQ = CQ.Create(postResponse);
+                        var pollEndResponses = pollEndResponsecQ["input"];
+                        foreach (var li in pollEndResponses)
+                        {
+                            if (li.Name == "code")
+                            {
+                                code = li.Value;
+                            }
+                            if (li.Name == "id_token")
+                            {
+                                id_token = li.Value;
+                            }
+                            if (li.Name == "state")
+                            {
+                                //state = li.Value;
+                            }
+                            if (li.Name == "session_state")
+                            {
+                                session_state = li.Value;
+                            }
                         }
                     }
                 }

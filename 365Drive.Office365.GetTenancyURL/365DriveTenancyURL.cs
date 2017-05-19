@@ -20,6 +20,12 @@ namespace _365Drive.Office365.CloudConnector
 {
     public static class _365DriveTenancyURL
     {
+
+        /// <summary>
+        /// If the MFA is checked as remember, we will not ask for next time
+        /// </summary>
+        static bool rememberMFA { get; set; }
+
         /// <summary>
         /// Get the tenancy name from username password combination
         /// </summary>
@@ -270,7 +276,7 @@ namespace _365Drive.Office365.CloudConnector
                                 if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                 {
                                     SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
-                                    string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd);
+                                    string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
                                     Task<HttpResponseMessage> SASProcessAuth = HttpClientHelper.PostAsyncFullResponse(sAuthConstantResponse.SASControllerProcessAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
                                     SASProcessAuth.Wait();
 
@@ -332,7 +338,7 @@ namespace _365Drive.Office365.CloudConnector
                                     if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                     {
                                         SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
-                                        string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd);
+                                        string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
                                         Task<HttpResponseMessage> SASProcessAuth = HttpClientHelper.PostAsyncFullResponse(sAuthConstantResponse.SASControllerProcessAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
                                         SASProcessAuth.Wait();
 
@@ -432,10 +438,12 @@ namespace _365Drive.Office365.CloudConnector
 
                         if (authMethod.ToLower() == "onewaysms" || authMethod.ToLower() == "phoneappotp")
                         {
+                            rememberMFA = mfaForm.rememberMFA;
                             smsCode = mfaForm.smsCode;
                         }
                         else if (authMethod.ToLower() == "twowayvoicemobile" || authMethod.ToLower() == "phoneappnotification" || authMethod.ToLower() == "twowayvoiceoffice")
                         {
+                            rememberMFA = mfaForm.rememberMFA;
                             smsCode = mfaForm.verify.ToString();
                         }
 
@@ -443,6 +451,7 @@ namespace _365Drive.Office365.CloudConnector
                     catch { }
                 }
             });
+
             return smsCode;
         }
 
@@ -603,97 +612,137 @@ namespace _365Drive.Office365.CloudConnector
 
 
                 string msLoginPostData = String.Format(StringConstants.loginPostData, upn, password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
-                Task<String> postCalresponse = HttpClientHelper.PostAsync((StringConstants.loginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies);
+                NameValueCollection postCalHeader = new NameValueCollection();
+                Task<HttpResponseMessage> postCalresponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.loginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies, postCalHeader);
                 postCalresponse.Wait();
+                string postCalresponseString = postCalresponse.Result.Content.ReadAsStringAsync().Result;
 
-                CQ msPOSTcq = CQ.Create(postCalresponse.Result);
-                var msPOSTcqItems = msPOSTcq["input"];
-                foreach (var li in msPOSTcqItems)
+                if (postCalresponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
                 {
-                    if (li.Name == "ctx")
+                    CQ msPOSTcq = CQ.Create(postCalresponseString);
+
+                    string isPollingRequired = getpolingRequired(postCalresponseString);
+                    bool pollingRequired = false;
+                    bool.TryParse(isPollingRequired, out pollingRequired);
+
+                    if (pollingRequired)
                     {
-                        if (!string.IsNullOrEmpty(li.Value))
-                            msPostCtx = li.Value;
-                    }
-                    if (li.Name == "flowToken")
-                    {
-                        msPostFlow = li.Value;
-                    }
-                }
+                        var msPOSTcqItems = msPOSTcq["input"];
+                        foreach (var li in msPOSTcqItems)
+                        {
+                            if (li.Name == "ctx")
+                            {
+                                if (!string.IsNullOrEmpty(li.Value))
+                                    msPostCtx = li.Value;
+                            }
+                            if (li.Name == "flowToken")
+                            {
+                                msPostFlow = li.Value;
+                            }
+                        }
 
-                msPostHpgact = getHPGact(postCalresponse.Result);
-                msPostHpgid = getHPGId(postCalresponse.Result);
-                msPostCanary = getapiCanary(postCalresponse.Result);
-                LogManager.Verbose("MS post call finished. Canary: " + msPostCanary);
+                        msPostHpgact = getHPGact(postCalresponseString);
+                        msPostHpgid = getHPGId(postCalresponseString);
+                        msPostCanary = getapiCanary(postCalresponseString);
+                        LogManager.Verbose("MS post call finished. Canary: " + msPostCanary);
 
-                //preparing for call 4 which is poll start
+                        //preparing for call 4 which is poll start
 
-                //poll start cookie container
-                CookieContainer pollStartCookieContainer = new CookieContainer();
-                Uri msLoginPosturi = new Uri(StringConstants.loginPost);
-                IEnumerable<Cookie> responseCookies = msLoginPostCookies.GetCookies(msLoginPosturi).Cast<Cookie>();
-                foreach (Cookie cookie in responseCookies)
-                {
-                    pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
-                }
-                pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
+                        //poll start cookie container
+                        CookieContainer pollStartCookieContainer = new CookieContainer();
+                        Uri msLoginPosturi = new Uri(StringConstants.loginPost);
+                        IEnumerable<Cookie> responseCookies = msLoginPostCookies.GetCookies(msLoginPosturi).Cast<Cookie>();
+                        foreach (Cookie cookie in responseCookies)
+                        {
+                            pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
+                        }
+                        pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
 
-                NameValueCollection pollStartHeader = new NameValueCollection();
-                pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
-                pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
-                pollStartHeader.Add("Accept", "application/json");
-                pollStartHeader.Add("X-Requested-With", "XMLHttpRequest");
-                pollStartHeader.Add("hpgid", msPostHpgid);
-                pollStartHeader.Add("hpgact", msPostHpgact);
+                        NameValueCollection pollStartHeader = new NameValueCollection();
+                        pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
+                        pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
+                        pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                        pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
+                        pollStartHeader.Add("Accept", "application/json");
+                        pollStartHeader.Add("X-Requested-With", "XMLHttpRequest");
+                        pollStartHeader.Add("hpgid", msPostHpgid);
+                        pollStartHeader.Add("hpgact", msPostHpgact);
 
-                string pollStartData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
+                        string pollStartData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
 
-                //poll start heading
-                Task<String> pollStartResponse = HttpClientHelper.PostAsync((StringConstants.AADPoll), pollStartData, "application/json", pollStartCookieContainer, pollStartHeader);
-                pollStartResponse.Wait();
+                        //poll start heading
+                        Task<String> pollStartResponse = HttpClientHelper.PostAsync((StringConstants.AADPoll), pollStartData, "application/json", pollStartCookieContainer, pollStartHeader);
+                        pollStartResponse.Wait();
 
-                pollStartFlowToken = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).flowToken;
-                pollStartctx = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).ctx;
-                LogManager.Verbose("Poll start call finished. FlowToken: " + pollStartFlowToken + ", ctx: " + pollStartctx);
+                        pollStartFlowToken = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).flowToken;
+                        pollStartctx = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).ctx;
+                        LogManager.Verbose("Poll start call finished. FlowToken: " + pollStartFlowToken + ", ctx: " + pollStartctx);
 
 
-                //poll end cookie container
-                CookieContainer pollEndCookieContainer = new CookieContainer();
-                foreach (Cookie cookie in responseCookies)
-                {
-                    pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
-                }
-                pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
+                        //poll end cookie container
+                        CookieContainer pollEndCookieContainer = new CookieContainer();
+                        foreach (Cookie cookie in responseCookies)
+                        {
+                            pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
+                        }
+                        pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
 
-                NameValueCollection pollEndHeader = new NameValueCollection();
-                pollEndHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                pollEndHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                pollEndHeader.Add("Accept", "application/json");
-                pollEndHeader.Add("X-Requested-With", "XMLHttpRequest");
+                        NameValueCollection pollEndHeader = new NameValueCollection();
+                        pollEndHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
+                        pollEndHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                        pollEndHeader.Add("Accept", "application/json");
+                        pollEndHeader.Add("X-Requested-With", "XMLHttpRequest");
 
-                string pollEndData = String.Format(StringConstants.AADPollEndBody, pollStartFlowToken, pollStartctx);
+                        string pollEndData = String.Format(StringConstants.AADPollEndBody, pollStartFlowToken, pollStartctx);
 
-                //poll start heading
-                Task<HttpResponseMessage> pollEndResponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
-                pollEndResponse.Wait();
-
-                if (pollEndResponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.AADFailedLoginUrl.ToLower())
-                {
-                    string code = retrieveCodeFromMFA(pollEndResponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
-                    if (string.IsNullOrEmpty(code))
-                    {
-                        return string.Empty;
+                        //poll start heading
+                        Task<HttpResponseMessage> pollEndResponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
+                        pollEndResponse.Wait();
+                        if (pollEndResponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.AADFailedLoginUrl.ToLower())
+                        {
+                            string code = retrieveCodeFromMFA(pollEndResponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                            if (string.IsNullOrEmpty(code))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                authCode = code;
+                            }
+                        }
+                        else
+                        {
+                            NameValueCollection qscoll = HttpUtility.ParseQueryString(pollEndResponse.Result.RequestMessage.RequestUri.Query);
+                            if (qscoll.Count > 0)
+                                authCode = qscoll[0];
+                        }
                     }
                     else
                     {
-                        authCode = code;
+                        if (postCalresponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                        {
+                            string code = retrieveCodeFromMFA(postCalresponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                            if (string.IsNullOrEmpty(code))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                authCode = code;
+                            }
+                        }
+                        else
+                        {
+                            NameValueCollection qscoll = HttpUtility.ParseQueryString(postCalresponse.Result.RequestMessage.RequestUri.Query);
+                            if (qscoll.Count > 0)
+                                authCode = qscoll[0];
+                        }
                     }
+
                 }
                 else
                 {
-                    NameValueCollection qscoll = HttpUtility.ParseQueryString(pollEndResponse.Result.RequestMessage.RequestUri.Query);
+                    NameValueCollection qscoll = HttpUtility.ParseQueryString(postCalresponse.Result.RequestMessage.RequestUri.Query);
                     if (qscoll.Count > 0)
                         authCode = qscoll[0];
                 }
@@ -982,6 +1031,15 @@ namespace _365Drive.Office365.CloudConnector
         public static string getHPGact(string response)
         {
             int indexofCanary = response.IndexOf("\"hpgact\":") + 9;
+            int endIndex = response.IndexOf(",", indexofCanary + 1);
+            string clientRequest = response.Substring(indexofCanary, endIndex - indexofCanary);
+            return clientRequest;
+        }
+
+
+        public static string getpolingRequired(string response)
+        {
+            int indexofCanary = response.IndexOf("isPollingRequired: ") + 19;
             int endIndex = response.IndexOf(",", indexofCanary + 1);
             string clientRequest = response.Substring(indexofCanary, endIndex - indexofCanary);
             return clientRequest;

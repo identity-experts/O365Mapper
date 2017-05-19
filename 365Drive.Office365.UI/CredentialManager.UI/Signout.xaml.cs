@@ -90,6 +90,11 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             o365cookieManager.signout();
             ADFSAuth.signout();
 
+            //clear license states
+            LicenseManager.lastLicenseChecked = null;
+            LicenseManager.lastDriveFetched = null;
+            LicenseManager.lastLicenseState = null;
+
             ////exit
             //Application.Current.Shutdown();
         }

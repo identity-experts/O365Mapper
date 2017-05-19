@@ -76,7 +76,8 @@ namespace _365Drive.Office365.CommunicationManager
                 if (!Utility.ready())
                     return null;
 
-                if (notificationQueue.Count(n => !n.Notified) > 0)
+
+                if (notificationQueue != null && notificationQueue.Count(n => !n.Notified) > 0)
                 {
                     //first retrieve the next item
                     Notification nextNotification = notificationQueue.FirstOrDefault(n => !n.Notified);

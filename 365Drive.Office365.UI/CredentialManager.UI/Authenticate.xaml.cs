@@ -132,7 +132,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                     _365Drive.Office365.CloudConnector.LicenseManager.hasPasswordChangedOrFirstTime = true;
 
                     //Notify the user that we will attempt the credentials shortly
-                    CommunicationManager.Communications.queueNotification(Globalization.Globalization.credentials, Globalization.Globalization.CredentialsReceived);
+                    CommunicationManager.Communications.queueNotification(Globalization.Globalization.SignInPageheader, Globalization.Globalization.CredentialsReceived);
                 }
 
                 SignInprogress.Visibility = Visibility.Hidden;

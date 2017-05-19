@@ -43,7 +43,7 @@ namespace _365Drive.Office365
         public const string retrieveDriveMappingsUrl = "{0}?wc-api={1}&tenancy={2}";
 
         //beta
-        public const string softwareVersion = "0.1.0";
+        public const string softwareVersion = "0.1.2";
 
         public const int licenseCheckInterval = 120;
         public const int localLicenseCheckLimit = 24;

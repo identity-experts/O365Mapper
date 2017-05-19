@@ -439,6 +439,24 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 365mapper Settings.
+        /// </summary>
+        public static string settings {
+            get {
+                return ResourceManager.GetString("settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We will soon re-check your license status and fetch updated drive mapping details.
+        /// </summary>
+        public static string settingsrefreshed {
+            get {
+                return ResourceManager.GetString("settingsrefreshed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign in.
         /// </summary>
         public static string SignInPageheader {

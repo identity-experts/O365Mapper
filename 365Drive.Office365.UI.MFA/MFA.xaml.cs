@@ -52,14 +52,27 @@ namespace _365Drive.Office365.UI.MFA
         }
 
 
+        private bool _rememberMFA;
+        public bool rememberMFA
+        {
+            get
+            {
+                return _rememberMFA;
+            }
+            set
+            {
+                _rememberMFA = value;
+            }
+        }
+
         public MFA()
         {
             InitializeComponent();
 
             //set the usermessage
-            
 
-         
+
+
             // define the dialog buttons
             Button customOK = new Button();
             // define the dialog buttons
@@ -85,7 +98,9 @@ namespace _365Drive.Office365.UI.MFA
         private void VerifyNow_Click(object sender, RoutedEventArgs e)
         {
             verify = true;
+            _rememberMFA = ckRememberMFA.IsChecked.Value;
             this.Close();
+            
         }
 
         public void ShowMFA()
@@ -134,6 +149,7 @@ namespace _365Drive.Office365.UI.MFA
                 if (!string.IsNullOrEmpty(this.SMSCode.Text))
                 {
                     smsCode = this.SMSCode.Text;
+                    _rememberMFA = ckRememberMFA.IsChecked.Value;
                     this.Close();
                 }
                 else
@@ -146,6 +162,7 @@ namespace _365Drive.Office365.UI.MFA
                 if (!string.IsNullOrEmpty(this.SASPAOTP.Text))
                 {
                     smsCode = this.PAOTP.Text;
+                    _rememberMFA = ckRememberMFA.IsChecked.Value;
                     this.Close();
                 }
                 else
@@ -156,9 +173,10 @@ namespace _365Drive.Office365.UI.MFA
             else if (sAuthContext_AuthMethodId.ToLower() == "twowayvoicemobile" || sAuthContext_AuthMethodId.ToLower() == "phoneappnotification")
             {
                 verify = true;
+                _rememberMFA = ckRememberMFA.IsChecked.Value;
                 this.Close();
             }
-      
+
             //unmap all drives
         }
 

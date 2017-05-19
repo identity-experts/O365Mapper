@@ -99,7 +99,7 @@ namespace _365Drive.Office365.CloudConnector
         internal const string SASBeginAuthPostBody = "{{\"Method\":\"BeginAuth\",\"flowToken\":\"{0}\",\"ctx\":\"{1}\",\"AuthMethodId\":\"{2}\"}}";
         internal const string SASEndAuthPostBody = "{{\"Method\":\"EndAuth\",\"FlowToken\":\"{0}\",\"SessionId\":\"{1}\",\"Ctx\":\"{2}\",\"AuthMethodId\":\"{6}\",\"AdditionalAuthData\":\"{3}\",\"LastPollStart\":\"{4}\",\"LastPollEnd\":\"{5}\"}}";
         internal const string SASCallEndAuthPostBody = "{{\"Method\":\"EndAuth\",\"FlowToken\":\"{0}\",\"SessionId\":\"{1}\",\"Ctx\":\"{2}\",\"PollCount\":\"1\",\"LastPollStart\":\"{3}\",\"LastPollEnd\":\"{4}\",\"AuthMethodId\":\"{5}\"}}";
-        internal const string SASProcessAuthPostBody = "request={0}&flowToken={1}&canary={2}&mfaAuthMethod=OneWaySMS&rememberMFA=false&mfaLastPollStart={3}&mfaLastPollEnd={4}";
+        internal const string SASProcessAuthPostBody = "request={0}&flowToken={1}&canary={2}&mfaAuthMethod={6}&rememberMFA={5}&mfaLastPollStart={3}&mfaLastPollEnd={4}";
         internal const string SharePointFormPost = "code={0}&id_token={1}&state={2}&session_state={3}";
     }
 }

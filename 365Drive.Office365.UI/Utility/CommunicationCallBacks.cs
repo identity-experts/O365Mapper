@@ -120,6 +120,7 @@ namespace _365Drive.Office365.UI.Utility
                 LicenseManager.lastLicenseChecked = null;
                 LicenseManager.lastDriveFetched = null;
                 LicenseManager.lastLicenseState = null;
+                CommunicationManager.Communications.queueNotification(Globalization.Globalization.settings, Globalization.Globalization.settingsrefreshed);
             }
             catch { }
         }

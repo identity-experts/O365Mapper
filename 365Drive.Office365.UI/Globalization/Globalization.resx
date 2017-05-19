@@ -284,4 +284,10 @@
   <data name="CredentialsReceived" xml:space="preserve">
     <value>Thank you for signing in, we will attempt login shortly</value>
   </data>
+  <data name="settings" xml:space="preserve">
+    <value>365mapper Settings</value>
+  </data>
+  <data name="settingsrefreshed" xml:space="preserve">
+    <value>We will soon re-check your license status and fetch updated drive mapping details</value>
+  </data>
 </root>

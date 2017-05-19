@@ -25,6 +25,14 @@ namespace _365Drive.Office365.CloudConnector
         [DllImport("wininet.dll", SetLastError = true)]
         public static extern bool InternetGetCookie(string lpszUrl, string lpszCookieName, StringBuilder lpszCookieData, ref int lpdwSize);
 
+        [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool InternetSetOption(
+     int hInternet,
+     int dwOption,
+     string lpBuffer,
+     int dwBufferLength
+ );
+
         [DllImport("kernel32.dll")]
         #endregion
         public static extern uint GetLastError();
@@ -92,7 +100,7 @@ namespace _365Drive.Office365.CloudConnector
                 RealM userRealM = JsonConvert.DeserializeObject<RealM>(realM.Result);
 
                 //only for debug until we find way to differetiate cloud and AAD Connect
-                if (upn.ToLower() == "demo.mfa@identityexperts.co.uk" && RegistryManager.IsDev)
+                if (upn.ToLower() == "leigh.wood@node-it.com" && RegistryManager.IsDev)
                 {
                     FederationType = FedType.Cloud;
                 }
@@ -363,6 +371,45 @@ namespace _365Drive.Office365.CloudConnector
             }
         }
 
+
+        /// <summary>
+        /// Set the cookies in IE to keep them persistant and used by drive mapper
+        /// </summary>
+        /// <param name="cookies"></param>
+        public static void deleteCookiesFromIE(string fedAuth, string rtFA, string strUrl)
+        {
+            try
+            {
+                if (!Utility.ready())
+                    return;
+
+                LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
+                ///Setting fedAuth
+                bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "FedAuth", fedAuth + ";" + "Expires = " + DateTime.Now.AddDays(-10).ToString("R"));
+                LogManager.Verbose("fedAuth cookie setIE result: " + FedAuthcookiesetresult);
+
+                ///setting rtFA
+                bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "rtFa", rtFA + ";" + "Expires = " + DateTime.Now.AddDays(-10).ToString("R"));
+
+                //delete cookies
+                InternetSetOption(0, 42, null, 0);
+
+                LogManager.Verbose("rtFA cookie setIE result: " + rtFAcookiesetresult);
+
+                if (!FedAuthcookiesetresult)
+                {
+
+                    uint lastError = GetLastError(); //this will return 87  for www.nonexistent.com
+                    LogManager.Verbose("cookie setIE failed with error uint code: " + lastError.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+        }
+
         /// <summary>
         /// map SharePoint Drives
         /// </summary>
@@ -377,7 +424,8 @@ namespace _365Drive.Office365.CloudConnector
                 string singleDrivePowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};(New-Object -ComObject WScript.Network).MapNetworkDrive(\"" + "{0}" + "\", \"" + "{1}" + "\", $true, \"" + "\", \"" + "\"); (New-Object -ComObject Shell.Application).NameSpace(\"" + "{0}" + "\").Self.Name = \"" + "{2}" + "\";$RegKey = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{3}\";$RegKey2 = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{4}\";Set-ItemProperty -Path $RegKey2 -Name _LabelFromReg -Value \"{2}\";Set-ItemProperty -Path $RegKey -Name _LabelFromReg -Value \"{2}\";}}Catch{{}}";
                 string singleRepairDrivePowershellCommand = "Try{{(New-Object -ComObject Shell.Application).NameSpace(\"" + "{0}" + "\").Self.Name = \"" + "{1}" + "\";$RegKey = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{2}\";$RegKey2 = \"HKCU:\\software\\microsoft\\windows\\currentversion\\explorer\\mountpoints2\\{3}\";Set-ItemProperty -Path $RegKey2 -Name _LabelFromReg -Value \"{1}\";Set-ItemProperty -Path $RegKey -Name _LabelFromReg -Value \"{1}\";}}Catch{{}}";
                 string singleDriveunmapPowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};}}Catch{{}}";
-                string restartExplorer = ";Stop-Process -processName: Explorer;";
+                //string restartExplorer = ";Stop-Process -processName: Explorer;";
+                string restartExplorer = ";";
 
                 StringBuilder powerShell = new StringBuilder();
                 bool anyDelete = false;
@@ -642,8 +690,8 @@ namespace _365Drive.Office365.CloudConnector
                 if (!Utility.ready())
                     return;
 
-                DriveManager.setCookiestoIE(string.Empty, string.Empty, DriveManager.rootSiteUrl);
-                DriveManager.setCookiestoIE(string.Empty, string.Empty, DriveManager.oneDriveHostSiteUrl);
+                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, DriveManager.rootSiteUrl);
+                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, DriveManager.oneDriveHostSiteUrl);
             }
             catch (Exception ex)
             {
@@ -665,6 +713,7 @@ namespace _365Drive.Office365.CloudConnector
                 LogManager.Verbose("Unmapping all drives");
                 //{0}=Letter,{1}=Path,{2}=Name
                 string singleDriveunmapPowershellCommand = "Try{{If ((Test-Path " + "{0}" + ")) {{(New-Object -Com WScript.Network).RemoveNetworkDrive(\"" + "{0}" + "\",$true,$true);Remove-PSDrive " + "{0}" + " -Force;}};}}Catch{{}}";
+                //string restartExplorer = ";Stop-Process -processName: Explorer;";
                 StringBuilder powerShell = new StringBuilder();
 
                 //loop through each drive and make a complete powershell command
@@ -678,6 +727,9 @@ namespace _365Drive.Office365.CloudConnector
                 }
 
                 LogManager.Verbose("Full command: " + powerShell.ToString());
+
+                //refresh the desktop
+                //powerShell.Append(restartExplorer);
 
                 //invoke powershell ALL in
                 RunspaceConfiguration runspaceConfiguration = RunspaceConfiguration.Create();

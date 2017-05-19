@@ -22,6 +22,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
         </Grid.RowDefinitions>
         <Image Source="Images/3mxs.png" Grid.RowSpan="2" Width="111px" Height="111px" Grid.Column="0" />
 
@@ -56,6 +57,7 @@
             <TextBox Name="PAOTP" Width="100px" Height="30px" Margin="10,0,0,0" HorizontalAlignment="Left" />
             <TextBlock TextWrapping="Wrap" Name="PAvalidationSummary" Foreground="#FFB03030" />
         </StackPanel>
+        <CheckBox Name="ckRememberMFA" Content="Remember for 14 days" Grid.Column="1" Visibility="Collapsed" Grid.Row="2"></CheckBox>
     </Grid>
 
 </mui:ModernDialog>
