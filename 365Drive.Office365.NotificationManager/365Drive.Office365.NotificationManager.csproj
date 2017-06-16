@@ -80,6 +80,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Commands\ContextMenuHelper.cs" />
     <Compile Include="IconAnimation\Animation.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -118,6 +119,10 @@
     <ProjectReference Include="..\365Drive.Office365.Constants\365Drive.Office365.Constants.csproj">
       <Project>{b837f0c6-f2c4-4cf0-96a9-05201a234995}</Project>
       <Name>365Drive.Office365.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.UI.MFA\365Drive.Office365.UI.MFA.csproj">
+      <Project>{b7279763-d5ee-436c-ab1e-d0ad6ee6f5cc}</Project>
+      <Name>365Drive.Office365.UI.MFA</Name>
     </ProjectReference>
     <ProjectReference Include="..\365Drive.Office365.Utility\365Drive.Office365.Utility.csproj">
       <Project>{2a55bec8-5690-4ff9-95c0-29ac5c97ce35}</Project>

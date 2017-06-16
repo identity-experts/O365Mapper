@@ -70,6 +70,24 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to About Partner: .
+        /// </summary>
+        public static string AboutPartner {
+            get {
+                return ResourceManager.GetString("AboutPartner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Partner: .
+        /// </summary>
+        public static string AccountManager {
+            get {
+                return ResourceManager.GetString("AccountManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} drives mapped.
         /// </summary>
         public static string AllDrivesMapped {
@@ -385,6 +403,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thank you, we will attempt MFA shortly!.
+        /// </summary>
+        public static string MFAPromtNow {
+            get {
+                return ResourceManager.GetString("MFAPromtNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your account has been configured by multi factor authentication with default authentication set to {0}..
         /// </summary>
         public static string MFAUserMessage {
@@ -435,6 +462,24 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string ProductName {
             get {
                 return ResourceManager.GetString("ProductName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thank you for your input, we will proceed with MFA later. Meanwhile, If you want to re-enable MFA prompt, click on &apos;Prompt MFA&apos; from menu..
+        /// </summary>
+        public static string RemindMeLaterNotification {
+            get {
+                return ResourceManager.GetString("RemindMeLaterNotification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MFA will be attempted later. To start now, click &apos;Prompt MFA&apos; from menu. .
+        /// </summary>
+        public static string RemindMeLaterStatus {
+            get {
+                return ResourceManager.GetString("RemindMeLaterStatus", resourceCulture);
             }
         }
         

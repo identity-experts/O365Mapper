@@ -139,5 +139,25 @@ namespace _365Drive.Office365.UI.Utility
             }
             catch { }
         }
+
+
+        /// <summary>
+        /// Display about form
+        /// </summary>
+        public static void ClearMFACache()
+        {
+           
+            //getting DialogResult can be set only after Window is created and shown as dialog error. Will check later.
+            try
+            {
+                //clear MFA cache
+                _365Drive.Office365.UI.MFA.ReminderStates.lastRemiderState = null;
+
+                //notify user
+                //Notify the user that we will attempt the credentials shortly
+                CommunicationManager.Communications.queueNotification(Globalization.Globalization.SignInPageheader, Globalization.Globalization.MFAPromtNow);
+            }
+            catch { }
+        }
     }
 }

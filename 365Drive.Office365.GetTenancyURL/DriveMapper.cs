@@ -96,6 +96,10 @@ namespace _365Drive.Office365.CloudConnector
                 {
                     licenseMode = LicenseValidationState.LoginFailed;
                 }
+                else if (tenancyName == "0")
+                {
+                    return LicenseValidationState.MFARemindLater;
+                }
                 else
                 {
                     return LicenseValidationState.Ok;

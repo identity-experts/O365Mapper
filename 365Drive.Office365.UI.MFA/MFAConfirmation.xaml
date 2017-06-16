@@ -23,12 +23,25 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Image Source="Images/3mxs.png" Grid.RowSpan="2" Grid.Column="0" />
+        <Image Name="logo" Source="Images/3mxs.png" Width="111px" Grid.RowSpan="2" Grid.Column="0" />
         <TextBlock Name="Confirmation" Width="250px" Grid.RowSpan="2" Grid.Column="1" TextWrapping="WrapWithOverflow" 
                        Text="Your account has been configured for Multi-factor authentication. Would you like us to initiate second factor authentication now?" 
                    FontFamily="Lato" FontSize="14" Foreground="Gray" HorizontalAlignment="Left" >
         </TextBlock>
-     
+        <StackPanel Name="LaterTime" Visibility="Collapsed" Grid.RowSpan="2" Grid.Column="1" >
+            <StackPanel>
+                <DockPanel>
+                    <Button Name="remindIn1Hour" Content="1 hour" Background="#df6e09" Width="140px" Height="50px" Foreground="White" Click="remindLater_click"></Button>
+                    <Button Name="remindIn2Hour" Content="2 hours" Background="#df6e09" Width="140px" Height="50px" Foreground="White" Click="remindLater_click"></Button>
+                </DockPanel>
+            </StackPanel>
+            <StackPanel>
+                <DockPanel>
+                    <Button Name="remindIn5Hour" Content="5 hours" Background="#df6e09" Width="140px" Height="50px" Foreground="White" Click="remindLater_click"></Button>
+                    <Button Name="remindIn24Hour" Content="24 hours" Background="#df6e09" Width="140px" Height="50px" Foreground="White" Click="remindLater_click"></Button>
+                </DockPanel>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 
 </mui:ModernDialog>

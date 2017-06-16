@@ -6,8 +6,8 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
                   mc:Ignorable="d" 
-                  d:DesignHeight="300"
-                  Title="{x:Static p:Globalization.ProductName}" Width="400px" Height="200px" >
+                  d:DesignHeight="400"
+                  Title="{x:Static p:Globalization.ProductName}" Width="400px" Height="280px" >
 
 
     <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
@@ -26,15 +26,28 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Grid.Row="0" Source="../images/3mxs.png" Grid.Column="0" Grid.RowSpan="4" Width="111px" />
-        <Label Content="{x:Static p:Globalization.About}" Margin="0,1.4,4,14.6" Grid.Column="1" Grid.Row="0" FontFamily="Lato" FontSize="15" />
+        <Image Grid.Row="0" Name="logo"  Source="../images/3mxs.png" Grid.Column="0" Grid.RowSpan="4" Width="111px" />
+        <Label Content="{x:Static p:Globalization.About}"  Grid.Column="1" Grid.Row="0" FontFamily="Lato" FontSize="15" HorizontalAlignment="Right" />
         <Label Name="Software" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Content="{x:Static p:Globalization.ProductName}" 
                FontFamily="Lato" FontSize="15"  />
-        <Label Grid.Row="1" Content="{x:Static p:Globalization.Version}" HorizontalAlignment="Left" Grid.Column="1" FontFamily="Lato" FontSize="15" />
+        <Label Grid.Row="1" Content="{x:Static p:Globalization.Version}" HorizontalAlignment="Right" Grid.Column="1" FontFamily="Lato" FontSize="15" />
         <Label Name="VersionNumber" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
-        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
+
+        <Label Name="partnerNameLabel" Grid.Row="2" Content="{x:Static p:Globalization.AccountManager}" HorizontalAlignment="Right" Grid.Column="1" FontFamily="Lato" FontSize="15" />
+        <Label Name="partnerName" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
+
+        <Label Name="partnerAboutLabel" Grid.Row="3" Content="{x:Static p:Globalization.AboutPartner}" HorizontalAlignment="Right" Grid.Column="1" FontFamily="Lato" FontSize="15" />
+        <ScrollViewer Grid.Row="3" Grid.Column="2" Height="50" Width="185" HorizontalAlignment="Left">
+            <TextBlock ScrollViewer.HorizontalScrollBarVisibility="Disabled"  
+                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                       Name="partnerAbout" TextWrapping="Wrap" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" Width="175" Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
+        </ScrollViewer>
+
+        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
                Grid.ColumnSpan="2"
                FontFamily="Lato" FontSize="13" Foreground="Gray" />
         

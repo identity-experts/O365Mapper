@@ -34,7 +34,15 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             this.OkButton.Click += OkButton_Click;
 
             this.CancelButton.Content = Globalization.Globalization.Cancel;
-            this.CancelButton.Click += CancelButton_Click; ;
+            this.CancelButton.Click += CancelButton_Click;
+
+            if (LicenseManager.isitPartnerManaged)
+            {
+                //change logo
+                logo.Source = LicenseManager.partnerLogoBM;
+            }
+
+            //var menu = (ContextMenu)Resources["Vegetables"];
         }
 
 
@@ -79,6 +87,12 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             //remove all drive from array
             DriveManager.clearAll();
 
+            //clear partner details
+            LicenseManager.partnerName = string.Empty;
+            LicenseManager.partnerLogo = string.Empty;
+            LicenseManager.partnerAbout = string.Empty;
+
+
             //Delete credentials
             _365Drive.Office365.CredentialManager.RemoveCredentials();
 
@@ -89,6 +103,9 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             AADConnectCookieManager.signout();
             o365cookieManager.signout();
             ADFSAuth.signout();
+
+            //clear MFA cache
+            _365Drive.Office365.UI.MFA.ReminderStates.lastRemiderState = null;
 
             //clear license states
             LicenseManager.lastLicenseChecked = null;

@@ -21,7 +21,8 @@ namespace _365Drive.Office365
         TenancyName = 2,
         RootSiteUrl = 3,
         MySiteUrl = 4,
-        LastLicenseChecked = 5
+        LastLicenseChecked = 5,
+        PartnerLogo = 6
     }
 
 
@@ -160,6 +161,7 @@ namespace _365Drive.Office365
             Set(RegistryKeys.RootSiteUrl, string.Empty);
             Set(RegistryKeys.MySiteUrl, string.Empty);
             Set(RegistryKeys.LastLicenseChecked, string.Empty);
+            Set(RegistryKeys.PartnerLogo, string.Empty);
         }
 
         /// <summary>

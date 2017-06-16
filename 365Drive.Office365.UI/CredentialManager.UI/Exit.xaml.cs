@@ -38,6 +38,12 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             this.CancelButton.Click += CancelButton_Click;
             //this.CancelButton.IsCancel = true;
             //this.CancelButton.IsDefault = true;
+
+            if (LicenseManager.isitPartnerManaged)
+            {
+                //change logo
+                logo.Source = LicenseManager.partnerLogoBM;
+            }
         }
 
 

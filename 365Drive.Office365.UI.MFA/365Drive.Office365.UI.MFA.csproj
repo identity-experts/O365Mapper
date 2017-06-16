@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="RemindLater.cs" />
     <Page Include="Assets\ModernUI.Black.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

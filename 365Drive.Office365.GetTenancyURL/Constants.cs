@@ -9,6 +9,7 @@ namespace _365Drive.Office365.CloudConnector
 
     public enum LicenseValidationState
     {
+        MFARemindLater=8,
         Ok = 0,
         Expired = 1,
         Exceeded = 2,

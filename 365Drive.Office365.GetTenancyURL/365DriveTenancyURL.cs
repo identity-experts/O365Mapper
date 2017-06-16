@@ -27,6 +27,11 @@ namespace _365Drive.Office365.CloudConnector
         static bool rememberMFA { get; set; }
 
         /// <summary>
+        /// User has prompted to remind later
+        /// </summary>
+        static bool remindLater { get; set; }
+
+        /// <summary>
         /// Get the tenancy name from username password combination
         /// </summary>
         /// <param name="upn">username</param>
@@ -61,7 +66,7 @@ namespace _365Drive.Office365.CloudConnector
             }
 
             //Set the tennacy name at registry for next time use
-            if (!string.IsNullOrEmpty(TenancyName))
+            if (!string.IsNullOrEmpty(TenancyName) && TenancyName != "0")
                 RegistryManager.Set(RegistryKeys.TenancyName, TenancyName);
 
             return TenancyName;
@@ -151,7 +156,11 @@ namespace _365Drive.Office365.CloudConnector
                     string code = retrieveCodeFromMFA(msLoginPostResponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
                     if (string.IsNullOrEmpty(code))
                     {
-                        return string.Empty;
+                        ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                        if (remindLater)
+                            return "0";
+                        else
+                            return string.Empty;
                     }
                     else
                     {
@@ -432,6 +441,11 @@ namespace _365Drive.Office365.CloudConnector
                     try
                     {
                         mfaForm.Loaded += AboutForm_Loaded;
+                        if (LicenseManager.isitPartnerManaged)
+                        {
+                            //change logo
+                            mfaForm.partnerLogo = LicenseManager.partnerLogoBM;
+                        }
                         mfaForm.ShowMFA();
                         bool? dialogResult = mfaForm.ShowDialog();
 
@@ -486,8 +500,17 @@ namespace _365Drive.Office365.CloudConnector
                         try
                         {
                             mfaForm.Loaded += AboutForm_Loaded;
+                            if (LicenseManager.isitPartnerManaged)
+                            {
+                                //change logo
+                                mfaForm.partnerLogo = LicenseManager.partnerLogoBM;
+                            }
+
                             bool? dialogResult = mfaForm.ShowDialog();
                             userConsent = mfaForm.proceed;
+                            if (mfaForm.RemindLater != null)
+                                remindLater = true;
+
                             if (userConsent)
                             {
                                 LicenseManager.MFAConsent = true;
@@ -703,7 +726,11 @@ namespace _365Drive.Office365.CloudConnector
                             string code = retrieveCodeFromMFA(pollEndResponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
                             if (string.IsNullOrEmpty(code))
                             {
-                                return string.Empty;
+                                ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                                if (remindLater)
+                                    return "0";
+                                else
+                                    return string.Empty;
                             }
                             else
                             {
@@ -724,7 +751,12 @@ namespace _365Drive.Office365.CloudConnector
                             string code = retrieveCodeFromMFA(postCalresponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
                             if (string.IsNullOrEmpty(code))
                             {
-                                return string.Empty;
+                                ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                                if (remindLater)
+                                    return "0";
+                                else
+                                    return string.Empty;
+                                //return string.Empty;
                             }
                             else
                             {
@@ -883,7 +915,12 @@ namespace _365Drive.Office365.CloudConnector
                     string code = retrieveCodeFromMFA(ADFSrstPostResult.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
                     if (string.IsNullOrEmpty(code))
                     {
-                        return string.Empty;
+                        ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                        if (remindLater)
+                            return "0";
+                        else
+                            return string.Empty;
+                        //return string.Empty;
                     }
                     else
                     {

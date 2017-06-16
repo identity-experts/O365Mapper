@@ -7,8 +7,10 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows.Media.Imaging;
 
 namespace _365Drive.Office365.CloudConnector
 {
@@ -30,10 +32,13 @@ namespace _365Drive.Office365.CloudConnector
         public string user_id { get; set; }
     }
 
+
+
     public class LicenseUserMappingResult
     {
         public bool success { get; set; }
         public LicenseUserMappingResultData data { get; set; }
+
     }
 
     public class LicenseUserMappingResultData
@@ -43,8 +48,9 @@ namespace _365Drive.Office365.CloudConnector
         public bool alreadyactivated { get; set; }
         public bool tenancynotexist { get; set; }
         public bool licenseexcceded { get; set; }
-
-
+        public string partner_about { get; set; }
+        public string partner_name { get; set; }
+        public string partner_logo { get; set; }
     }
 
     public class LicenseCheckResult
@@ -72,6 +78,46 @@ namespace _365Drive.Office365.CloudConnector
 
     public static class LicenseManager
     {
+
+        #region partner specific properties
+        public static string partnerName { get; set; }
+        public static string partnerLogo { get; set; }
+
+        public static BitmapImage partnerLogoBM
+        {
+            get
+            {
+                //if (!string.IsNullOrEmpty(LicenseManager.partnerLogo))
+                //{
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(LicenseManager.partnerLogo, UriKind.Absolute);
+                bitmap.EndInit();
+                return bitmap;
+                //}
+            }
+        }
+
+        public static string partnerAbout { get; set; }
+        public static string partnerAboutPlainText
+        {
+            get { return Regex.Replace(partnerAbout, "<.*?>", String.Empty); }
+        }
+        public static bool isitPartnerManaged
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(partnerName))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+        #endregion
         /// <summary>
         /// This bool will be used for making sure whether we need to directly prompt for MFA or not
         /// </summary>
@@ -83,6 +129,7 @@ namespace _365Drive.Office365.CloudConnector
         public static bool MFAConsent { get; set; }
 
         public static string lastActivationMessage { get; set; }
+
 
         /// <summary>
         /// Last checked time
@@ -125,7 +172,7 @@ namespace _365Drive.Office365.CloudConnector
                 bool consentRequired = true;
 
                 //if this is first time user typed in credential, they would deffo expect the MFA so no need for user consent. And finally set it off.
-                if(hasPasswordChangedOrFirstTime)
+                if (hasPasswordChangedOrFirstTime)
                 {
                     consentRequired = false;
                     hasPasswordChangedOrFirstTime = false;
@@ -211,6 +258,17 @@ namespace _365Drive.Office365.CloudConnector
                 //if we get the key, proceed or check for why its failed
                 if (userLicenseMapresult.success)
                 {
+                    //check partner information
+                    if (userLicenseMapresult.data.partner_name != null && !string.IsNullOrEmpty(userLicenseMapresult.data.partner_name.Trim()))
+                    {
+                        partnerName = userLicenseMapresult.data.partner_name;
+                        partnerLogo = userLicenseMapresult.data.partner_logo;
+                        partnerAbout = userLicenseMapresult.data.partner_about;
+
+                        //set to registry ONLY for notifications
+                        RegistryManager.Set(RegistryKeys.PartnerLogo, userLicenseMapresult.data.partner_logo);
+                    }
+
                     string uniqueMachineID = ThumbPrint.Value();
                     string licenseStatusUrl = String.Format(Constants.statusCheckUrl, Constants.licensingBaseDomain, Constants.activationApiCode, encode(userLicenseMapresult.data.email), userLicenseMapresult.data.key, Constants.statusRequestName, encode(Constants.ie365MapperProductName), uniqueMachineID, encode(userName), System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
                     //check the license status 
@@ -417,7 +475,7 @@ namespace _365Drive.Office365.CloudConnector
                         }
 
                     }
-                    if(DriveManager.mappableDrives == null || DriveManager.mappableDrives.Count == 0)
+                    if (DriveManager.mappableDrives == null || DriveManager.mappableDrives.Count == 0)
                     {
                         addDefaultDrives();
                     }

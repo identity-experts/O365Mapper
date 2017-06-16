@@ -1,6 +1,7 @@
 ﻿using FirstFloor.ModernUI.Windows.Controls;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace _365Drive.Office365.UI.MFA
 {
@@ -9,7 +10,17 @@ namespace _365Drive.Office365.UI.MFA
     /// </summary>
     public partial class MFA : ModernDialog
     {
-
+        public BitmapImage partnerLogo
+        {
+            set
+            {
+                try
+                {
+                    this.logo.Source = value;
+                }
+                catch { }
+            }
+        }
 
         private string _sAuthContext_AuthMethodId;
         public string sAuthContext_AuthMethodId

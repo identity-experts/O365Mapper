@@ -290,4 +290,19 @@
   <data name="settingsrefreshed" xml:space="preserve">
     <value>We will soon re-check your license status and fetch updated drive mapping details</value>
   </data>
+  <data name="AboutPartner" xml:space="preserve">
+    <value>About Partner: </value>
+  </data>
+  <data name="AccountManager" xml:space="preserve">
+    <value>Partner: </value>
+  </data>
+  <data name="MFAPromtNow" xml:space="preserve">
+    <value>Thank you, we will attempt MFA shortly!</value>
+  </data>
+  <data name="RemindMeLaterNotification" xml:space="preserve">
+    <value>Thank you for your input, we will proceed with MFA later. Meanwhile, If you want to re-enable MFA prompt, click on 'Prompt MFA' from menu.</value>
+  </data>
+  <data name="RemindMeLaterStatus" xml:space="preserve">
+    <value>MFA will be attempted later. To start now, click 'Prompt MFA' from menu. </value>
+  </data>
 </root>

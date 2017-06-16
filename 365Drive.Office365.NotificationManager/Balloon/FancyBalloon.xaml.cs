@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Hardcodet.Wpf.TaskbarNotification;
+using _365Drive.Office365.CloudConnector;
 
 namespace _365Drive.Office365.NotificationManager
 {
@@ -92,6 +93,13 @@ namespace _365Drive.Office365.NotificationManager
         {
             InitializeComponent();
             TaskbarIcon.AddBalloonClosingHandler(this, OnBalloonClosing);
+
+            //ensure partner
+            if (LicenseManager.isitPartnerManaged)
+            {
+                //change logo
+                logo.Source = LicenseManager.partnerLogoBM;
+            }
         }
 
     

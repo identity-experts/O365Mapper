@@ -399,6 +399,13 @@ namespace _365Drive.Office365
                 #endregion
 
                 #region get and set tenancy name and urls
+
+                //if the Prompt mfa is enabled, disable it first and restart
+                currentDispatcher.Invoke(() =>
+                {
+                    DisableMFAMenuitem();
+                });
+
                 //as this is must in next calls, lets fetch the tenancy name here
                 LicenseValidationState tenancyNameState = DriveMapper.retrieveTenancyName(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 if (tenancyNameState == LicenseValidationState.LoginFailed)
@@ -416,6 +423,27 @@ namespace _365Drive.Office365
                     busy = false;
                     return;
                 }
+                else if (tenancyNameState == LicenseValidationState.MFARemindLater)
+                {
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.RemindMeLaterStatus);
+                    });
+                    LogManager.Verbose("User opted for remind later (MFA)");
+                    NotificationManager.NotificationManager.notify(Globalization.SignInPageheader, Globalization.RemindMeLaterNotification, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    //reset the current state
+                    Communications.CurrentState = States.UserAction;
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
+                    busy = false;
+                    currentDispatcher.Invoke(() =>
+                    {
+                        EnableMFAMenuitem();
+
+                    });
+
+                    return;
+                }
                 else if (tenancyNameState == LicenseValidationState.CouldNotVerify)
                 {
                     currentDispatcher.Invoke(() =>
@@ -423,7 +451,7 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.LicenseValidationFailed);
                     });
                     LogManager.Verbose("License could not be verified");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailed, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.Stopped;
                     Animation.Stop();
@@ -471,7 +499,7 @@ namespace _365Drive.Office365
                         Communications.updateStatus(Globalization.LicenseValidationFailed);
                     });
                     LogManager.Verbose("License could not be verified");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailed, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.Stopped;
                     Animation.Stop();
@@ -487,7 +515,7 @@ namespace _365Drive.Office365
                         Communications.updateStatus(notificationMessage);
                     });
                     LogManager.Verbose("License could not be verified");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailed, notificationMessage, ToolTipIcon.Error);
+                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, notificationMessage, ToolTipIcon.Error);
                     //reset the current state
                     Communications.CurrentState = States.Stopped;
                     Animation.Stop();
@@ -621,6 +649,73 @@ namespace _365Drive.Office365
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);
             }
+        }
+
+
+        /// <summary>
+        /// If user prompts for later in MFA, enable menu item now
+        /// </summary>
+        public static void EnableMFAMenuitem()
+        {
+            System.Windows.Controls.ContextMenu ctxMenu = (System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu");
+            System.Windows.Controls.ItemCollection items = ctxMenu.Items;
+
+            //foreach (var item in items)
+            //{
+            //    if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
+            //    {
+            //        // do your work with the item 
+            //        if (((System.Windows.Controls.MenuItem)item).Name == "MFA")
+            //        {
+
+            //  Add to main menu
+            System.Windows.Controls.MenuItem promptMFA = new System.Windows.Controls.MenuItem();
+            promptMFA.Name = "MFA";
+            promptMFA.Header = "Prompt MFA";
+            promptMFA.Click += PromptMFA_Click;
+            ((System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu")).Items.Add(promptMFA);
+            //        }
+            //    }
+            //}
+        }
+
+
+        /// <summary>
+        /// Clear MFA Cache
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void PromptMFA_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            //throw new NotImplementedException();
+            CommunicationCallBacks.ClearMFACache();
+
+            //finally again disable MFA
+            DisableMFAMenuitem();
+        }
+
+
+        /// <summary>
+        /// If user prompts for later in MFA, enable menu item now
+        /// </summary>
+        public static void DisableMFAMenuitem()
+        {
+            System.Windows.Controls.ContextMenu ctxMenu = (System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu");
+            System.Windows.Controls.ItemCollection items = ctxMenu.Items;
+            System.Windows.Controls.MenuItem itemtobeRemoved = null;
+            foreach (var item in items)
+            {
+                if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
+                {
+                    // do your work with the item 
+                    if (((System.Windows.Controls.MenuItem)item).Name == "MFA")
+                    {
+                        itemtobeRemoved = ((System.Windows.Controls.MenuItem)item);
+                    }
+                }
+            }
+            if (itemtobeRemoved != null)
+                ctxMenu.Items.Remove(itemtobeRemoved);
         }
 
         /// <summary>

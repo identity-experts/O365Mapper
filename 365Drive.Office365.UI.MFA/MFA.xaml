@@ -24,7 +24,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
-        <Image Source="Images/3mxs.png" Grid.RowSpan="2" Width="111px" Height="111px" Grid.Column="0" />
+        <Image Source="Images/3mxs.png" Grid.RowSpan="2" Width="111px" Height="111px" Name="logo" Grid.Column="0" />
 
         <StackPanel Name="SASAuth" Visibility="Collapsed" Grid.RowSpan="2" Grid.Column="1" >
             <TextBlock Name="SASSMSCode" Width="250px" TextWrapping="WrapWithOverflow" 

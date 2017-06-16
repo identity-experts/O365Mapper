@@ -174,6 +174,10 @@
       <Project>{991255a3-816f-4c88-9d55-21909ea37874}</Project>
       <Name>365Drive.Office365.RegistryManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.UI.MFA\365Drive.Office365.UI.MFA.csproj">
+      <Project>{b7279763-d5ee-436c-ab1e-d0ad6ee6f5cc}</Project>
+      <Name>365Drive.Office365.UI.MFA</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\IE-Medium.png">

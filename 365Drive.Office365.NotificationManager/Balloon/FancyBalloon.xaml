@@ -111,7 +111,7 @@
                Source="/Images/3mxs.png"
                Stretch="Fill"
                Height="69"
-               VerticalAlignment="Top" />
+               VerticalAlignment="Top" Name="logo" />
         <TextBlock Margin="91,50,21,0"
                    VerticalAlignment="Top"
                    Foreground="WhiteSmoke"

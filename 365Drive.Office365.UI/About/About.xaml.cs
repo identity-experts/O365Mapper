@@ -1,4 +1,5 @@
-﻿using FirstFloor.ModernUI.Windows.Controls;
+﻿using _365Drive.Office365.CloudConnector;
+using FirstFloor.ModernUI.Windows.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,35 @@ namespace _365Drive.Office365.UI.About
 
             //Set the version 
             VersionNumber.Content = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+
+            //set the partner information
+            if(LicenseManager.isitPartnerManaged)
+            {
+                //this.Height = 400;
+                //visible everything
+                partnerNameLabel.Visibility = Visibility.Visible;
+                partnerName.Visibility = Visibility.Visible;
+
+                //visible everything
+                partnerAboutLabel.Visibility = Visibility.Visible;
+                partnerAbout.Visibility = Visibility.Visible;
+
+                partnerAbout.Text = LicenseManager.partnerAboutPlainText;
+                partnerName.Content = LicenseManager.partnerName;
+
+                //change logo
+                logo.Source = LicenseManager.partnerLogoBM;
+            }
+            else
+            {
+                //visible everything
+                partnerNameLabel.Visibility = Visibility.Hidden;
+                partnerName.Visibility = Visibility.Hidden;
+
+                //visible everything
+                partnerAboutLabel.Visibility = Visibility.Hidden;
+                partnerAbout.Visibility = Visibility.Hidden;
+            }
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)

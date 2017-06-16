@@ -23,10 +23,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Source="/365Drive.Office365.UI;component/Images/3mxs.png" Width="110" Height="111" Grid.RowSpan="2" />
+        <Image Name="logo" Source="/365Drive.Office365.UI;component/Images/3mxs.png" Width="110" Height="111" Grid.RowSpan="2" />
         <TextBlock Width="250px" TextWrapping="WrapWithOverflow" FontFamily="Lato" FontSize="14" Foreground="Gray" Grid.RowSpan="2" Grid.Column="1"><Run Text="Exiting application will unmap "/><InlineUIContainer>
         	</InlineUIContainer><Run Text="365mapper drives, are you sure?"/></TextBlock>
+        <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
+               Grid.ColumnSpan="2"
+               FontFamily="Lato" FontSize="13" Foreground="Gray" />
     </Grid>
 
 </mui:ModernDialog>

@@ -1,4 +1,5 @@
-﻿using FirstFloor.ModernUI.Windows.Controls;
+﻿using _365Drive.Office365.CloudConnector;
+using FirstFloor.ModernUI.Windows.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,12 @@ namespace _365Drive.Office365.UI.WebClientSupport
 
             //set the help tex
             webClientHelp.Text = string.Format(Globalization.Globalization.webClientHelp, Environment.NewLine);
+
+            if (LicenseManager.isitPartnerManaged)
+            {
+                //change logo
+                logo.Source = LicenseManager.partnerLogoBM;
+            }
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)

@@ -65,6 +65,7 @@ namespace _365Drive.Office365.NotificationManager
             }
         }
 
+
         /// <summary>
         /// Shuts down the application.
         /// </summary>
@@ -118,7 +119,7 @@ namespace _365Drive.Office365.NotificationManager
 
         public bool CanExecute(object parameter)
         {
-            return CanExecuteFunc == null  || CanExecuteFunc();
+            return CanExecuteFunc == null || CanExecuteFunc();
         }
 
         public event EventHandler CanExecuteChanged

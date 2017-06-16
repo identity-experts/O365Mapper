@@ -106,6 +106,11 @@ namespace _365Drive.Office365.GetTenancyURL
                     try
                         {
                             mfaForm.Loaded += AboutForm_Loaded;
+                            if (LicenseManager.isitPartnerManaged)
+                            {
+                                //change logo
+                                mfaForm.partnerLogo = LicenseManager.partnerLogoBM;
+                            }
                             bool? dialogResult = mfaForm.ShowDialog();
                             userConsent = mfaForm.proceed;
                         }
@@ -328,6 +333,11 @@ namespace _365Drive.Office365.GetTenancyURL
                     try
                     {
                         mfaForm.Loaded += AboutForm_Loaded;
+                        if (LicenseManager.isitPartnerManaged)
+                        {
+                            //change logo
+                            mfaForm.partnerLogo = LicenseManager.partnerLogoBM;
+                        }
                         mfaForm.ShowMFA();
                         bool? dialogResult = mfaForm.ShowDialog();
 

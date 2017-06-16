@@ -1,4 +1,5 @@
-﻿using FirstFloor.ModernUI.Windows.Controls;
+﻿using _365Drive.Office365.CloudConnector;
+using FirstFloor.ModernUI.Windows.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,12 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             if (this.WindowState == WindowState.Minimized)
             {
                 this.WindowState = WindowState.Normal;
+            }
+
+            if (LicenseManager.isitPartnerManaged)
+            {
+                //change logo
+                logo.Source = LicenseManager.partnerLogoBM;
             }
 
             this.Activate();
