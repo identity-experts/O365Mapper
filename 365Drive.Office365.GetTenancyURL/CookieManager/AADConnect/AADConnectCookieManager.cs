@@ -53,6 +53,10 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
         class MsoCookies
         {
+            //IPUT
+            public string build { get; set; }
+            public string estsauthpersistent { get; set; }
+
             public string FedAuth { get; set; }
             public string rtFa { get; set; }
             public DateTime Expires { get; set; }
@@ -107,6 +111,30 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             };
                             cc.Add(rtFa);
                         }
+
+                        //IPUT
+                        // Set the buid cookie
+                        Cookie buid = new Cookie("buid", cookies.build)
+                        {
+                            Expires = cookies.Expires,
+                            Path = "/",
+                            Secure = cookies.Host.Scheme == "https",
+                            HttpOnly = true,
+                            Domain = cookies.Host.Host
+                        };
+                        cc.Add(buid);
+
+                        // Set the buid cookie
+                        Cookie estsauthpersistent = new Cookie("ESTSAUTHPERSISTENT", cookies.estsauthpersistent)
+                        {
+                            Expires = cookies.Expires,
+                            Path = "/",
+                            Secure = cookies.Host.Scheme == "https",
+                            HttpOnly = true,
+                            Domain = cookies.Host.Host
+                        };
+                        cc.Add(estsauthpersistent);
+
                         _cachedCookieContainer = cc;
                         return cc;
                     }
@@ -440,6 +468,10 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 ret.FedAuth = spCookies["FedAuth"].Value;
                 ret.rtFa = spCookies["rtFa"].Value;
                 ret.Host = _host;
+
+                //IPUT
+                ret.build = AuthrequestCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["buid"].Value;
+                ret.estsauthpersistent = msLoginPostCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["ESTSAUTHPERSISTENT"].Value;
 
                 //setting expiry
                 ret.Expires = DateTime.Now.AddHours(Constants.AuthcookieExpiryHours);

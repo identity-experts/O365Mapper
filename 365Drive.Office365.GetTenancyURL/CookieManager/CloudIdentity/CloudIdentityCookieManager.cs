@@ -78,6 +78,11 @@ namespace _365Drive.Office365.CloudConnector
         {
             public string FedAuth { get; set; }
             public string rtFa { get; set; }
+
+            //IPUT
+            public string build { get; set; }
+            public string estsauthpersistent { get; set; }
+
             public DateTime Expires { get; set; }
             public Uri Host { get; set; }
         }
@@ -137,6 +142,29 @@ namespace _365Drive.Office365.CloudConnector
                             };
                             cc.Add(rtFa);
                         }
+
+                        // Set the buid cookie
+                        Cookie buid = new Cookie("buid", cookies.build)
+                        {
+                            Expires = cookies.Expires,
+                            Path = "/",
+                            Secure = cookies.Host.Scheme == "https",
+                            HttpOnly = true,
+                            Domain = cookies.Host.Host
+                        };
+                        cc.Add(buid);
+
+                        // Set the buid cookie
+                        Cookie estsauthpersistent = new Cookie("ESTSAUTHPERSISTENT", cookies.estsauthpersistent)
+                        {
+                            Expires = cookies.Expires,
+                            Path = "/",
+                            Secure = cookies.Host.Scheme == "https",
+                            HttpOnly = true,
+                            Domain = cookies.Host.Host
+                        };
+                        cc.Add(estsauthpersistent);
+
                         _cachedCookieContainer = cc;
                         return cc;
                     }
@@ -300,6 +328,14 @@ namespace _365Drive.Office365.CloudConnector
                 SharePointPostHeader.Add("X-Requested-With", "XMLHttpRequest");
                 SharePointPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
                 Task<HttpResponseMessage> SharePointPostResult = null;
+
+
+                //IPUT
+                ret.build = AuthrequestCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["buid"].Value;
+                LogManager.Info("ret.build: " + ret.build);
+                ret.estsauthpersistent = AuthrequestCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["ESTSAUTHPERSISTENT"].Value;
+                LogManager.Info("ret.ESTSAUTHPERSISTENT: " + ret.estsauthpersistent);
+
                 try
                 {
                     SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);

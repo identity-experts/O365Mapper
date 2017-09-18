@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,12 +42,18 @@ namespace _365Drive.Office365.CloudConnector
         {
             string TenancyName = string.Empty;
 
+            
             //Checking first registry
             if (!String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.TenancyName)) && !String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.RootSiteUrl)) && !String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.MySiteUrl)))
             {
                 DriveManager.rootSiteUrl = RegistryManager.Get(RegistryKeys.RootSiteUrl);
                 DriveManager.oneDriveHostSiteUrl = RegistryManager.Get(RegistryKeys.MySiteUrl);
                 return RegistryManager.Get(RegistryKeys.TenancyName);
+            }
+            //check for exceptions first!
+            else if (!string.IsNullOrEmpty(exceptionDomain(upn)))
+            {
+                TenancyName = exceptionDomain(upn);
             }
             else
             {
@@ -70,6 +77,38 @@ namespace _365Drive.Office365.CloudConnector
                 RegistryManager.Set(RegistryKeys.TenancyName, TenancyName);
 
             return TenancyName;
+        }
+
+        /// <summary>
+        /// For companies like microsoft, we will not ask them to grant permission to app
+        /// </summary>
+        /// <param name="upn"></param>
+        /// <returns></returns>
+        public static string exceptionDomain(string upn)
+        {
+            string domainName = string.Empty;
+            MailAddress address = new MailAddress(upn);
+            string host = address.Host.ToString().ToLower(); // host contains yahoo.com
+
+            if (Constants.exception_domains.Contains(host))
+            {
+                if (host == "microsoft.com")
+                {
+                    string tenancyUniqueName = "microsoft";
+
+                    //Set onedrive host
+                    DriveManager.oneDriveHostSiteUrl = "https://" + tenancyUniqueName + "-my.sharepoint.com";
+                    RegistryManager.Set(RegistryKeys.MySiteUrl, DriveManager.oneDriveHostSiteUrl);
+
+
+                    //as this is going to be needed at many places, we will save it 
+                    DriveManager.rootSiteUrl = "https://" + tenancyUniqueName + ".sharepoint.com";
+                    RegistryManager.Set(RegistryKeys.RootSiteUrl, DriveManager.rootSiteUrl);
+
+                    domainName = "sharepoint" + StringConstants.rootUrltobeReplacedWith;
+                }
+            }
+            return domainName;
         }
 
         /// <summary>
@@ -903,6 +942,7 @@ namespace _365Drive.Office365.CloudConnector
                             rst = li.Value;
                     }
                 }
+                //System.DirectoryServices.AccountManagement.UserPrincipal.Current.UserPrincipalName
 
                 string authCode = string.Empty, accessToken = string.Empty;
                 //post rst to microsoft

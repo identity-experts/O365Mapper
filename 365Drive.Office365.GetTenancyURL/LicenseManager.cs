@@ -547,8 +547,33 @@ namespace _365Drive.Office365.CloudConnector
                         //Last: Get value from users' profile and Priority 3: get from app value
                         else
                         {
-                            //Call to Azure AD, user profile and registry to fetch and populate drive
-                            addDefaultDrives();
+
+                            string strUser = _365Drive.Office365.CredentialManager.GetCredential().UserName;
+
+                            if (!string.IsNullOrEmpty(_365DriveTenancyURL.exceptionDomain(strUser)))
+                            {
+                                if(_365DriveTenancyURL.exceptionDomain(strUser).ToLower() == "sharepoint.onmicrosoft.com")
+                                {
+                                    LogManager.Verbose("Adding default microsoft drives (hard coded)");
+                                    DriveManager.addDrive("I", "India Learning", "https://microsoft.sharepoint.com/sites/infopedia/indialearning/Documents");
+                                    DriveManager.addDrive("T", "ITWeb", "https://microsoft.sharepoint.com/sites/itweb/Documents");
+                                    DriveManager.addDrive("M", "MSW", "https://microsoft.sharepoint.com/sites/msw/documents");
+                                    DriveManager.addDrive("N", "Dining", "https://microsoft.sharepoint.com/sites/refweb/na/Redmond/dining/Documents");
+                                    DriveManager.addDrive("H", "Sharepoint Hosting Options", "https://microsoft.sharepoint.com/sites/SharePoint/Documents");
+                                    
+                                    DriveManager.addDrive("O", "OneDrive for Business", string.Empty, driveType.OneDrive);
+
+                                }
+                                else
+                                {
+                                    addDefaultDrives();
+                                }
+                            }
+                            else
+                            {
+                                //Call to Azure AD, user profile and registry to fetch and populate drive
+                                addDefaultDrives();
+                            }
 
                         }
                         lastDriveFetched = DateTime.Now;

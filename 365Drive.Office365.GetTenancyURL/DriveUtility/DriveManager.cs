@@ -372,6 +372,45 @@ namespace _365Drive.Office365.CloudConnector
         }
 
 
+        //IPUT
+        /// <summary>
+        /// Set the cookies in IE to keep them persistant and used by drive mapper
+        /// </summary>
+        /// <param name="cookies"></param>
+        public static void setIPUTCookiestoIE(string buid, string estsauthpersistent)
+        {
+            try
+            {
+                if (!Utility.ready())
+                    return;
+
+                LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
+                
+                //setting rtFA
+                bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri("https://login.microsoftonline.com").Authority, "ESTSAUTHPERSISTENT", estsauthpersistent + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
+                LogManager.Verbose("ESTSAUTHPERSISTENT cookie setIE result: " + rtFAcookiesetresult);
+
+
+                //Setting fedAuth
+                bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri("https://login.microsoftonline.com").Authority, "buid", buid + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
+                LogManager.Verbose("buid cookie setIE result: " + FedAuthcookiesetresult);
+
+                
+                if (!FedAuthcookiesetresult)
+                {
+
+                    uint lastError = GetLastError(); //this will return 87  for www.nonexistent.com
+                    LogManager.Verbose("cookie setIE failed with error uint code: " + lastError.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+        }
+
+
         /// <summary>
         /// Set the cookies in IE to keep them persistant and used by drive mapper
         /// </summary>
@@ -435,7 +474,7 @@ namespace _365Drive.Office365.CloudConnector
                 {
                     LogManager.Verbose("Ensuring user has access to:" + d.DriveUrl);
                     string webDavPath;
-                    if (!string.IsNullOrEmpty(d.DriveUrl))
+                    if (!string.IsNullOrEmpty(d.DriveUrl) && d.Drivetype != driveType.OneDrive)
                         webDavPath = d.DriveUrl.Replace("http://", "\\\\").Replace("https://", "\\\\").Replace(new Uri(d.DriveUrl).Host, new Uri(d.DriveUrl).Host + (new Uri(d.DriveUrl).Scheme == Uri.UriSchemeHttps ? "@SSL\\DavWWWRoot" : "\\DavWWWRoot")).Replace("/", "\\");
                     else
                         webDavPath = string.Empty;

@@ -227,13 +227,17 @@ namespace _365Drive.Office365.CloudConnector
 
 
                 //Make sure it doesnt have any proxy
-                if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString() != host)
+                if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)) != new Uri(host))
                 {
-                    LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
-                    WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));
-                    proxy.Credentials = CredentialCache.DefaultCredentials;
-                    proxy.UseDefaultCredentials = true;
-                    oneDriveUrlCall.Proxy = proxy;
+                    try
+                    {
+                        LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
+                        WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));
+                        proxy.Credentials = CredentialCache.DefaultCredentials;
+                        proxy.UseDefaultCredentials = true;
+                        oneDriveUrlCall.Proxy = proxy;
+                    }
+                    catch (Exception ex) { }
                 }
 
                 try
@@ -272,7 +276,7 @@ namespace _365Drive.Office365.CloudConnector
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { }
             }
             catch (Exception ex)
             {
@@ -313,7 +317,7 @@ namespace _365Drive.Office365.CloudConnector
                 requestDigestCall.ContentLength = 0;
 
                 //Make sure it doesnt have any proxy
-                if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString() != host)
+                if (WebRequest.DefaultWebProxy.GetProxy(new Uri(host)) != new Uri(host))
                 {
                     LogManager.Verbose("Proxy found: " + WebRequest.DefaultWebProxy.GetProxy(new Uri(host)).ToString());
                     WebProxy proxy = new WebProxy((WebRequest.DefaultWebProxy.GetProxy(new Uri(host))));

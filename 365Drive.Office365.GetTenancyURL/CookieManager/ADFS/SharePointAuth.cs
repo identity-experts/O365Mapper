@@ -101,6 +101,9 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
         /// <returns></returns>
         public CookieContainer getIECookies()
         {
+
+
+
             CookieContainer ret = new CookieContainer();
             try
             {
@@ -120,6 +123,28 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 {
                     nonce = qscoll["nonce"];
                     clientRequestId = qscoll["client-request-id"];
+                }
+
+
+                //lets again start as we need more details (I hope)
+                //MS call 1 to get 
+                //post to MS
+                string ADFSMSCall1 = string.Format(StringConstants.MSADFSGetRST, clientRequestId);
+                Task<string> ADFSMSCall1Result = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, ADFSMSCall1, "application/x-www-form-urlencoded", AuthrequestCookies);
+                ADFSMSCall1Result.Wait();
+
+                //get the ctx which is RST
+                string ADFSMScall1CTX = string.Empty;
+                CQ ADFSMScall1Parser = CQ.Create(ADFSMSCall1Result.Result);
+                var ADFSMScall1ParserInputs = ADFSMScall1Parser["input"];
+                foreach (var li in ADFSMScall1ParserInputs)
+                {
+                    if (li.Name == "ctx")
+                    {
+                        if (!string.IsNullOrEmpty(li.Value))
+                            ADFSMScall1CTX = li.Value;
+
+                    }
                 }
 
                 var Wreply = spSiteUrl.GetLeftPart(UriPartial.Authority) + "/_forms/default.aspx";
@@ -163,15 +188,17 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //get the ADFS post URL
                 string strADFSPostUrl = ADFSRealMresponse.AuthURL;
 
-
                 //post to ADFS now
                 string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
                 Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
                 adfsloginPostBodyResult.Wait();
 
+                //retrieve code, idtoken 
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
 
                 //retrieving rst
                 string rst = string.Empty;
+                string wctx = string.Empty;
                 CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
                 var adfsPostResponseItems = adfsPostResponse["input"];
                 foreach (var li in adfsPostResponseItems)
@@ -183,8 +210,140 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                 }
 
-                //retrieve code, idtoken 
-                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+
+                //ADFS + MFA (MS case)
+                if (string.IsNullOrEmpty(rst))
+                {
+
+                    return getMSIECookies();
+
+
+                    //get the ADFS URL using realM
+                    string ADFSMSCall2RealM = String.Format(StringConstants.ADFSRealM, LicenseManager.encode(username), Authorizectx);
+                    Task<string> ADFSMSCall2RealMResult = HttpClientHelper.GetAsync(ADFSMSCall2RealM, AuthrequestCookies);
+                    ADFSMSCall2RealMResult.Wait();
+
+
+                    var adfsPostResponseAnchors = adfsPostResponse["a"];
+                    foreach (var a in adfsPostResponseAnchors)
+                    {
+                        if (a.Id == "WindowsAzureMultiFactorAuthentication")
+                        {
+
+                            //its a case of microsoft!
+
+                            if (GlobalCookieManager.MFAUserConsent())
+                            {
+                                //Initiate the MFA
+                                string adfsMFAPostBody = StringConstants.AdfsPhoneMFAPostBody;
+                                Task<string> adfsMFAPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsMFAPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                                adfsMFAPostBodyResult.Wait();
+
+                                var context = string.Empty;
+                                //get the context value
+                                CQ adfsMFAPostBodyResponse = CQ.Create(adfsMFAPostBodyResult.Result);
+                                var adfsMFAPostBodyResponseItems = adfsMFAPostBodyResponse["input"];
+                                foreach (var li in adfsMFAPostBodyResponseItems)
+                                {
+                                    if (li.Name.ToLower() == "context")
+                                    {
+                                        if (!string.IsNullOrEmpty(li.Value))
+                                            context = li.Value;
+                                    }
+                                }
+                                //string verify = GlobalCookieManager.PromptMFA("phoneappnotification");
+                                //if (verify.ToLower() == "true")
+                                //The call is synchronized with auth 
+                                if(true)
+                                {
+                                    //Lets check
+                                    string adfsMFADoneBody = string.Format(StringConstants.AdfsPhoneMFAPostDoneBody, context);
+                                    Task<string> adfsMFAPostDoneBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsMFADoneBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                                    adfsMFAPostDoneBodyResult.Wait();
+
+                                    CQ MFADoneBodyResponseParser = CQ.Create(adfsMFAPostDoneBodyResult.Result);
+                                    var MFADoneBodyResponseParserInputs = MFADoneBodyResponseParser["input"];
+                                    foreach (var li in MFADoneBodyResponseParserInputs)
+                                    {
+                                        if (li.Name == "wresult")
+                                        {
+                                            if (!string.IsNullOrEmpty(li.Value))
+                                                rst = li.Value;
+                                        }
+                                        if(li.Name == "wctx")
+                                        {
+                                            if (!string.IsNullOrEmpty(li.Value))
+                                                wctx = li.Value;
+                                            
+                                        }
+                                    }
+
+                                    NameValueCollection MSstrrstPostHeader = new NameValueCollection();
+                                    MSstrrstPostHeader.Add("Origin", "https://msft.sts.microsoft.com");
+                                    MSstrrstPostHeader.Add("Upgrade-Insecure-Requests", "1");
+                                    MSstrrstPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                                    MSstrrstPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                                    MSstrrstPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                                    MSstrrstPostHeader.Add("Referer", strADFSPostUrl);
+
+                                    string MSstrrstPostBody = string.Format(StringConstants.MSADFSrstPostBody, LicenseManager.encode(rst), LicenseManager.encode(wctx));
+                                    Task<String> MSADFSrstPostResult = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, MSstrrstPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, MSstrrstPostHeader);
+                                    MSADFSrstPostResult.Wait();
+
+
+                                    //get the token "t"
+                                    string t = string.Empty;
+                                    CQ MSpostBodyResponseParser = CQ.Create(MSADFSrstPostResult.Result);
+                                    var MSpostBodyResponseInputs = MSpostBodyResponseParser["input"];
+                                    foreach (var li in MSpostBodyResponseInputs)
+                                    {
+                                        if (li.Name == "t")
+                                        {
+                                            t = li.Value;
+                                        }
+                                     
+                                    }
+
+                                    //get all code, state...
+                                    string MSADCodeUrl = string.Format(StringConstants.MSADGetCodeandTokenCall, clientRequestId);
+                                    Task<string> MSADCodeResponse = HttpClientHelper.GetAsync(MSADCodeUrl, AuthrequestCookies);
+                                    MSADCodeResponse.Wait();
+
+
+                                    CQ MSADCodeResponseParser = CQ.Create(MSADCodeResponse.Result);
+                                    var MSADCodeResponseInputs = MSADCodeResponseParser["input"];
+                                    foreach (var li in MSADCodeResponseInputs)
+                                    {
+                                        if (li.Name == "code")
+                                        {
+                                            code = li.Value;
+                                        }
+                                        if (li.Name == "id_token")
+                                        {
+                                            id_token = li.Value;
+                                        }
+                                        if (li.Name == "state")
+                                        {
+                                            state = li.Value;
+                                        }
+                                        if (li.Name == "session_state")
+                                        {
+                                            session_state = li.Value;
+                                        }
+                                    }
+
+                                    goto codereceived;
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+
+
+                
+
                 //post rst to microsoft
                 string strrstPostBody = string.Format(StringConstants.ADFSrstPostBody, LicenseManager.encode(rst), Authorizectx);
                 Task<String> ADFSrstPostResult = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, new NameValueCollection());
@@ -239,6 +398,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                 }
 
+                codereceived:
                 //post everyhing to sharepoint
                 string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
                 NameValueCollection SharePointPostHeader = new NameValueCollection();
@@ -278,6 +438,347 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
             return ret;
         }
 
+
+        /// <summary>
+        /// Get cookies for Microsoft AUTH 
+        /// </summary>
+        /// <returns></returns>
+        public CookieContainer getMSIECookies()
+        {
+            CookieContainer ret = new CookieContainer();
+            try
+            {
+                //are we ready?
+                if (!Utility.ready())
+                    return null;
+
+                //get nonse
+                string authorizeCall = string.Empty, Authorizectx = string.Empty, Authorizeflowtoken = string.Empty, authorizeCanary = string.Empty, nonce = string.Empty, clientRequestId = string.Empty;
+                string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, spSiteUrl.ToString());
+                CookieContainer AuthrequestCookies = new CookieContainer();
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies, true);
+                AuthrequestResponse.Wait();
+
+                NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
+                if (qscoll.Count > 0)
+                {
+                    nonce = qscoll["nonce"];
+                    clientRequestId = qscoll["client-request-id"];
+                }
+
+
+                string strADFSPostUrl = AuthrequestResponse.Result.RequestMessage.RequestUri.ToString();
+
+                //lets again start as we need more details (I hope)
+                //MS call 1 to get 
+                //post to MS
+                string ADFSMSCall1 = string.Format(StringConstants.MSADFSGetRST, clientRequestId);
+                Task<string> ADFSMSCall1Result = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, ADFSMSCall1, "application/x-www-form-urlencoded", AuthrequestCookies);
+                ADFSMSCall1Result.Wait();
+
+                //get the ctx which is RST
+                string ADFSMScall1CTX = string.Empty;
+                CQ ADFSMScall1Parser = CQ.Create(ADFSMSCall1Result.Result);
+                var ADFSMScall1ParserInputs = ADFSMScall1Parser["input"];
+                foreach (var li in ADFSMScall1ParserInputs)
+                {
+                    if (li.Name == "ctx")
+                    {
+                        if (!string.IsNullOrEmpty(li.Value))
+                            ADFSMScall1CTX = li.Value;
+
+                    }
+                }
+
+                var Wreply = spSiteUrl.GetLeftPart(UriPartial.Authority) + "/_forms/default.aspx";
+
+                string WindowsoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep0, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                Task<string> call0Result = HttpClientHelper.GetAsync(WindowsoAuthCallUrl, AuthrequestCookies);
+                call0Result.Wait();
+
+                //first call to get flow token, ctx and canary
+                string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                Task<HttpResponseMessage> call1Result = HttpClientHelper.GetAsyncFullResponse(MSOnlineoAuthCallUrl, AuthrequestCookies);
+                call1Result.Wait();
+
+                //string strADFSPostUrl = call1Result.Result.RequestMessage.RequestUri.Query;
+                authorizeCall = call1Result.Result.Content.ReadAsStringAsync().Result;
+
+                ///Fetch the ctx and flow token and canary
+                CQ htmlparser = CQ.Create(authorizeCall);
+                var items = htmlparser["input"];
+                foreach (var li in items)
+                {
+                    if (li.Name == "ctx")
+                    {
+                        Authorizectx = li.Value;
+                    }
+                    if (li.Name == "flowToken")
+                    {
+                        Authorizeflowtoken = li.Value;
+                    }
+                }
+                authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
+
+
+                //get user realM
+                string ADFSRealM = String.Format(StringConstants.ADFSRealM, LicenseManager.encode(username), Authorizectx);
+                Task<string> ADFSRealMResult = HttpClientHelper.GetAsync(ADFSRealM, AuthrequestCookies);
+                ADFSRealMResult.Wait();
+                RealM ADFSRealMresponse = JsonConvert.DeserializeObject<RealM>(ADFSRealMResult.Result);
+
+                //get the ADFS post URL
+                //string strADFSPostUrl = ADFSRealMresponse.AuthURL;
+
+                //post to ADFS now
+                string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
+                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                adfsloginPostBodyResult.Wait();
+
+                //retrieve code, idtoken 
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+
+                //retrieving rst
+                string rst = string.Empty;
+                string wctx = string.Empty;
+                CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                var adfsPostResponseItems = adfsPostResponse["input"];
+                foreach (var li in adfsPostResponseItems)
+                {
+                    if (li.Name == "wresult")
+                    {
+                        if (!string.IsNullOrEmpty(li.Value))
+                            rst = li.Value;
+                    }
+                }
+
+
+                //ADFS + MFA (MS case)
+                if (string.IsNullOrEmpty(rst))
+                {
+
+
+
+
+                    //get the ADFS URL using realM
+                    string ADFSMSCall2RealM = String.Format(StringConstants.ADFSRealM, LicenseManager.encode(username), Authorizectx);
+                    Task<string> ADFSMSCall2RealMResult = HttpClientHelper.GetAsync(ADFSMSCall2RealM, AuthrequestCookies);
+                    ADFSMSCall2RealMResult.Wait();
+
+
+                    var adfsPostResponseAnchors = adfsPostResponse["a"];
+                    foreach (var a in adfsPostResponseAnchors)
+                    {
+                        if (a.Id == "WindowsAzureMultiFactorAuthentication")
+                        {
+
+                            //its a case of microsoft!
+
+                            if (GlobalCookieManager.MFAUserConsent())
+                            {
+                                //Initiate the MFA
+                                string adfsMFAPostBody = StringConstants.AdfsPhoneMFAPostBody;
+                                Task<string> adfsMFAPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsMFAPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                                adfsMFAPostBodyResult.Wait();
+
+                                var context = string.Empty;
+                                //get the context value
+                                CQ adfsMFAPostBodyResponse = CQ.Create(adfsMFAPostBodyResult.Result);
+                                var adfsMFAPostBodyResponseItems = adfsMFAPostBodyResponse["input"];
+                                foreach (var li in adfsMFAPostBodyResponseItems)
+                                {
+                                    if (li.Name.ToLower() == "context")
+                                    {
+                                        if (!string.IsNullOrEmpty(li.Value))
+                                            context = li.Value;
+                                    }
+                                }
+                                //string verify = GlobalCookieManager.PromptMFA("phoneappnotification");
+                                //if (verify.ToLower() == "true")
+                                //The call is synchronized with auth 
+                                if (true)
+                                {
+                                    //Lets check
+                                    string adfsMFADoneBody = string.Format(StringConstants.AdfsPhoneMFAPostDoneBody, context);
+                                    Task<string> adfsMFAPostDoneBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsMFADoneBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                                    adfsMFAPostDoneBodyResult.Wait();
+
+                                    CQ MFADoneBodyResponseParser = CQ.Create(adfsMFAPostDoneBodyResult.Result);
+                                    var MFADoneBodyResponseParserInputs = MFADoneBodyResponseParser["input"];
+                                    foreach (var li in MFADoneBodyResponseParserInputs)
+                                    {
+                                        if (li.Name == "wresult")
+                                        {
+                                            if (!string.IsNullOrEmpty(li.Value))
+                                                rst = li.Value;
+                                        }
+                                        if (li.Name == "wctx")
+                                        {
+                                            if (!string.IsNullOrEmpty(li.Value))
+                                                wctx = li.Value;
+
+                                        }
+                                    }
+
+                                    NameValueCollection MSstrrstPostHeader = new NameValueCollection();
+                                    MSstrrstPostHeader.Add("Origin", "https://msft.sts.microsoft.com");
+                                    MSstrrstPostHeader.Add("Upgrade-Insecure-Requests", "1");
+                                    MSstrrstPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                                    MSstrrstPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                                    MSstrrstPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                                    MSstrrstPostHeader.Add("Referer", strADFSPostUrl);
+
+                                    string MSstrrstPostBody = string.Format(StringConstants.MSADFSrstPostBody, LicenseManager.encode(rst), LicenseManager.encode(wctx));
+                                    Task<String> MSADFSrstPostResult = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, MSstrrstPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, MSstrrstPostHeader);
+                                    MSADFSrstPostResult.Wait();
+
+
+                                    ////get the token "t"
+                                    //string t = string.Empty;
+                                    //CQ MSpostBodyResponseParser = CQ.Create(MSADFSrstPostResult.Result);
+                                    //var MSpostBodyResponseInputs = MSpostBodyResponseParser["input"];
+                                    //foreach (var li in MSpostBodyResponseInputs)
+                                    //{
+                                    //    if (li.Name == "t")
+                                    //    {
+                                    //        t = li.Value;
+                                    //    }
+
+                                    //}
+
+                                    ////get all code, state...
+                                    //string MSADCodeUrl = string.Format(StringConstants.MSADGetCodeandTokenCall, clientRequestId);
+                                    //Task<string> MSADCodeResponse = HttpClientHelper.GetAsync(MSADCodeUrl, AuthrequestCookies);
+                                    //MSADCodeResponse.Wait();
+
+
+                                    CQ MSADCodeResponseParser = CQ.Create(MSADFSrstPostResult.Result);
+                                    var MSADCodeResponseInputs = MSADCodeResponseParser["input"];
+                                    foreach (var li in MSADCodeResponseInputs)
+                                    {
+                                        if (li.Name == "code")
+                                        {
+                                            code = li.Value;
+                                        }
+                                        if (li.Name == "id_token")
+                                        {
+                                            id_token = li.Value;
+                                        }
+                                        if (li.Name == "state")
+                                        {
+                                            state = li.Value;
+                                        }
+                                        if (li.Name == "session_state")
+                                        {
+                                            session_state = li.Value;
+                                        }
+                                    }
+
+                                    goto codereceived;
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+
+
+
+
+                //post rst to microsoft
+                string strrstPostBody = string.Format(StringConstants.ADFSrstPostBody, LicenseManager.encode(rst), Authorizectx);
+                Task<String> ADFSrstPostResult = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, new NameValueCollection());
+                ADFSrstPostResult.Wait();
+
+                CQ postBodyResponseParser = CQ.Create(ADFSrstPostResult.Result);
+                var postBodyResponseInputs = postBodyResponseParser["input"];
+                foreach (var li in postBodyResponseInputs)
+                {
+                    if (li.Name == "code")
+                    {
+                        code = li.Value;
+                    }
+                    if (li.Name == "id_token")
+                    {
+                        id_token = li.Value;
+                    }
+                    if (li.Name == "state")
+                    {
+                        state = li.Value;
+                    }
+                    if (li.Name == "session_state")
+                    {
+                        session_state = li.Value;
+                    }
+                }
+
+                ///Check for MFA
+                if (string.IsNullOrEmpty(code))
+                {
+                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(ADFSrstPostResult.Result, AuthrequestCookies);
+                    postBodyResponseParser = CQ.Create(postResponse);
+                    postBodyResponseInputs = postBodyResponseParser["input"];
+                    foreach (var li in postBodyResponseInputs)
+                    {
+                        if (li.Name == "code")
+                        {
+                            code = li.Value;
+                        }
+                        if (li.Name == "id_token")
+                        {
+                            id_token = li.Value;
+                        }
+                        if (li.Name == "state")
+                        {
+                            state = li.Value;
+                        }
+                        if (li.Name == "session_state")
+                        {
+                            session_state = li.Value;
+                        }
+                    }
+                }
+
+                codereceived:
+                //post everyhing to sharepoint
+                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
+                NameValueCollection SharePointPostHeader = new NameValueCollection();
+                SharePointPostHeader.Add("Origin", "https://login.microsoftonline.com");
+                SharePointPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                SharePointPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                SharePointPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                SharePointPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+                Task<HttpResponseMessage> SharePointPostResult = null;
+                try
+                {
+                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);
+                    SharePointPostResult.Wait();
+                }
+                catch (Exception ex)
+                {
+                    if (SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
+                    {
+
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
+                foreach (Cookie SPCookie in AuthrequestCookies.GetCookies(new Uri(Wreply)))
+                {
+                    ret.Add(SPCookie);
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+
+            return ret;
+        }
 
         public CookieContainer Authenticate()
         {

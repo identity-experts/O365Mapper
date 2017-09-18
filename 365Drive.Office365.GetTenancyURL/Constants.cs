@@ -41,8 +41,14 @@ namespace _365Drive.Office365.CloudConnector
 
         internal const string AdfsPost = "{0}?wauth=http%3a%2f%2fschemas.microsoft.com%2fws%2f2008%2f06%2fidentity%2fauthenticationmethod%2fpassword&username={1}&wa=wsignin1.0&wtrealm=urn%3afederation%3aMicrosoftOnline&wctx=estsredirect%3d2%26estsrequest%3d{2}&popupui=";
         internal const string AdfsPostBody = "UserName={0}&Password={1}&AuthMethod=FormsAuthentication";
+        internal const string AdfsPhoneMFAPostBody = "AuthMethod=WindowsAzureMultiFactorAuthentication";
+        internal const string AdfsPhoneMFAPostDoneBody = "AuthMethod=WindowsAzureMultiFactorAuthentication&Context={0}";
         internal const string ADFSrstPost = "https://login.microsoftonline.com/login.srf";
         internal const string ADFSrstPostBody = "wa=wsignin1.0&wresult={0}&wctx=estsredirect%3D2%26estsrequest%3D{1}";
+        internal const string MSADFSrstPostBody = "wa=wsignin1.0&wresult={0}&wctx={1}";
+
+        //get the RST
+        internal const string MSADFSGetRST = "wa=wsignin1.0&rpsnv=4&ct=1500043152&rver=6.7.6640.0&wp=MCMBI&wreply=https%3a%2f%2fportal.office.com%2flanding.aspx%3ftarget%3d%252fdefault.aspx&lc=1033&id=501392&msafed=0&client-request-id={0}";
 
         //internal const string AdfsloginPostBody = "wa=wsignin1.0&wresult={0}";
 
@@ -92,8 +98,13 @@ namespace _365Drive.Office365.CloudConnector
         internal const string CloudloginPostData = "login={0}&passwd={1}&ctx={2}&flowToken={3}&canary={4}&n1=104502&n2=-1488344436000&n3=-1488344436000&n4=104502&n5=104502&n6=104502&n7=104502&n8=NaN&n9=104502&n10=104502&n11=104502&n12=104663&n13=104502&n14=104827&n15=60&n16=104897&n17=104898&n18=104904&n19=1109.2413112395688&n20=1&n21=0&n22=0&n23=1&n24=45.49044898147713&n25=2&n26=0&n27=0&n28=0&n29=23.89304877782797&n30=0.1526726045049145&n31=0&n32=1&n33=1&n34=48.88773517247546&n35=0&n36=0&n37=76.70878919505594&n38=1&n39=49.78367104484914&n40=0&n41=404.46821822517455&n42=352.2768531653051&n43=402.2914575615063&type=11&LoginOptions=2&NewUser=1&idsbho=1&PwdPad=&sso=&vv=&uiver=1&i12=1&i13=MSIE&i14=7.0&i15=604&i16=552&i20=";
 
 
+        internal const string MSADGetCodeandTokenCall = "https://login.microsoftonline.com/common/oauth2/authorize?client_id=4345a7b9-9a63-4910-a426-35363201d503&response_mode=form_post&response_type=code+id_token&scope=openid+profile&state=OpenIdConnect.AuthenticationProperties%3dbWgWcJqkzkLvLNQ2M2KamFf9FBeawxpJNxtNRTapOPoBkN3ueBOcjWPllRnEU2dMC2qI_jML9tpO8WoP9F6NG0JxivalI_vw3HxaZOhX66GrqUdfCzfVNpl3E72PVPY2yg1CwZUJaachIJPpyThMh2hO5I8qi_Hgo_CWOoZOKikzgl4cMWbexLh8A4tiliRWJaJBHEmjlN7tu5s4YqYVGGQJwGDyH6YOMTv1mS3Pf7kkU70Q4z58ROsSlCwl3vsircR2zRPEtEuWLYUWCX5U-gQrCi6up0h_ARvdMVXvkWM&nonce=636356399976707733.NDIzM2E4MzMtZGQ3My00NGQyLTkxODAtMDc2NTBhZGZkZmExNWMzMDkyMjItZTQ4My00YWVkLTg5ZWItMzVlODg3YTYxZTM0&redirect_uri=https%3a%2f%2fwww.office.com%2flanding&ui_locales=en-US&mkt=en-US&client-request-id={0}&msafed=0";
+        internal const string MSADGetMSAuthUrl = "https://login.microsoftonline.com/common/oauth2/authorize?client_id=00000003-0000-0ff1-ce00-000000000000&response_mode=form_post&response_type=code%20id_token&resource=00000003-0000-0ff1-ce00-000000000000&scope=openid&nonce={0}&redirect_uri=https:%2F%2Fmicrosoft.sharepoint.com%2F_forms%2Fdefault.aspx&domain_hint=microsoft.com&state=0&client-request-id={1}";
         ////////////////////////////ADFS AUTH////////////////////////////
         internal const string ADFSRealM = "https://login.microsoftonline.com/common/userrealm?user={0}&api-version=2.1&stsRequest={1}&checkForMicrosoftAccount=true";
+
+        ////////////////////////////ADFS MS AUTH////////////////////////////
+        internal const string ADFSMSRealM = "https://login.microsoftonline.com/common/userrealm?user={0}&api-version=2.1&stsRequest={1}&checkForMicrosoftAccount=true";
 
         ////////////////////////////MFA////////////////////////////
         //SMS

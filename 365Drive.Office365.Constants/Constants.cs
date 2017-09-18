@@ -12,9 +12,9 @@ namespace _365Drive.Office365
         /// Registry constants
         /// </summary>
         public const string registryRoot = @"software\Identity Experts\365mapper";
-
         public const string fileUploadLimitKey = @"SYSTEM\CurrentControlSet\Services\WebClient\Parameters";
         public const string enableLinkedConnectionsKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+        public static readonly string[] exception_domains = { "microsoft.com" };
 
         public const string mappingregKey = @"mappings";
         public const string exeName = "365Drive.Office365.NotificationManager.exe";
@@ -43,7 +43,7 @@ namespace _365Drive.Office365
         public const string retrieveDriveMappingsUrl = "{0}?wc-api={1}&tenancy={2}";
 
         //beta
-        public const string softwareVersion = "0.2.0";
+        public const string softwareVersion = "0.2.2";
 
         public const int licenseCheckInterval = 120;
         public const int localLicenseCheckLimit = 24;

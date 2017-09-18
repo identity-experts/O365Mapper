@@ -471,18 +471,42 @@ namespace _365Drive.Office365
 
                 if (userCookies == null)
                 {
-                    currentDispatcher.Invoke(() =>
+                    if (!_365Drive.Office365.UI.MFA.ReminderStates.mfaConfirmationTimeNow)
                     {
-                        Communications.updateStatus(Globalization.LoginFailed);
-                    });
-                    LogManager.Verbose("credentials not valid or app isnt registered");
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.UserAction;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Warning);
-                    busy = false;
-                    return;
+                        currentDispatcher.Invoke(() =>
+                        {
+                            Communications.updateStatus(Globalization.RemindMeLaterStatus);
+                        });
+                        LogManager.Verbose("User opted for remind later (MFA)");
+                        NotificationManager.NotificationManager.notify(Globalization.SignInPageheader, Globalization.RemindMeLaterNotification, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                        //reset the current state
+                        Communications.CurrentState = States.UserAction;
+                        Animation.Stop();
+                        Animation.Animate(AnimationTheme.Warning);
+                        busy = false;
+                        currentDispatcher.Invoke(() =>
+                        {
+                            EnableMFAMenuitem();
+
+                        });
+
+                        return;
+                    }
+                    else
+                    {
+                        currentDispatcher.Invoke(() =>
+                        {
+                            Communications.updateStatus(Globalization.LoginFailed);
+                        });
+                        LogManager.Verbose("credentials not valid or app isnt registered");
+                        NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                        //reset the current state
+                        Communications.CurrentState = States.UserAction;
+                        Animation.Stop();
+                        Animation.Animate(AnimationTheme.Warning);
+                        busy = false;
+                        return;
+                    }
                 }
                 LogManager.Verbose("cookies found");
                 string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedauth"].Value;
@@ -602,6 +626,12 @@ namespace _365Drive.Office365
                 LogManager.Verbose("setting cookies to IE for oneDriveHostUrl");
                 DriveManager.setCookiestoIE(fedAuth, rtFA, DriveManager.oneDriveHostSiteUrl);
                 #endregion
+
+                //IPUT
+                DriveManager.setCookiestoIE(fedAuth, rtFA, "https://sharepoint.com");
+                string buid = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["buid"].Value;
+                string estsauthpersistent = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["estsauthpersistent"].Value;
+                DriveManager.setIPUTCookiestoIE(buid, estsauthpersistent);
 
                 #region Getting mappable drive details
                 LogManager.Verbose("Trying to get all drive details");
