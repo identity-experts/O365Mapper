@@ -43,6 +43,11 @@ namespace _365Drive.Office365.CloudConnector
         static FedType?[] AllowedAuthenticationTypes = { FedType.Cloud, FedType.AAD, FedType.ADFS };
 
         /// <summary>
+        /// Allowed single sign on auth
+        /// </summary>
+        static FedType?[] AllowedSSOAuthenticationTypes = { FedType.ADFS };
+
+        /// <summary>
         /// Collection of all mappable drives
         /// </summary>
         public static List<Drive> mappableDrives { get; set; }
@@ -182,6 +187,36 @@ namespace _365Drive.Office365.CloudConnector
             }
 
         }
+
+
+        /// <summary>
+        /// make sure the user federation type is something we do
+        /// </summary>
+        /// <param name="upn"></param>
+        public static bool isAllowedSSOFedType(string upn)
+        {
+            try
+            {
+                if (!Utility.ready())
+                    return false;
+                LogManager.Verbose("Ensuring the authentication type");
+                //if we still havent retrieved federation type, do so
+                if (FederationType == null)
+                {
+                    LogManager.Verbose("Could not retrieve authentication type, so getting it");
+                    RetrieveAuthType(upn);
+                }
+                return AllowedSSOAuthenticationTypes.Contains(FederationType);
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+                return false;
+            }
+
+        }
+
         /// <summary>
         /// Add a new drive to mappable drive
         /// </summary>
@@ -347,21 +382,25 @@ namespace _365Drive.Office365.CloudConnector
             {
                 if (!Utility.ready())
                     return;
-
-                LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
-                ///Setting fedAuth
-                bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "FedAuth", fedAuth + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
-                LogManager.Verbose("fedAuth cookie setIE result: " + FedAuthcookiesetresult);
-
-                ///setting rtFA
-                bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "rtFa", rtFA + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
-                LogManager.Verbose("rtFA cookie setIE result: " + rtFAcookiesetresult);
-
-                if (!FedAuthcookiesetresult)
+                //as many times this method is called WITHOUT URL (Probably user is signing out before the tenancy name is get, it puts unnecessary errors in event. Lets handle it!
+                Uri host;
+                if (!String.IsNullOrEmpty(strUrl) && Uri.TryCreate(strUrl, UriKind.Absolute, out host))
                 {
+                    LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
+                    ///Setting fedAuth
+                    bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "FedAuth", fedAuth + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
+                    LogManager.Verbose("fedAuth cookie setIE result: " + FedAuthcookiesetresult);
 
-                    uint lastError = GetLastError(); //this will return 87  for www.nonexistent.com
-                    LogManager.Verbose("cookie setIE failed with error uint code: " + lastError.ToString());
+                    ///setting rtFA
+                    bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "rtFa", rtFA + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
+                    LogManager.Verbose("rtFA cookie setIE result: " + rtFAcookiesetresult);
+
+                    if (!FedAuthcookiesetresult)
+                    {
+
+                        uint lastError = GetLastError(); //this will return 87  for www.nonexistent.com
+                        LogManager.Verbose("cookie setIE failed with error uint code: " + lastError.ToString());
+                    }
                 }
             }
             catch (Exception ex)
@@ -385,7 +424,7 @@ namespace _365Drive.Office365.CloudConnector
                     return;
 
                 LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
-                
+
                 //setting rtFA
                 bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri("https://login.microsoftonline.com").Authority, "ESTSAUTHPERSISTENT", estsauthpersistent + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
                 LogManager.Verbose("ESTSAUTHPERSISTENT cookie setIE result: " + rtFAcookiesetresult);
@@ -395,7 +434,7 @@ namespace _365Drive.Office365.CloudConnector
                 bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri("https://login.microsoftonline.com").Authority, "buid", buid + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
                 LogManager.Verbose("buid cookie setIE result: " + FedAuthcookiesetresult);
 
-                
+
                 if (!FedAuthcookiesetresult)
                 {
 
@@ -422,24 +461,31 @@ namespace _365Drive.Office365.CloudConnector
                 if (!Utility.ready())
                     return;
 
-                LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
-                ///Setting fedAuth
-                bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "FedAuth", fedAuth + ";" + "Expires = " + DateTime.Now.AddDays(-10).ToString("R"));
-                LogManager.Verbose("fedAuth cookie setIE result: " + FedAuthcookiesetresult);
 
-                ///setting rtFA
-                bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "rtFa", rtFA + ";" + "Expires = " + DateTime.Now.AddDays(-10).ToString("R"));
-
-                //delete cookies
-                InternetSetOption(0, 42, null, 0);
-
-                LogManager.Verbose("rtFA cookie setIE result: " + rtFAcookiesetresult);
-
-                if (!FedAuthcookiesetresult)
+                //as many times this method is called WITHOUT URL (Probably user is signing out before the tenancy name is get, it puts unnecessary errors in event. Lets handle it!
+                Uri host;
+                if (!String.IsNullOrEmpty(strUrl) && Uri.TryCreate(strUrl, UriKind.Absolute, out host))
                 {
 
-                    uint lastError = GetLastError(); //this will return 87  for www.nonexistent.com
-                    LogManager.Verbose("cookie setIE failed with error uint code: " + lastError.ToString());
+                    LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
+                    ///Setting fedAuth
+                    bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "FedAuth", fedAuth + ";" + "Expires = " + DateTime.Now.AddDays(-10).ToString("R"));
+                    LogManager.Verbose("fedAuth cookie setIE result: " + FedAuthcookiesetresult);
+
+                    ///setting rtFA
+                    bool rtFAcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "rtFa", rtFA + ";" + "Expires = " + DateTime.Now.AddDays(-10).ToString("R"));
+
+                    //delete cookies
+                    InternetSetOption(0, 42, null, 0);
+
+                    LogManager.Verbose("rtFA cookie setIE result: " + rtFAcookiesetresult);
+
+                    if (!FedAuthcookiesetresult)
+                    {
+
+                        uint lastError = GetLastError(); //this will return 87  for www.nonexistent.com
+                        LogManager.Verbose("cookie setIE failed with error uint code: " + lastError.ToString());
+                    }
                 }
             }
             catch (Exception ex)

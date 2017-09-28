@@ -39,7 +39,7 @@ namespace _365Drive.Office365.GetTenancyURL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> GetAsyncFullResponse(string url,CookieContainer container)
+        public static async Task<HttpResponseMessage> GetAsyncFullResponse(string url, CookieContainer container)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
             using (var handler = new HttpClientHandler() { CookieContainer = container })
@@ -59,7 +59,7 @@ namespace _365Drive.Office365.GetTenancyURL
         public static async Task<HttpResponseMessage> GetAsyncFullResponse(string url, CookieContainer container, bool autoredirect)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
-            using (var handler = new HttpClientHandler() { CookieContainer = container, AllowAutoRedirect=autoredirect })
+            using (var handler = new HttpClientHandler() { CookieContainer = container, AllowAutoRedirect = autoredirect })
             using (HttpClient request = new HttpClient(handler))
             {
                 var responseMessage = await request.GetAsync(url);
@@ -87,6 +87,26 @@ namespace _365Drive.Office365.GetTenancyURL
             }
         }
 
+        /// <summary>
+        /// Call with header preset
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="header">header</param>
+        /// <returns></returns>
+        public static async Task<string> GetAsync(string url, NameValueCollection header, bool useDefaultCreds)
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+            using (HttpClient request = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true }))
+            {
+                ///set the header
+                if (header != null)
+                    SetHeader(request, header);
+
+                var responseMessage = await request.GetAsync(url);
+                responseMessage.EnsureSuccessStatusCode();
+                return await responseMessage.Content.ReadAsStringAsync();
+            }
+        }
         /// <summary>
         /// Call with cookies preset
         /// </summary>
@@ -140,7 +160,7 @@ namespace _365Drive.Office365.GetTenancyURL
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
             using (HttpClient request = new HttpClient())
             {
-                
+
                 var responseMessage = await request.PostAsync(url, new StringContent(postBody, Encoding.UTF8, contentType));
                 responseMessage.EnsureSuccessStatusCode();
                 return await responseMessage.Content.ReadAsStringAsync();
@@ -194,10 +214,10 @@ namespace _365Drive.Office365.GetTenancyURL
         /// <param name="url"></param>
         /// <param name="container"></param>
         /// <returns></returns>
-        public static async Task<string> PostAsync(string url, string postBody, string contentType, CookieContainer container,bool automaticredirect)
+        public static async Task<string> PostAsync(string url, string postBody, string contentType, CookieContainer container, bool automaticredirect)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
-            using (var handler = new HttpClientHandler() { CookieContainer = container,AllowAutoRedirect = automaticredirect })
+            using (var handler = new HttpClientHandler() { CookieContainer = container, AllowAutoRedirect = automaticredirect })
             using (HttpClient request = new HttpClient(handler))
             {
                 var responseMessage = await request.PostAsync(url, new StringContent(postBody, Encoding.UTF8, contentType));
@@ -274,7 +294,7 @@ namespace _365Drive.Office365.GetTenancyURL
         /// <param name="url"></param>
         /// <param name="container"></param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostAsyncFullResponse(string url, string postBody, string contentType, CookieContainer container, NameValueCollection header,bool allowAutoredirect)
+        public static async Task<HttpResponseMessage> PostAsyncFullResponse(string url, string postBody, string contentType, CookieContainer container, NameValueCollection header, bool allowAutoredirect)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls;

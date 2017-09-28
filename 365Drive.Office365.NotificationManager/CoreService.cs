@@ -280,6 +280,7 @@ namespace _365Drive.Office365
             }
             return true;
         }
+
         //Going to be triggered on every specific interval
         async void tick()
         {
@@ -288,6 +289,7 @@ namespace _365Drive.Office365
 
             try
             {
+                start:
                 //starting animation
                 Animation.animatedIcontimer = iconTimer;
                 Animation.notifyIcon = notifyIcon;
@@ -398,6 +400,23 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
+
+                #region Ensuring SSO authentication type
+                //Mare sure the user authentication type is supported
+                LogManager.Verbose("Checking, if we have SSO and the auth type is allowed for SSO");
+                if (!DriveManager.isAllowedSSOFedType(CredentialManager.GetCredential().UserName))
+                {
+                    LogManager.Verbose("trying SSO in non-sso type methods");
+
+                    //lets disable all what we have done 
+                    bool isAutoSSOEnabled = CredentialManager.disableAutoSSO();
+
+                    //restart
+                    if (isAutoSSOEnabled)
+                        goto start;
+                }
+                #endregion
+
                 #region get and set tenancy name and urls
 
                 //if the Prompt mfa is enabled, disable it first and restart
@@ -410,16 +429,28 @@ namespace _365Drive.Office365
                 LicenseValidationState tenancyNameState = DriveMapper.retrieveTenancyName(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 if (tenancyNameState == LicenseValidationState.LoginFailed)
                 {
+                    //lets make sure if we have autoSSO ON, lets make it off
+                    bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
+
                     currentDispatcher.Invoke(() =>
                     {
-                        Communications.updateStatus(Globalization.LoginFailed);
+                        if (blwasAutoSSOOn)
+                            Communications.updateStatus(Globalization.InformAutoSSOFailed);
+                        else
+                            Communications.updateStatus(Globalization.LoginFailed);
                     });
                     LogManager.Verbose("credentials not valid or app isnt registered");
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+
+                    ///Only show if really credential faied and its not autoSSO
+                    if (!blwasAutoSSOOn)
+                        NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.UserAction;
                     Animation.Stop();
-                    Animation.Animate(AnimationTheme.Warning);
+
+                    ///Only show if really credential faied and its not autoSSO
+                    if (!blwasAutoSSOOn)
+                        Animation.Animate(AnimationTheme.Warning);
                     busy = false;
                     return;
                 }
@@ -494,16 +525,24 @@ namespace _365Drive.Office365
                     }
                     else
                     {
+                        //lets make sure if we have autoSSO ON, lets make it off
+                        bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
+
                         currentDispatcher.Invoke(() =>
                         {
-                            Communications.updateStatus(Globalization.LoginFailed);
+                            if (blwasAutoSSOOn)
+                                Communications.updateStatus(Globalization.InformAutoSSOFailed);
+                            else
+                                Communications.updateStatus(Globalization.LoginFailed);
                         });
                         LogManager.Verbose("credentials not valid or app isnt registered");
-                        NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+                        if (!blwasAutoSSOOn)
+                            NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                         //reset the current state
                         Communications.CurrentState = States.UserAction;
                         Animation.Stop();
-                        Animation.Animate(AnimationTheme.Warning);
+                        if (!blwasAutoSSOOn)
+                            Animation.Animate(AnimationTheme.Warning);
                         busy = false;
                         return;
                     }
@@ -560,16 +599,29 @@ namespace _365Drive.Office365
                 }
                 else if (licenseValidationState == LicenseValidationState.LoginFailed)
                 {
+                    //lets make sure if we have autoSSO ON, lets make it off
+                    bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
+
                     currentDispatcher.Invoke(() =>
                     {
-                        Communications.updateStatus(Globalization.LoginFailed);
+                        if (blwasAutoSSOOn)
+                            Communications.updateStatus(Globalization.InformAutoSSOFailed);
+                        else
+                            Communications.updateStatus(Globalization.LoginFailed);
                     });
                     LogManager.Verbose("credentials not valid or app isnt registered");
-                    NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+
+                    ///Only show if really credential faied and its not autoSSO
+                    if (!blwasAutoSSOOn)
+                        NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
+
                     //reset the current state
                     Communications.CurrentState = States.UserAction;
                     Animation.Stop();
-                    Animation.Animate(AnimationTheme.Warning);
+
+                    ///Only show if really credential faied and its not autoSSO
+                    if (!blwasAutoSSOOn)
+                        Animation.Animate(AnimationTheme.Warning);
                     busy = false;
                     return;
                 }
@@ -629,10 +681,21 @@ namespace _365Drive.Office365
 
                 //IPUT
                 DriveManager.setCookiestoIE(fedAuth, rtFA, "https://sharepoint.com");
-                string buid = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["buid"].Value;
-                string estsauthpersistent = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["estsauthpersistent"].Value;
-                DriveManager.setIPUTCookiestoIE(buid, estsauthpersistent);
-
+                try
+                {
+                    if (userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["buid"] != null && userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["estsauthpersistent"] != null)
+                    {
+                        string buid = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["buid"].Value;
+                        string estsauthpersistent = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["estsauthpersistent"].Value;
+                        DriveManager.setIPUTCookiestoIE(buid, estsauthpersistent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogManager.Verbose("Error in setting build and estsauth");
+                    LogManager.Error(ex.Message);
+                    LogManager.Error(ex.StackTrace);
+                }
                 #region Getting mappable drive details
                 LogManager.Verbose("Trying to get all drive details");
                 //get drive details

@@ -9,7 +9,7 @@ namespace _365Drive.Office365.CloudConnector
 
     public enum LicenseValidationState
     {
-        MFARemindLater=8,
+        MFARemindLater = 8,
         Ok = 0,
         Expired = 1,
         Exceeded = 2,
@@ -29,7 +29,7 @@ namespace _365Drive.Office365.CloudConnector
         internal const string AzureGetALLSKUURL = "https://graph.windows.net/{0}/subscribedSkus?api-version=2013-11-08";
         internal const string AuthenticateRequestUrl = "{0}_forms/default.aspx?ReturnUrl=%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252F&Source=cookie";
         internal const string getAADCookieStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?client_id=00000003-0000-0ff1-ce00-000000000000&response_mode=form_post&response_type=code id_token&scope=openid&nonce={1}&redirect_uri={0}_forms/default.aspx";
-        internal const string AzureActivateUserStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id={1}&redirect_uri={2}&resource={3}&amr_values=pwd&nux=1&login_hint2={0}";
+        internal const string AzureActivateUserStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id={1}&redirect_uri={2}&resource={3}&nux=1&login_hint2={0}";
         internal const string AzureActivateUserStep2 = "https://login.microsoftonline.com/common/login";
         internal const string AzureActivationUserLogin = "login={0}&passwd={1}&ctx={2}&flowToken={3}&canary={4}";
         internal const string AzureActivateUserStep3 = "https://login.microsoftonline.com/common/oauth2/token";
