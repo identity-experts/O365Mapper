@@ -520,7 +520,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UI, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UI, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_1490687975BD857AB5F94D51AF234E95"
@@ -551,7 +551,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CommunicationManager, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CommunicationManager, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_15C622FF0A8C23A6A54C9E13F53AF364"
@@ -613,7 +613,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CredentialManager, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.CredentialManager, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_35404E4776ADFB5B26F52C276DBCA51C"
@@ -644,7 +644,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Hardcodet.Wpf.TaskbarNotification, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Hardcodet.Wpf.TaskbarNotification, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_3FF8B8BCC1B456B0957CBE6D218D08A0"
@@ -706,7 +706,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.Constants, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.Constants, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_4751843E7E2495D6F797A477D64C5407"
@@ -768,7 +768,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.LogManager, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.LogManager, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_7B39EB6BEF25898D5496A99428449E62"
@@ -799,7 +799,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.GetTenancyURL, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.GetTenancyURL, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_7F388BAD297551A6479EA8256B80234B"
@@ -892,7 +892,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.Utility, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.Utility, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_A2F16011C0B9C8D695CC9C5FD7A2A0F6"
@@ -923,7 +923,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.RegistryManager, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.RegistryManager, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_AB23B2F688086472C64A75F67A66038F"
@@ -985,7 +985,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UpdateManager, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.UpdateManager, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_CA32E1B7ECC863B153B1FEA358137543"
@@ -1047,7 +1047,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:365Drive.Office365.MutexManager, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:365Drive.Office365.MutexManager, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_DB5CAEE9C2F88CEAE40944B9C32355C2"
@@ -1102,7 +1102,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_CBAC8A97F1984BD18423FC9A0A7D77AC"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder][Manufacturer]\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -1150,15 +1150,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:365mapper"
-        "ProductCode" = "8:{FA51683F-FAB7-4EAD-BD10-8AE7B975EFE1}"
-        "PackageCode" = "8:{A8E723D8-A3AD-4282-8FFE-9B2597A0CAC6}"
+        "ProductCode" = "8:{D5E0416C-4E66-409F-8C78-C482733471B5}"
+        "PackageCode" = "8:{266558D9-1CF9-4DCD-9A56-AE85CFDF04C2}"
         "UpgradeCode" = "8:{C62FC6BD-1B7E-490D-A2AF-239104560CF1}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.5.00"
+        "ProductVersion" = "8:0.6.00"
         "Manufacturer" = "8:Identity Experts"
         "ARPHELPTELEPHONE" = "8:+44 (0) 3333 444950"
         "ARPHELPLINK" = "8:https://store.identityexperts.co.uk"
@@ -1172,7 +1172,7 @@
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
-        "TargetPlatform" = "3:0"
+        "TargetPlatform" = "3:1"
         "PreBuildEvent" = "8:"
         "PostBuildEvent" = "8:cscript.exe \"$(ProjectDir)LaunchAfterSetupFinished.js\" \"$(BuiltOuputPath)\""
         "RunPostBuildEvent" = "3:0"

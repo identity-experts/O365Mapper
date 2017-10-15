@@ -135,18 +135,29 @@ namespace _365Drive.Office365.GetTenancyURL
             string strongAuthConstant = getStrongAuthConstant(responseContent);
             string strongAuthContext = getStrongAuthContext(responseContent);
             string canary = getCanary2(responseContent);
+            LogManager.Info("String Auth Constant: " + strongAuthConstant);
+            LogManager.Info("strongAuthContext: " + strongAuthContext);
+            LogManager.Info("canary: " + canary);
+
             //ensure the strong auth required or not
             if (!string.IsNullOrEmpty(strongAuthContext.Trim()))
             {
+                LogManager.Info("string auth not empty");
+
                 StrongAuthConstantResponse sAuthConstantResponse = JsonConvert.DeserializeObject<StrongAuthConstantResponse>(strongAuthConstant);
                 StrongAuthContextResponse sAuthContextResponse = JsonConvert.DeserializeObject<StrongAuthContextResponse>(strongAuthContext);
 
-                //Check whether MFA is really configured
-                if (sAuthContextResponse.Result.ToLower() == "true")
-                {
+                LogManager.Info("result" + Convert.ToString(sAuthContextResponse.Success)); 
 
+                //Check whether MFA is really configured
+                if (sAuthContextResponse.Success.ToLower() == "true")
+                {
+                    LogManager.Info("its true");
                     if (MFAUserConsent())
                     {
+                        LogManager.Info("MFAUserConsent required");
+                        LogManager.Info("FToken" + sAuthConstantResponse.FlowToken);
+                        LogManager.Info("CTX" + sAuthConstantResponse.Ctx);
 
                         string authMethodId = sAuthContextResponse.DefaultMethod.AuthMethodId;
 
@@ -169,7 +180,7 @@ namespace _365Drive.Office365.GetTenancyURL
 
 
                             AuthResponse beginAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASBeginAuth.Result);
-                            if (beginAuthResponse.Result.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
+                            if (beginAuthResponse.Success.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
                             {
                                 string smsCode = PromptMFA(authMethodId);
                                 string PollEnd = DateTime.UtcNow.Ticks.ToString();
@@ -178,7 +189,7 @@ namespace _365Drive.Office365.GetTenancyURL
                                 SASEndAuth.Wait();
 
                                 AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
-                                if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
+                                if (endAuthResponse.Success.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                 {
                                     SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                     string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd,rememberMFA.ToString().ToLower(), authMethodId);
@@ -231,7 +242,7 @@ namespace _365Drive.Office365.GetTenancyURL
 
 
                             AuthResponse beginAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASBeginAuth.Result);
-                            if (beginAuthResponse.Result.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
+                            if (beginAuthResponse.Success.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
                             {
 
                                 string verify = PromptMFA(authMethodId);
@@ -243,7 +254,7 @@ namespace _365Drive.Office365.GetTenancyURL
                                     SASEndAuth.Wait();
 
                                     AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
-                                    if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
+                                    if (endAuthResponse.Success.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                     {
                                         SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                         string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd,rememberMFA.ToString().ToLower(), authMethodId);

@@ -287,7 +287,7 @@ namespace _365Drive.Office365.CloudConnector
                 StrongAuthContextResponse sAuthContextResponse = JsonConvert.DeserializeObject<StrongAuthContextResponse>(strongAuthContext);
 
                 //Check whether MFA is really configured
-                if (sAuthContextResponse.Result.ToLower() == "true")
+                if (sAuthContextResponse.Success.ToLower() == "true")
                 {
                     if (MFAUserConsent())
                     {
@@ -312,7 +312,7 @@ namespace _365Drive.Office365.CloudConnector
 
 
                             AuthResponse beginAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASBeginAuth.Result);
-                            if (beginAuthResponse.Result.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
+                            if (beginAuthResponse.Success.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
                             {
                                 string smsCode = PromptMFA(authMethodId);
                                 string PollEnd = DateTime.UtcNow.Ticks.ToString();
@@ -321,7 +321,7 @@ namespace _365Drive.Office365.CloudConnector
                                 SASEndAuth.Wait();
 
                                 AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
-                                if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
+                                if (endAuthResponse.Success.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                 {
                                     SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                     string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
@@ -372,7 +372,7 @@ namespace _365Drive.Office365.CloudConnector
 
 
                             AuthResponse beginAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASBeginAuth.Result);
-                            if (beginAuthResponse.Result.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
+                            if (beginAuthResponse.Success.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
                             {
                                 string verify = PromptMFA(authMethodId);
                                 if (verify.ToLower() == "true")
@@ -383,7 +383,7 @@ namespace _365Drive.Office365.CloudConnector
                                     SASEndAuth.Wait();
 
                                     AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
-                                    if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
+                                    if (endAuthResponse.Success.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                     {
                                         SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                         string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
