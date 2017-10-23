@@ -286,6 +286,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatic Single sign-on (SSO) failed, prompting for credentials soon....
+        /// </summary>
+        public static string InformAutoSSOFailed {
+            get {
+                return ResourceManager.GetString("InformAutoSSOFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Intializing 365mapper.
         /// </summary>
         public static string Initializing {

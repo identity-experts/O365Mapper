@@ -370,6 +370,18 @@ namespace _365Drive.Office365.CloudConnector
         {
             return WebUtility.UrlEncode(encodeString);
         }
+
+
+        /// <summary>
+        /// decode given string
+        /// </summary>
+        /// <param name="decodeString"></param>
+        /// <returns></returns>
+        public static string decode(string decodeString)
+        {
+            return WebUtility.UrlDecode(decodeString);
+        }
+
         /// <summary>
         /// as per the input given by user, identify what is it
         /// </summary>

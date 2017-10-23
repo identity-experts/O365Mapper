@@ -77,7 +77,7 @@ namespace _365Drive.Office365.CloudConnector
 
     public class AuthResponse
     {
-        public string Result { get; set; }
+        public string Success { get; set; }
         public string ResultValue { get; set; }
         public object Message { get; set; }
         public string AuthMethodId { get; set; }
@@ -100,7 +100,7 @@ namespace _365Drive.Office365.CloudConnector
 
     public class StrongAuthContextResponse
     {
-        public string Result { get; set; }
+        public string Success { get; set; }
         public DefaultMethod DefaultMethod { get; set; }
         //public List<Method> Methods { get; set; }
     }

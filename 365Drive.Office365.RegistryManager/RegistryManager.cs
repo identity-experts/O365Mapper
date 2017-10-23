@@ -22,7 +22,9 @@ namespace _365Drive.Office365
         RootSiteUrl = 3,
         MySiteUrl = 4,
         LastLicenseChecked = 5,
-        PartnerLogo = 6
+        PartnerLogo = 6,
+        SSO = 7,
+        AutoSSO = 8
     }
 
 

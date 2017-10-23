@@ -305,4 +305,7 @@
   <data name="RemindMeLaterStatus" xml:space="preserve">
     <value>MFA will be attempted later. To start now, click 'Prompt MFA' from menu. </value>
   </data>
+  <data name="InformAutoSSOFailed" xml:space="preserve">
+    <value>Automatic Single sign-on (SSO) failed, prompting for credentials soon...</value>
+  </data>
 </root>

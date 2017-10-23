@@ -42,7 +42,7 @@ namespace _365Drive.Office365.CloudConnector
         {
             string TenancyName = string.Empty;
 
-            
+
             //Checking first registry
             if (!String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.TenancyName)) && !String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.RootSiteUrl)) && !String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.MySiteUrl)))
             {
@@ -287,7 +287,7 @@ namespace _365Drive.Office365.CloudConnector
                 StrongAuthContextResponse sAuthContextResponse = JsonConvert.DeserializeObject<StrongAuthContextResponse>(strongAuthContext);
 
                 //Check whether MFA is really configured
-                if (sAuthContextResponse.Result.ToLower() == "true")
+                if (sAuthContextResponse.Success.ToLower() == "true")
                 {
                     if (MFAUserConsent())
                     {
@@ -312,7 +312,7 @@ namespace _365Drive.Office365.CloudConnector
 
 
                             AuthResponse beginAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASBeginAuth.Result);
-                            if (beginAuthResponse.Result.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
+                            if (beginAuthResponse.Success.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
                             {
                                 string smsCode = PromptMFA(authMethodId);
                                 string PollEnd = DateTime.UtcNow.Ticks.ToString();
@@ -321,7 +321,7 @@ namespace _365Drive.Office365.CloudConnector
                                 SASEndAuth.Wait();
 
                                 AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
-                                if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
+                                if (endAuthResponse.Success.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                 {
                                     SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                     string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
@@ -372,7 +372,7 @@ namespace _365Drive.Office365.CloudConnector
 
 
                             AuthResponse beginAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASBeginAuth.Result);
-                            if (beginAuthResponse.Result.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
+                            if (beginAuthResponse.Success.ToLower() == "true" && beginAuthResponse.ResultValue.ToLower() == "success")
                             {
                                 string verify = PromptMFA(authMethodId);
                                 if (verify.ToLower() == "true")
@@ -383,7 +383,7 @@ namespace _365Drive.Office365.CloudConnector
                                     SASEndAuth.Wait();
 
                                     AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
-                                    if (endAuthResponse.Result.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
+                                    if (endAuthResponse.Success.ToLower() == "true" && endAuthResponse.ResultValue.ToLower() == "success")
                                     {
                                         SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                         string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
@@ -879,6 +879,24 @@ namespace _365Drive.Office365.CloudConnector
         }
 
 
+        public static string RemoveQueryStringByKey(string url, string key)
+        {
+            var uri = new Uri(url);
+
+            // this gets all the query string key value pairs as a collection
+            var newQueryString = HttpUtility.ParseQueryString(uri.Query);
+
+            // this removes the key if exists
+            newQueryString.Remove(key);
+
+            // this gets the page path from root without QueryString
+            string pagePathWithoutQueryString = uri.GetLeftPart(UriPartial.Path);
+
+            return newQueryString.Count > 0
+                ? String.Format("{0}?{1}", pagePathWithoutQueryString, newQueryString)
+                : pagePathWithoutQueryString;
+        }
+
         public static string adfsConnectTenancy(string upn, string password)
         {
             string tenancyUniqueName = string.Empty;
@@ -925,14 +943,49 @@ namespace _365Drive.Office365.CloudConnector
 
                 //get the ADFS post URL
                 string strADFSPostUrl = ADFSRealMresponse.AuthURL;
-                string adfsPostBody = string.Format(StringConstants.AdfsPostBody, upn, password);
-                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", authorizeCookies);
-                adfsloginPostBodyResult.Wait();
-
-
-                //retrieving rst
+                CQ adfsPostResponse = null;
                 string rst = string.Empty;
-                CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                //is SSO
+                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+
+
+                //if SSO, then do different set of calls
+                if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
+                {
+                    LogManager.Info("SSO");
+                    string NoWAAuthstrADFSPostUrl = RemoveQueryStringByKey(strADFSPostUrl, "wauth");
+                    Uri ADFSAuthUri = new Uri(NoWAAuthstrADFSPostUrl);
+                    string WIAUrl = String.Format("{0}{1}{2}{3}{4}{5}", ADFSAuthUri.Scheme, Uri.SchemeDelimiter, ADFSAuthUri.Authority, ADFSAuthUri.AbsolutePath, ADFSAuthUri.AbsolutePath.EndsWith("/") ? "wia" : "/wia", ADFSAuthUri.Query);
+
+                    //ADFS GET URI
+                    LogManager.Info("ADFS WIA get:" + WIAUrl);
+
+                    //render header
+                    NameValueCollection ADFSGetHeader = new NameValueCollection();
+                    ADFSGetHeader.Add("Referrer", call1Url);
+                    ADFSGetHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                    ADFSGetHeader.Add("Accept", "image/gif, image/jpeg, image/pjpeg, application/x-ms-application, application/xaml+xml, application/x-ms-xbap, */*");
+
+                    Task<string> adfsloginPostBodyResult = HttpClientHelper.GetAsync(WIAUrl, ADFSGetHeader, true);
+                    adfsloginPostBodyResult.Wait();
+
+
+                    LogManager.Info("ADFS WIA resposne:" + adfsloginPostBodyResult.Result);
+                    //retrieving rst
+                    adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+
+                }
+                else
+                {
+                    string adfsPostBody = string.Format(StringConstants.AdfsPostBody, upn, password);
+                    Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", authorizeCookies);
+                    adfsloginPostBodyResult.Wait();
+
+                    //retrieving rst
+                    adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                }
+
+
                 var adfsPostResponseItems = adfsPostResponse["input"];
                 foreach (var li in adfsPostResponseItems)
                 {

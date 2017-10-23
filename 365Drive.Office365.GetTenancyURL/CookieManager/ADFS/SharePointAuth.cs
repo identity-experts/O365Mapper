@@ -95,6 +95,24 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
             return _cachedCookieContainer;
         }
 
+        public static string RemoveQueryStringByKey(string url, string key)
+        {
+            var uri = new Uri(url);
+
+            // this gets all the query string key value pairs as a collection
+            var newQueryString = HttpUtility.ParseQueryString(uri.Query);
+
+            // this removes the key if exists
+            newQueryString.Remove(key);
+
+            // this gets the page path from root without QueryString
+            string pagePathWithoutQueryString = uri.GetLeftPart(UriPartial.Path);
+
+            return newQueryString.Count > 0
+                ? String.Format("{0}?{1}", pagePathWithoutQueryString, newQueryString)
+                : pagePathWithoutQueryString;
+        }
+
         /// <summary>
         /// Retrieve cookies in new way
         /// </summary>
@@ -188,10 +206,50 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //get the ADFS post URL
                 string strADFSPostUrl = ADFSRealMresponse.AuthURL;
 
-                //post to ADFS now
-                string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
-                Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
-                adfsloginPostBodyResult.Wait();
+
+                //is SSO
+                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+
+                CQ adfsPostResponse = null;
+                //if SSO, then do different set of calls
+                if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
+                {
+                    LogManager.Info("SSO");
+                    string NoWAAuthstrADFSPostUrl = RemoveQueryStringByKey(strADFSPostUrl, "wauth");
+                    Uri ADFSAuthUri = new Uri(NoWAAuthstrADFSPostUrl);
+                    string WIAUrl = String.Format("{0}{1}{2}{3}{4}{5}", ADFSAuthUri.Scheme, Uri.SchemeDelimiter, ADFSAuthUri.Authority, ADFSAuthUri.AbsolutePath, ADFSAuthUri.AbsolutePath.EndsWith("/") ? "wia" : "/wia", ADFSAuthUri.Query);
+
+                    //ADFS GET URI
+                    LogManager.Info("ADFS WIA get:" + WIAUrl);
+
+                    //render header
+                    NameValueCollection ADFSGetHeader = new NameValueCollection();
+                    ADFSGetHeader.Add("Referrer", MSOnlineoAuthCallUrl);
+                    ADFSGetHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                    ADFSGetHeader.Add("Accept", "text/html, application/xhtml+xml, image/jxr, */*");
+
+                    Task<string> adfsloginPostBodyResult = HttpClientHelper.GetAsync(WIAUrl, ADFSGetHeader, true);
+                    adfsloginPostBodyResult.Wait();
+
+
+                    LogManager.Info("ADFS WIA resposne:" + adfsloginPostBodyResult.Result);
+                    //retrieving rst
+                    adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                }
+                else
+                {
+                    //post to ADFS now
+                    string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
+                    Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                    adfsloginPostBodyResult.Wait();
+
+                    //retrieving rst
+                    adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                }
+
+
+
+
 
                 //retrieve code, idtoken 
                 string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
@@ -199,7 +257,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //retrieving rst
                 string rst = string.Empty;
                 string wctx = string.Empty;
-                CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
+                //CQ adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);
                 var adfsPostResponseItems = adfsPostResponse["input"];
                 foreach (var li in adfsPostResponseItems)
                 {
@@ -254,7 +312,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                                 //string verify = GlobalCookieManager.PromptMFA("phoneappnotification");
                                 //if (verify.ToLower() == "true")
                                 //The call is synchronized with auth 
-                                if(true)
+                                if (true)
                                 {
                                     //Lets check
                                     string adfsMFADoneBody = string.Format(StringConstants.AdfsPhoneMFAPostDoneBody, context);
@@ -270,11 +328,11 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                                             if (!string.IsNullOrEmpty(li.Value))
                                                 rst = li.Value;
                                         }
-                                        if(li.Name == "wctx")
+                                        if (li.Name == "wctx")
                                         {
                                             if (!string.IsNullOrEmpty(li.Value))
                                                 wctx = li.Value;
-                                            
+
                                         }
                                     }
 
@@ -301,7 +359,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                                         {
                                             t = li.Value;
                                         }
-                                     
+
                                     }
 
                                     //get all code, state...
@@ -342,7 +400,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 }
 
 
-                
+
 
                 //post rst to microsoft
                 string strrstPostBody = string.Format(StringConstants.ADFSrstPostBody, LicenseManager.encode(rst), Authorizectx);
