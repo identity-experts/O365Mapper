@@ -45,7 +45,7 @@ namespace _365Drive.Office365.CloudConnector
         /// <summary>
         /// Allowed single sign on auth
         /// </summary>
-        static FedType?[] AllowedSSOAuthenticationTypes = { FedType.ADFS };
+        static FedType?[] AllowedSSOAuthenticationTypes = { FedType.ADFS, FedType.AAD };
 
         /// <summary>
         /// Collection of all mappable drives
@@ -105,13 +105,13 @@ namespace _365Drive.Office365.CloudConnector
                 RealM userRealM = JsonConvert.DeserializeObject<RealM>(realM.Result);
 
                 //only for debug until we find way to differetiate cloud and AAD Connect
-                if (upn.ToLower() == "leigh.wood@node-it.com" && RegistryManager.IsDev)
-                {
-                    FederationType = FedType.Cloud;
-                }
+                //if (upn.ToLower() == "leigh.wood@node-it.com" && RegistryManager.IsDev)
+                //{
+                //    FederationType = FedType.Cloud;
+                //}
 
                 //AAD SSO
-                else if (userRealM.is_dsso_enabled != null && userRealM.is_dsso_enabled == true)
+                if (userRealM.is_dsso_enabled != null && userRealM.is_dsso_enabled == true)
                 {
                     LogManager.Verbose("AAD SSO auth found");
                     AADSSODomainName = userRealM.DomainName;
