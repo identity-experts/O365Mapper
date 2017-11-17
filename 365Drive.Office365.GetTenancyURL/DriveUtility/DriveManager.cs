@@ -386,7 +386,9 @@ namespace _365Drive.Office365.CloudConnector
                 Uri host;
                 if (!String.IsNullOrEmpty(strUrl) && Uri.TryCreate(strUrl, UriKind.Absolute, out host))
                 {
-                    LogManager.Verbose("setting fedAuth and rtFA cookie in IE");
+                    LogManager.Verbose("setting fedAuth and rtFA cookie in IE for URL: " + "https://" + new Uri(strUrl).Authority);
+                    LogManager.Verbose("fedAuth: " + fedAuth);
+                    LogManager.Verbose("rtFA: " + rtFA);
                     ///Setting fedAuth
                     bool FedAuthcookiesetresult = InternetSetCookie("https://" + new Uri(strUrl).Authority, "FedAuth", fedAuth + ";" + "Expires = " + DateTime.Now.AddDays(10).ToString("R"));
                     LogManager.Verbose("fedAuth cookie setIE result: " + FedAuthcookiesetresult);
