@@ -176,9 +176,14 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 string accessToken = string.Empty;
                 string nonce = string.Empty;
                 string code = string.Empty, id_token = string.Empty, session_state = string.Empty;
+                string desktopSsoConfig = string.Empty;
+                string dssoToken = string.Empty;
 
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
                 CookieContainer AuthrequestCookies = new CookieContainer();
+
+            
+
                 Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies);
                 AuthrequestResponse.Wait();
 
@@ -199,7 +204,13 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //    authorizeCookies.Add(new Uri("https://" + new Uri(call1Url).Authority), new Cookie(cookie.Name, cookie.Value));
                 //}
 
-                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies);
+                //render header
+                NameValueCollection loginPostHeader = new NameValueCollection();
+                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+
+
+                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies, loginPostHeader);
                 call1Result.Wait();
                 authorizeCall = call1Result.Result;
 
@@ -225,6 +236,32 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 Authorizehpgact = _365DriveTenancyURL.getHPGact(authorizeCall);
                 Authorizehpgid = _365DriveTenancyURL.getHPGId(authorizeCall);
                 LogManager.Verbose("Call 1 finished. output: ctx=" + Authorizectx + " flow=" + Authorizeflowtoken + " cookie count: " + authorizeCookies.Count.ToString());
+
+                //is SSO
+                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+
+                //if SSO, Its a shortcut, lets try it and try to finish from here
+                if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
+                {
+                    desktopSsoConfig = _365DriveTenancyURL.getDesktopSsoConfig(authorizeCall);
+                    desktopSsoConfig = string.Format(desktopSsoConfig, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
+
+                    //render header
+                    NameValueCollection AADConnectSSOGetHeader = new NameValueCollection();
+                    AADConnectSSOGetHeader.Add("Referrer", call1Url);
+                    AADConnectSSOGetHeader.Add("Origin", "https://login.microsoftonline.com");
+                    AADConnectSSOGetHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                    AADConnectSSOGetHeader.Add("Accept", "text/plain, */*; q=0.01");
+
+
+                    Task<string> AADConnectloginPostBodyResult = HttpClientHelper.GetAsync(desktopSsoConfig, AADConnectSSOGetHeader, true);
+                    AADConnectloginPostBodyResult.Wait();
+
+
+                    LogManager.Info("AAD SSO WIA resposne:" + AADConnectloginPostBodyResult.Result);
+                    //retrieving rst
+                    dssoToken = AADConnectloginPostBodyResult.Result;
+                }
 
 
                 ///Making call 2 which is to inform Microsoft about desktop SSO. This will give us canary value
@@ -278,7 +315,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 msLoginPostCookies.Add(new Uri("https://" + new Uri(StringConstants.loginPost).Authority), new Cookie("ESTSAUTHLIGHT", "+"));
                 msLoginPostCookies.Add(new Uri("https://" + new Uri(StringConstants.loginPost).Authority), new Cookie("ESTSSC", "00"));
 
-                string msLoginPostData = String.Format(StringConstants.loginPostData, _username, _password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                string msLoginPostData = String.Format(StringConstants.loginPostData, _username, _password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary), dssoToken);
                 Task<String> postCalresponse = HttpClientHelper.PostAsync((StringConstants.AADConnectCookieloginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies);
                 postCalresponse.Wait();
 

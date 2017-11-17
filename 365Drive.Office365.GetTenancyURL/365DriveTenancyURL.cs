@@ -592,13 +592,23 @@ namespace _365Drive.Office365.CloudConnector
                 string pollStartctx = string.Empty;
                 string authCode = string.Empty;
                 string accessToken = string.Empty;
+                string desktopSsoConfig = string.Empty;
+                string dssoToken = string.Empty;
 
                 CookieContainer authorizeCookies = new CookieContainer();
 
                 ///Making call 1, this will be an initial call to microsoftonline to get the apiCananary, flow and ctx values
                 LogManager.Verbose("Get request: " + String.Format(StringConstants.AzureActivateUserStep1, upn, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri));
                 string call1Url = String.Format(StringConstants.AzureActivateUserStep1, upn, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri);
-                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, authorizeCookies);
+
+
+                //render header
+                NameValueCollection loginPostHeader = new NameValueCollection();
+                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+
+
+                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, authorizeCookies,loginPostHeader);
                 call1Result.Wait();
                 authorizeCall = call1Result.Result;
 
@@ -646,6 +656,33 @@ namespace _365Drive.Office365.CloudConnector
                 authorizeCookies.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("ESTSSC", "00"));
 
 
+                //is SSO
+                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+
+                //if SSO, Its a shortcut, lets try it and try to finish from here
+                if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
+                {
+                    desktopSsoConfig = getDesktopSsoConfig(authorizeCall);
+                    desktopSsoConfig = string.Format(desktopSsoConfig, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
+
+                    //render header
+                    NameValueCollection AADConnectSSOGetHeader = new NameValueCollection();
+                    AADConnectSSOGetHeader.Add("Referrer", call1Url);
+                    AADConnectSSOGetHeader.Add("Origin", "https://login.microsoftonline.com"); 
+                    AADConnectSSOGetHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                    AADConnectSSOGetHeader.Add("Accept", "text/plain, */*; q=0.01");
+
+
+                    Task<string> AADConnectloginPostBodyResult = HttpClientHelper.GetAsync(desktopSsoConfig, AADConnectSSOGetHeader, true);
+                    AADConnectloginPostBodyResult.Wait();
+
+
+                    LogManager.Info("AAD SSO WIA resposne:" + AADConnectloginPostBodyResult.Result);
+                    //retrieving rst
+                    dssoToken = AADConnectloginPostBodyResult.Result;
+                }
+
+
                 ///Heading for call 2 which is desktop SSO
                 /// 
                 Task<String> dSSOresponse = HttpClientHelper.PostAsync((StringConstants.dssoPoll), StringConstants.dssoPollBody, "application/json", authorizeCookies, dSSOHeader);
@@ -673,7 +710,7 @@ namespace _365Drive.Office365.CloudConnector
                 msLoginPostCookies.Add(new Uri("https://" + new Uri(StringConstants.loginPost).Authority), new Cookie("ESTSSC", "00"));
 
 
-                string msLoginPostData = String.Format(StringConstants.loginPostData, upn, password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                string msLoginPostData = String.Format(StringConstants.loginPostData, upn, password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary), dssoToken);
                 NameValueCollection postCalHeader = new NameValueCollection();
                 Task<HttpResponseMessage> postCalresponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.loginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies, postCalHeader);
                 postCalresponse.Wait();
@@ -1150,6 +1187,15 @@ namespace _365Drive.Office365.CloudConnector
             return Canary;
         }
 
+
+
+        public static string getDesktopSsoConfig(string response)
+        {
+            int indexofCanary = response.IndexOf("iwaEndpointUrlFormat: \"") + 23;
+            int endIndex = response.IndexOf("\"", indexofCanary + 1);
+            string Canary = response.Substring(indexofCanary, endIndex - indexofCanary);
+            return Canary;
+        }
         public static string getClientRequest(string response)
         {
             int indexofCanary = response.IndexOf("\"correlationId\":") + 17;
