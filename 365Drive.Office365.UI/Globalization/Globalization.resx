@@ -308,4 +308,16 @@
   <data name="InformAutoSSOFailed" xml:space="preserve">
     <value>Automatic Single sign-on (SSO) failed, prompting for credentials soon...</value>
   </data>
+  <data name="Updates" xml:space="preserve">
+    <value>Updates: </value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>A new 365mapper update is available. Please click 'Update' below.</value>
+  </data>
+  <data name="UpdateButton" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="DontAskForUpdates" xml:space="preserve">
+    <value>Don't ask next time</value>
+  </data>
 </root>

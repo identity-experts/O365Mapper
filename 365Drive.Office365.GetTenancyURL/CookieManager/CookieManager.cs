@@ -128,38 +128,48 @@ namespace _365Drive.Office365.GetTenancyURL
         public static string retrieveCodeFromMFA(string responseContent, CookieContainer authorizeCookies)
         {
 
+            MFAConfig mfaConfig = _365DriveTenancyURL.renderMFAConfig(responseContent);
+
+
+            string flowToken = mfaConfig.sFT;
+            string ctx = mfaConfig.sCtx;
+            string canary = mfaConfig.canary;
+            string beginAuthUrl = mfaConfig.urlBeginAuth;
+            string endAuthUrl = mfaConfig.urlEndAuth;
+            string processAuthUrl = mfaConfig.urlPost;
+            string authMethodId = mfaConfig.defaultAuthMethod;
+
             //Task<string> msLoginPostResponsestrongAuth = HttpClientHelper.PostAsync(StringConstants.AzureActivateUserStep2, MSloginpostData, "application/x-www-form-urlencoded", authorizeCookies, MSloginpostHeader);
             //msLoginPostResponsestrongAuth.Wait();
 
             //Task<string> responseContent = msLoginPostResponse.Result.Content.ReadAsStringAsync();
-            string strongAuthConstant = getStrongAuthConstant(responseContent);
-            string strongAuthContext = getStrongAuthContext(responseContent);
-            string canary = getCanary2(responseContent);
-            LogManager.Info("String Auth Constant: " + strongAuthConstant);
-            LogManager.Info("strongAuthContext: " + strongAuthContext);
-            LogManager.Info("canary: " + canary);
+            //string strongAuthConstant = getStrongAuthConstant(responseContent);
+            //string strongAuthContext = getStrongAuthContext(responseContent);
+            //string canary = getCanary2(responseContent);
+            //LogManager.Info("String Auth Constant: " + strongAuthConstant);
+            //LogManager.Info("strongAuthContext: " + strongAuthContext);
+            //LogManager.Info("canary: " + canary);
 
             //ensure the strong auth required or not
-            if (!string.IsNullOrEmpty(strongAuthContext.Trim()))
+            if (!string.IsNullOrEmpty(ctx))
             {
                 LogManager.Info("string auth not empty");
 
-                StrongAuthConstantResponse sAuthConstantResponse = JsonConvert.DeserializeObject<StrongAuthConstantResponse>(strongAuthConstant);
-                StrongAuthContextResponse sAuthContextResponse = JsonConvert.DeserializeObject<StrongAuthContextResponse>(strongAuthContext);
+                //StrongAuthConstantResponse sAuthConstantResponse = JsonConvert.DeserializeObject<StrongAuthConstantResponse>(strongAuthConstant);
+                //StrongAuthContextResponse sAuthContextResponse = JsonConvert.DeserializeObject<StrongAuthContextResponse>(strongAuthContext);
 
-                LogManager.Info("result" + Convert.ToString(sAuthContextResponse.Success)); 
+                //LogManager.Info("result" + Convert.ToString(sAuthContextResponse.Success)); 
 
                 //Check whether MFA is really configured
-                if (sAuthContextResponse.Success.ToLower() == "true")
+                if (!string.IsNullOrEmpty(beginAuthUrl))
                 {
                     LogManager.Info("its true");
                     if (MFAUserConsent())
                     {
                         LogManager.Info("MFAUserConsent required");
-                        LogManager.Info("FToken" + sAuthConstantResponse.FlowToken);
-                        LogManager.Info("CTX" + sAuthConstantResponse.Ctx);
+                        LogManager.Info("FToken" + flowToken);
+                        LogManager.Info("CTX" + ctx);
 
-                        string authMethodId = sAuthContextResponse.DefaultMethod.AuthMethodId;
 
                         //SMS based MFA
                         if (authMethodId.ToLower() == "onewaysms" || authMethodId.ToLower() == "phoneappotp")
@@ -173,8 +183,8 @@ namespace _365Drive.Office365.GetTenancyURL
                             SASBeginAuthHeader.Add("Host", "login.microsoftonline.com");
 
                             //begin auth
-                            string SASBeginAuthBody = string.Format(StringConstants.SASBeginAuthPostBody, sAuthConstantResponse.FlowToken, sAuthConstantResponse.Ctx, authMethodId);
-                            Task<string> SASBeginAuth = HttpClientHelper.PostAsync(sAuthConstantResponse.SASControllerBeginAuthUrl, SASBeginAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
+                            string SASBeginAuthBody = string.Format(StringConstants.SASBeginAuthPostBody, flowToken, ctx, authMethodId);
+                            Task<string> SASBeginAuth = HttpClientHelper.PostAsync(beginAuthUrl, SASBeginAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
                             SASBeginAuth.Wait();
                             string PollStart = DateTime.UtcNow.Ticks.ToString();
 
@@ -185,7 +195,7 @@ namespace _365Drive.Office365.GetTenancyURL
                                 string smsCode = PromptMFA(authMethodId);
                                 string PollEnd = DateTime.UtcNow.Ticks.ToString();
                                 string SASEndAuthBody = string.Format(StringConstants.SASEndAuthPostBody, beginAuthResponse.FlowToken, beginAuthResponse.SessionId, beginAuthResponse.Ctx, smsCode, PollStart, PollEnd, authMethodId);
-                                Task<string> SASEndAuth = HttpClientHelper.PostAsync(sAuthConstantResponse.SASControllerEndAuthUrl, SASEndAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
+                                Task<string> SASEndAuth = HttpClientHelper.PostAsync(endAuthUrl, SASEndAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
                                 SASEndAuth.Wait();
 
                                 AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
@@ -193,11 +203,21 @@ namespace _365Drive.Office365.GetTenancyURL
                                 {
                                     SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                     string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd,rememberMFA.ToString().ToLower(), authMethodId);
-                                    Task<HttpResponseMessage> SASProcessAuth = HttpClientHelper.PostAsyncFullResponse(sAuthConstantResponse.SASControllerProcessAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
+                                    Task<string> SASProcessAuth = HttpClientHelper.PostAsync(processAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
                                     SASProcessAuth.Wait();
 
-                                    Task<string> SASProcessAuthResponse = SASProcessAuth.Result.Content.ReadAsStringAsync();
-                                    return SASProcessAuthResponse.Result;
+
+                                    LoginConfig msPostConfig = _365DriveTenancyURL.renderConfig(SASProcessAuth.Result);
+                                    string Authorizectx = msPostConfig.sCtx;
+                                    string Authorizeflowtoken = msPostConfig.sFT;
+                                    string msPostCanary = msPostConfig.canary;
+
+                                    //getting ready for KMSI post
+                                    string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
+                                    Task<string> msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
+                                    msKMSIPost.Wait();
+
+                                    return msKMSIPost.Result;
                                     //if (SASProcessAuth.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
                                     //{
                                     //    //auth failed
@@ -235,8 +255,8 @@ namespace _365Drive.Office365.GetTenancyURL
                             SASBeginAuthHeader.Add("Host", "login.microsoftonline.com");
 
                             //begin auth
-                            string SASBeginAuthBody = string.Format(StringConstants.SASBeginAuthPostBody, sAuthConstantResponse.FlowToken, sAuthConstantResponse.Ctx, authMethodId);
-                            Task<string> SASBeginAuth = HttpClientHelper.PostAsync(sAuthConstantResponse.SASControllerBeginAuthUrl, SASBeginAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
+                            string SASBeginAuthBody = string.Format(StringConstants.SASBeginAuthPostBody, flowToken, ctx, authMethodId);
+                            Task<string> SASBeginAuth = HttpClientHelper.PostAsync(beginAuthUrl, SASBeginAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
                             SASBeginAuth.Wait();
                             string PollStart = DateTime.UtcNow.Ticks.ToString();
 
@@ -250,7 +270,7 @@ namespace _365Drive.Office365.GetTenancyURL
                                 {
                                     string PollEnd = DateTime.UtcNow.Ticks.ToString();
                                     string SASEndAuthBody = string.Format(StringConstants.SASCallEndAuthPostBody, beginAuthResponse.FlowToken, beginAuthResponse.SessionId, beginAuthResponse.Ctx, PollStart, PollEnd, authMethodId);
-                                    Task<string> SASEndAuth = HttpClientHelper.PostAsync(sAuthConstantResponse.SASControllerEndAuthUrl, SASEndAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
+                                    Task<string> SASEndAuth = HttpClientHelper.PostAsync(endAuthUrl, SASEndAuthBody, "application/json", authorizeCookies, SASBeginAuthHeader);
                                     SASEndAuth.Wait();
 
                                     AuthResponse endAuthResponse = JsonConvert.DeserializeObject<AuthResponse>(SASEndAuth.Result);
@@ -258,11 +278,22 @@ namespace _365Drive.Office365.GetTenancyURL
                                     {
                                         SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                         string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd,rememberMFA.ToString().ToLower(), authMethodId);
-                                        Task<HttpResponseMessage> SASProcessAuth = HttpClientHelper.PostAsyncFullResponse(sAuthConstantResponse.SASControllerProcessAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
+                                        Task<string> SASProcessAuth = HttpClientHelper.PostAsync(processAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
                                         SASProcessAuth.Wait();
 
-                                        Task<string> SASProcessAuthResponse = SASProcessAuth.Result.Content.ReadAsStringAsync();
-                                        return SASProcessAuthResponse.Result;
+                                        LoginConfig msPostConfig = _365DriveTenancyURL.renderConfig(SASProcessAuth.Result);
+                                        string Authorizectx = msPostConfig.sCtx;
+                                        string Authorizeflowtoken = msPostConfig.sFT;
+                                        string msPostCanary = msPostConfig.canary;
+
+                                        //getting ready for KMSI post
+                                        string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
+                                        Task<string> msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
+                                        msKMSIPost.Wait();
+
+                                        return msKMSIPost.Result;
+
+                                        
                                         //if (SASProcessAuth.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
                                         //{
                                         //    //auth failed

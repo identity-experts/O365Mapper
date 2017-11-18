@@ -187,6 +187,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t ask next time.
+        /// </summary>
+        public static string DontAskForUpdates {
+            get {
+                return ResourceManager.GetString("DontAskForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .NET Version.
         /// </summary>
         public static string DotNetVersion {
@@ -561,6 +570,33 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string TenancyNotRegistered {
             get {
                 return ResourceManager.GetString("TenancyNotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new 365mapper update is available. Please click &apos;Update&apos; below..
+        /// </summary>
+        public static string UpdateAvailable {
+            get {
+                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string UpdateButton {
+            get {
+                return ResourceManager.GetString("UpdateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updates: .
+        /// </summary>
+        public static string Updates {
+            get {
+                return ResourceManager.GetString("Updates", resourceCulture);
             }
         }
         

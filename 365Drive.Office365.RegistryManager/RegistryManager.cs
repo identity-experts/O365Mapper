@@ -24,7 +24,8 @@ namespace _365Drive.Office365
         LastLicenseChecked = 5,
         PartnerLogo = 6,
         SSO = 7,
-        AutoSSO = 8
+        AutoSSO = 8,
+        DontAskForUpdates = 9
     }
 
 

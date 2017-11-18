@@ -1,0 +1,41 @@
+﻿<mui:ModernDialog x:Class="_365Drive.Office365.UI.About.Updates"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                  xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
+                  mc:Ignorable="d" d:DesignWidth="300"
+                  Title="{x:Static p:Globalization.SignOut}" Width="400px" Height="262.5px" >
+
+    <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
+    <Grid Width="400px">
+        <Grid.Resources>
+            <Style TargetType="{x:Type Image}">
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Image Name="logo" Source="/365Drive.Office365.UI;component/Images/3mxs.png" Width="110" Height="111" Grid.RowSpan="2" />
+        <TextBlock Grid.Row="0" Grid.Column="1" Width="250px" TextWrapping="WrapWithOverflow" Text="{x:Static p:Globalization.UpdateAvailable}" FontFamily="Lato" FontSize="14" Foreground="Gray" VerticalAlignment="Bottom" >
+        </TextBlock>
+        <CheckBox
+            Content="{x:Static p:Globalization.DontAskForUpdates}"
+            HorizontalAlignment="Left"
+            Grid.Column="1"
+            VerticalAlignment="Top"
+            Name="dontAskCheckbox"
+            Grid.Row="1" FontFamily="Lato" FontSize="14" Foreground="Gray" Margin="20,10,20,20" />
+        <ProgressBar Name="UpdateProgress" Minimum="0" Visibility="Hidden" Grid.Row="1" Grid.Column="1"  Maximum="20" Height="16" IsIndeterminate="True" />
+        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
+               Grid.ColumnSpan="2"
+               FontFamily="Lato" FontSize="13" Foreground="Gray" />
+    </Grid>
+</mui:ModernDialog>

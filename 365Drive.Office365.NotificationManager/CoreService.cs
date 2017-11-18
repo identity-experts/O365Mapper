@@ -15,6 +15,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using _365Drive.Office365.NotificationManager;
 using _365Drive.Office365.GetTenancyURL;
+using _365Drive.Office365.UpdateManager;
+using _365Drive.Office365.UI.About;
 
 namespace _365Drive.Office365
 {
@@ -220,6 +222,13 @@ namespace _365Drive.Office365
                 LogManager.Verbose("Registering power mode change event to make sure the system is not in resume mode");
                 SystemEvents.PowerModeChanged += EnsurePowerMode;
 
+                string dontAskForUpdates = RegistryManager.Get(RegistryKeys.DontAskForUpdates);
+                if (dontAskForUpdates != "1")
+                {
+                    //check for updates
+                    CheckForUpdates();
+                }
+
                 //call tick now
                 await Task.Run(() => tick());
             }
@@ -230,6 +239,23 @@ namespace _365Drive.Office365
             }
         }
 
+
+        void CheckForUpdates()
+        {
+            //check for updates
+            VersionResponse version = Versions.LatestVersion();
+
+            //get current version
+            if (!string.IsNullOrEmpty(version.data.version) && !string.IsNullOrEmpty(version.data.x64) && !string.IsNullOrEmpty(version.data.x86))
+            {
+                string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                if (currentVersion != version.data.version)
+                {
+                    Updates updatePrompt = new Updates();
+                    updatePrompt.Show();
+                }
+            }
+        }
 
         /// <summary>
         /// Make sure we are connected to internet

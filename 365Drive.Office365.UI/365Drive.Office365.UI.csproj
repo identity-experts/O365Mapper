@@ -38,6 +38,9 @@
       <HintPath>..\packages\ModernUI.WPF.1.0.9\lib\net45\FirstFloor.ModernUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Ionic.Zip.Reduced">
+      <HintPath>ExternalDLLs\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -62,6 +65,9 @@
     <Compile Include="About\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="About\Updates.xaml.cs">
+      <DependentUpon>Updates.xaml</DependentUpon>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -84,6 +90,10 @@
     <Compile Include="Utility\CommunicationCallBacks.cs" />
     <Compile Include="Utility\Helper.cs" />
     <Page Include="About\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="About\Updates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,6 +187,10 @@
     <ProjectReference Include="..\365Drive.Office365.UI.MFA\365Drive.Office365.UI.MFA.csproj">
       <Project>{b7279763-d5ee-436c-ab1e-d0ad6ee6f5cc}</Project>
       <Name>365Drive.Office365.UI.MFA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.UpdateManager\365Drive.Office365.UpdateManager.csproj">
+      <Project>{c36e35d3-7ca7-48e1-b0dc-b0effad3cea6}</Project>
+      <Name>365Drive.Office365.UpdateManager</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
