@@ -209,12 +209,16 @@ namespace _365Drive.Office365.CloudConnector
                 string authorizeCall = string.Empty, Authorizectx = string.Empty, Authorizeflowtoken = string.Empty, authorizeCanary = string.Empty, nonce = string.Empty, clientRequestId = string.Empty;
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
                 CookieContainer AuthrequestCookies = new CookieContainer();
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies, true);
+                CookieContainer wreplyCookies = new CookieContainer();
+               
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true);
                 AuthrequestResponse.Wait();
+
+                //CookieCollection wReplies = wreplyCookies.GetCookies(_host);
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
                 if (qscoll.Count > 0)
-                { 
+                {
                     nonce = qscoll["nonce"];
                     clientRequestId = qscoll["client-request-id"];
                 }
@@ -303,7 +307,7 @@ namespace _365Drive.Office365.CloudConnector
                 Task<string> msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies, MSloginpostHeader);
                 msKMSIPost.Wait();
 
-                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty, correlation_id = string.Empty;
                 ///Fetch the ctx and flow token and canary
                 CQ postBodyResponseParser = CQ.Create(msKMSIPost.Result);
                 var postBodyResponseInputs = postBodyResponseParser["input"];
@@ -325,10 +329,14 @@ namespace _365Drive.Office365.CloudConnector
                     {
                         session_state = li.Value;
                     }
+                    if (li.Name == "correlation_id")
+                    {
+                        correlation_id = li.Value;
+                    }
                 }
 
                 ///Check for MFA
-                if(string.IsNullOrEmpty(code))
+                if (string.IsNullOrEmpty(code))
                 {
                     string postResponse = GlobalCookieManager.retrieveCodeFromMFA(msKMSIPost.Result, AuthrequestCookies);
                     postBodyResponseParser = CQ.Create(postResponse);
@@ -351,11 +359,15 @@ namespace _365Drive.Office365.CloudConnector
                         {
                             session_state = li.Value;
                         }
+                        if (li.Name == "correlation_id")
+                        {
+                            correlation_id = li.Value;
+                        }
                     }
                 }
 
                 //post everyhing to sharepoint
-                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
+                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state, correlation_id);
                 NameValueCollection SharePointPostHeader = new NameValueCollection();
                 SharePointPostHeader.Add("Origin", "https://login.microsoftonline.com");
                 SharePointPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
@@ -373,12 +385,12 @@ namespace _365Drive.Office365.CloudConnector
 
                 try
                 {
-                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);
+                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", wreplyCookies, SharePointPostHeader);
                     SharePointPostResult.Wait();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    if(SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
+                    if (SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
                     {
 
                     }
@@ -387,7 +399,7 @@ namespace _365Drive.Office365.CloudConnector
                         throw ex;
                     }
                 }
-                foreach (Cookie SPCookie in AuthrequestCookies.GetCookies(new Uri(Wreply)))
+                foreach (Cookie SPCookie in wreplyCookies.GetCookies(new Uri(Wreply)))
                 {
                     if (SPCookie.Name.ToLower() == "fedauth")
                     {

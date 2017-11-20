@@ -41,9 +41,7 @@
         <Label Name="partnerNameLabel" Grid.Row="3" Content="{x:Static p:Globalization.AccountManager}" HorizontalAlignment="Right" Grid.Column="1" FontFamily="Lato" FontSize="15" />
         <Label Name="partnerName" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
 
-        <Label Name="updatesLabel" Grid.Row="2" Content="{x:Static p:Globalization.Updates}" HorizontalAlignment="Right" Grid.Column="1" FontFamily="Lato" FontSize="15" />
-        <Label Name="updateLink" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left"  Grid.RowSpan="2" FontFamily="Lato" FontSize="15" />
-
+       
         <Label Name="partnerAboutLabel" Grid.Row="4" Content="{x:Static p:Globalization.AboutPartner}" HorizontalAlignment="Right" Grid.Column="1" FontFamily="Lato" FontSize="15" />
         <ScrollViewer Grid.Row="4" Grid.Column="2" Height="50" Width="185" HorizontalAlignment="Left">
             <TextBlock ScrollViewer.HorizontalScrollBarVisibility="Disabled"  

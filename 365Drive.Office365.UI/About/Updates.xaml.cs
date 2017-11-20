@@ -147,6 +147,10 @@ namespace _365Drive.Office365.UI.About
                         //ApplicationUpdate.Versions.CreateLocalVersionFile(downloadToPath, "version.txt", currentVersion);
                         System.Diagnostics.Process proc = System.Diagnostics.Process.Start(exePath);
                         this.Close();
+
+                        //exit because it will show that application is ALREADY in use
+                        Application.Current.Shutdown();
+
                     }
                     else
                     {

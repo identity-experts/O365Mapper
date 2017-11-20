@@ -6,7 +6,7 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
                   mc:Ignorable="d" d:DesignWidth="300"
-                  Title="{x:Static p:Globalization.SignOut}" Width="400px" Height="262.5px" >
+                  Title="{x:Static p:Globalization.UpdatePageTitle}" Width="400px" Height="262.5px" >
 
     <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
     <Grid Width="400px">

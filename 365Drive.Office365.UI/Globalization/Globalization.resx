@@ -320,4 +320,7 @@
   <data name="DontAskForUpdates" xml:space="preserve">
     <value>Don't ask next time</value>
   </data>
+  <data name="UpdatePageTitle" xml:space="preserve">
+    <value>Updates</value>
+  </data>
 </root>

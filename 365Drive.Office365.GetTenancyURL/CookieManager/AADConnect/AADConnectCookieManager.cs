@@ -175,16 +175,16 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 string authCode = string.Empty;
                 string accessToken = string.Empty;
                 string nonce = string.Empty;
-                string code = string.Empty, id_token = string.Empty, session_state = string.Empty;
+                string code = string.Empty, id_token = string.Empty, session_state = string.Empty, state = string.Empty, correlation_id = string.Empty;
                 string desktopSsoConfig = string.Empty;
                 string dssoToken = string.Empty;
 
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
                 CookieContainer AuthrequestCookies = new CookieContainer();
+                CookieContainer wreplyCookies = new CookieContainer();
 
 
-
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies);
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies);
                 AuthrequestResponse.Wait();
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
@@ -355,6 +355,14 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     {
                         session_state = li.Value;
                     }
+                    if (li.Name == "state")
+                    {
+                        state = li.Value;
+                    }
+                    if (li.Name == "correlation_id")
+                    {
+                        correlation_id = li.Value;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(code))
@@ -468,6 +476,14 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             {
                                 session_state = li.Value;
                             }
+                            if (li.Name == "state")
+                            {
+                                state = li.Value;
+                            }
+                            if (li.Name == "correlation_id")
+                            {
+                                correlation_id = li.Value;
+                            }
                         }
 
 
@@ -489,7 +505,11 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                                 }
                                 if (li.Name == "state")
                                 {
-                                    //state = li.Value;
+                                    state = li.Value;
+                                }
+                                if (li.Name == "correlation_id")
+                                {
+                                    correlation_id = li.Value;
                                 }
                                 if (li.Name == "session_state")
                                 {
@@ -515,7 +535,11 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             }
                             if (li.Name == "state")
                             {
-                                //state = li.Value;
+                                state = li.Value;
+                            }
+                            if (li.Name == "correlation_id")
+                            {
+                                correlation_id = li.Value;
                             }
                             if (li.Name == "session_state")
                             {
@@ -525,13 +549,13 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                 }
 
-                string postCodeBody = String.Format(StringConstants.postCodeBody, code, id_token, session_state);
-                Task<String> postCodeResponse = HttpClientHelper.PostAsync(String.Format(StringConstants.postCodeUrl, _host), postCodeBody, "application/x-www-form-urlencoded", AuthrequestCookies, false);
+                string postCodeBody = String.Format(StringConstants.postCodeBody, code, id_token, state, session_state, correlation_id);
+                Task<String> postCodeResponse = HttpClientHelper.PostAsync(String.Format(StringConstants.postCodeUrl, _host), postCodeBody, "application/x-www-form-urlencoded", wreplyCookies, false);
                 postCodeResponse.Wait();
 
                 LogManager.Verbose("cookies retrieved. Code: " + authCode);
                 MsoCookies ret = new MsoCookies();
-                CookieCollection spCookies = AuthrequestCookies.GetCookies(_host);
+                CookieCollection spCookies = wreplyCookies.GetCookies(_host);
 
                 ret.FedAuth = spCookies["FedAuth"].Value;
                 ret.rtFa = spCookies["rtFa"].Value;

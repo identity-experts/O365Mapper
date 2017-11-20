@@ -133,7 +133,9 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 string authorizeCall = string.Empty, Authorizectx = string.Empty, Authorizeflowtoken = string.Empty, authorizeCanary = string.Empty, nonce = string.Empty, clientRequestId = string.Empty;
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, spSiteUrl.ToString());
                 CookieContainer AuthrequestCookies = new CookieContainer();
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies, true);
+                CookieContainer wreplyCookies = new CookieContainer();
+
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true);
                 AuthrequestResponse.Wait();
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
@@ -261,7 +263,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
 
                 //retrieve code, idtoken 
-                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty, correlation_id = string.Empty;
 
                 //retrieving rst
                 string rst = string.Empty;
@@ -395,6 +397,10 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                                         {
                                             session_state = li.Value;
                                         }
+                                        if (li.Name == "correlation_id")
+                                        {
+                                            correlation_id = li.Value;
+                                        }
                                     }
 
                                     goto codereceived;
@@ -445,6 +451,10 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     {
                         session_state = li.Value;
                     }
+                    if (li.Name == "correlation_id")
+                    {
+                        correlation_id = li.Value;
+                    }
                 }
 
                 ///Check for MFA
@@ -471,12 +481,16 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                         {
                             session_state = li.Value;
                         }
+                        if (li.Name == "correlation_id")
+                        {
+                            correlation_id = li.Value;
+                        }
                     }
                 }
 
                 codereceived:
                 //post everyhing to sharepoint
-                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
+                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state, correlation_id);
                 NameValueCollection SharePointPostHeader = new NameValueCollection();
                 SharePointPostHeader.Add("Origin", "https://login.microsoftonline.com");
                 SharePointPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
@@ -486,7 +500,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 Task<HttpResponseMessage> SharePointPostResult = null;
                 try
                 {
-                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);
+                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", wreplyCookies, SharePointPostHeader);
                     SharePointPostResult.Wait();
                 }
                 catch (Exception ex)
@@ -500,7 +514,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                         throw ex;
                     }
                 }
-                foreach (Cookie SPCookie in AuthrequestCookies.GetCookies(new Uri(Wreply)))
+                foreach (Cookie SPCookie in wreplyCookies.GetCookies(new Uri(Wreply)))
                 {
                     ret.Add(SPCookie);
                 }

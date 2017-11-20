@@ -592,6 +592,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Updates.
+        /// </summary>
+        public static string UpdatePageTitle {
+            get {
+                return ResourceManager.GetString("UpdatePageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Updates: .
         /// </summary>
         public static string Updates {

@@ -70,7 +70,7 @@ namespace _365Drive.Office365.CloudConnector
         internal const string ADFSailedLoginUrl = "https://login.microsoftonline.com/login.srf";
         //internal const string AzureActivationUserToken = "grant_type=authorization_code&code={0}&redirect_uri=urn%3aietf%3awg%3aoauth%3a2.0%3aoob&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c";
         internal const string postCodeUrl = "{0}_forms/default.aspx";
-        internal const string postCodeBody = "code={0}&id_token={1}&session_state={2}";
+        internal const string postCodeBody = "code={0}&id_token={1}&state={2}&session_state={3}&correlation_id={4}";
         internal const string AzureActivationUserToken = "client_id={1}&redirect_uri={3}&client_secret={2}&code={0}&grant_type=authorization_code&resource={4}";
         internal const string AzureActivateUserStep4 = "https://api.office.com/discovery/v2.0/me/services";
         internal const string rootUrlFinder = "rootsite@";
@@ -118,6 +118,6 @@ namespace _365Drive.Office365.CloudConnector
         internal const string SASEndAuthPostBody = "{{\"Method\":\"EndAuth\",\"FlowToken\":\"{0}\",\"SessionId\":\"{1}\",\"Ctx\":\"{2}\",\"AuthMethodId\":\"{6}\",\"AdditionalAuthData\":\"{3}\",\"LastPollStart\":\"{4}\",\"LastPollEnd\":\"{5}\"}}";
         internal const string SASCallEndAuthPostBody = "{{\"Method\":\"EndAuth\",\"FlowToken\":\"{0}\",\"SessionId\":\"{1}\",\"Ctx\":\"{2}\",\"PollCount\":\"1\",\"LastPollStart\":\"{3}\",\"LastPollEnd\":\"{4}\",\"AuthMethodId\":\"{5}\"}}";
         internal const string SASProcessAuthPostBody = "request={0}&flowToken={1}&canary={2}&mfaAuthMethod={6}&rememberMFA={5}&mfaLastPollStart={3}&mfaLastPollEnd={4}";
-        internal const string SharePointFormPost = "code={0}&id_token={1}&state={2}&session_state={3}";
+        internal const string SharePointFormPost = "code={0}&id_token={1}&state={2}&session_state={3}&correlation_id={4}";
     }
 }
