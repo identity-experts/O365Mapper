@@ -13,6 +13,35 @@ namespace _365Drive.Office365.UpdateManager
     {
         static VersionResponse _versionResponse;
 
+
+        /// <summary>
+        /// compare two versions 
+        /// </summary>
+        /// <param name="oldVersion">the current version</param>
+        /// <param name="newVersion">version received from api</param>
+        public static bool compareVersion(string oldVersion, string newVersion)
+        {
+            try
+            {
+                Version vOldVersion = new Version(oldVersion);
+                Version vnewVersion = new Version(newVersion);
+
+                var result = vnewVersion.CompareTo(vOldVersion);
+
+                if (result > 0)
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return false;
+        }
+
+
         public static VersionResponse LatestVersion()
         {
             if (_versionResponse != null)

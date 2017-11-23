@@ -323,4 +323,7 @@
   <data name="UpdatePageTitle" xml:space="preserve">
     <value>Updates</value>
   </data>
+  <data name="CouldNotRetrieveUPN" xml:space="preserve">
+    <value>We could not connect to Active Directory for fetching UPN to perform SSO</value>
+  </data>
 </root>

@@ -114,7 +114,7 @@ namespace _365Drive.Office365.CloudConnector
         public string canary { get; set; }
         public string defaultAuthMethod
         {
-            get { return arrUserProofs.Where(a => a.isDefault).FirstOrDefault().authMethodId; }
+            get { return arrUserProofs.Any(a => a.isDefault) ? arrUserProofs.Where(a => a.isDefault).FirstOrDefault().authMethodId : string.Empty; }
         }
 
     }
@@ -281,6 +281,22 @@ namespace _365Drive.Office365.CloudConnector
     {
         public string type { get; set; }
         public string reason { get; set; }
+    }
+
+    public class dSSO
+    {
+        public string iwaEndpointUrlFormat { get; set; }
+        public int iwaRequestTimeoutInMs { get; set; }
+        public bool startDesktopSsoOnPageLoad { get; set; }
+        public int progressAnimationTimeout { get; set; }
+        public bool isEdgeAllowed { get; set; }
+        public bool isSafariAllowed { get; set; }
+        public string redirectUri { get; set; }
+    }
+
+    public class dSSOConfig
+    {
+        public dSSO desktopSsoConfig;
     }
 
     public class LoginConfig

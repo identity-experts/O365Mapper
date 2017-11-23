@@ -250,8 +250,9 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //if SSO, Its a shortcut, lets try it and try to finish from here
                 if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
                 {
-                    desktopSsoConfig = _365DriveTenancyURL.getDesktopSsoConfig(authorizeCall);
-                    desktopSsoConfig = string.Format(desktopSsoConfig, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
+                    //desktopSsoConfig = getDesktopSsoConfig(authorizeCall);
+                    dSSOConfig DSSOConfig = _365DriveTenancyURL.renderdSSOConfig(authorizeCall);
+                    desktopSsoConfig = string.Format(DSSOConfig.desktopSsoConfig.iwaEndpointUrlFormat, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
 
                     //render header
                     NameValueCollection AADConnectSSOGetHeader = new NameValueCollection();
@@ -326,19 +327,31 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 Task<String> postCalresponse = HttpClientHelper.PostAsync((StringConstants.AADConnectCookieloginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies);
                 postCalresponse.Wait();
 
-                LoginConfig msPostConfig = _365DriveTenancyURL.renderConfig(postCalresponse.Result);
-                Authorizectx = msPostConfig.sCtx;
-                Authorizeflowtoken = msPostConfig.sFT;
-                authorizeCanary = msPostConfig.canary;
 
+                string outputControls = string.Empty;
+                string MSKMSIPostData = string.Empty;
+                LoginConfig msPostConfig;
+                Task<string> msKMSIPost;
+                msPostConfig = _365DriveTenancyURL.renderConfig(postCalresponse.Result);
+                if (msPostConfig == null)
+                {
+                    outputControls = postCalresponse.Result;
+                }
+                else
+                {
 
-                //getting ready for KMSI post
-                string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
-                Task<string> msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies);
-                msKMSIPost.Wait();
+                    Authorizectx = msPostConfig.sCtx;
+                    Authorizeflowtoken = msPostConfig.sFT;
+                    authorizeCanary = msPostConfig.canary;
 
+                    //getting ready for KMSI post
+                    MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                    msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies);
+                    msKMSIPost.Wait();
+                    outputControls = msKMSIPost.Result;
+                }
 
-                CQ msPOSTcq = CQ.Create(msKMSIPost.Result);
+                CQ msPOSTcq = CQ.Create(outputControls);
                 var msPOSTcqItems = msPOSTcq["input"];
 
                 foreach (var li in msPOSTcqItems)
@@ -367,8 +380,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
                 if (string.IsNullOrEmpty(code))
                 {
-
-                    string isPollingRequired = _365DriveTenancyURL.getpolingRequired(postCalresponse.Result);
+                    string isPollingRequired = _365DriveTenancyURL.getpolingRequired(outputControls);
                     bool pollingRequired = false;
                     bool.TryParse(isPollingRequired, out pollingRequired);
 
@@ -451,15 +463,21 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                         Authorizeflowtoken = msPostConfig.sFT;
                         authorizeCanary = msPostConfig.canary;
 
-
-                        //getting ready for KMSI post
-                        MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
-                        msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies, pollEndHeader);
-                        msKMSIPost.Wait();
-
+                        if (string.IsNullOrEmpty(Authorizectx))
+                        {
+                            outputControls = postCalresponse.Result;
+                        }
+                        else
+                        {
+                            //getting ready for KMSI post
+                            MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                            msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies);
+                            msKMSIPost.Wait();
+                            outputControls = msKMSIPost.Result;
+                        }
 
                         //var pollendResponse = await pollEndResponse.Content.ReadAsStringAsync();
-                        CQ pollEndResponsecQ = CQ.Create(msKMSIPost.Result);
+                        CQ pollEndResponsecQ = CQ.Create(outputControls);
                         var pollEndResponses = pollEndResponsecQ["input"];
 
                         foreach (var li in pollEndResponses)
@@ -490,7 +508,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                         ///Check for MFA
                         if (string.IsNullOrEmpty(code))
                         {
-                            string postResponse = GlobalCookieManager.retrieveCodeFromMFA(msKMSIPost.Result, AuthrequestCookies);
+                            string postResponse = GlobalCookieManager.retrieveCodeFromMFA(outputControls, AuthrequestCookies);
                             pollEndResponsecQ = CQ.Create(postResponse);
                             pollEndResponses = pollEndResponsecQ["input"];
                             foreach (var li in pollEndResponses)
@@ -520,7 +538,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                     else
                     {
-                        string postResponse = GlobalCookieManager.retrieveCodeFromMFA(msKMSIPost.Result, AuthrequestCookies);
+                        string postResponse = GlobalCookieManager.retrieveCodeFromMFA(outputControls, AuthrequestCookies);
                         var pollEndResponsecQ = CQ.Create(postResponse);
                         var pollEndResponses = pollEndResponsecQ["input"];
                         foreach (var li in pollEndResponses)

@@ -152,8 +152,11 @@ namespace _365Drive.Office365.CloudConnector
                 string pollStartctx = string.Empty;
                 string authCode = string.Empty;
                 string accessToken = string.Empty;
+                string query = string.Empty;
 
                 CookieContainer authorizeCookies = new CookieContainer();
+
+                LogManager.Info("Cloud authentication");
 
                 ///Making call 1, this will be an initial call to microsoftonline to get the apiCananary, flow and ctx values
                 LogManager.Verbose("Get request: " + String.Format(StringConstants.AzureActivateUserStep1, upn, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri));
@@ -168,7 +171,7 @@ namespace _365Drive.Office365.CloudConnector
                 Authorizeflowtoken = config.sFT;
                 msPostCanary = config.canary;
 
-             
+
                 LogManager.Verbose("Call 1 finished. output: ctx=" + Authorizectx + " flow=" + Authorizeflowtoken + " cookie count: " + authorizeCookies.Count.ToString());
 
                 //getting ready for call 2
@@ -182,43 +185,75 @@ namespace _365Drive.Office365.CloudConnector
                 MSloginpostHeader.Add("User-Agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729)");
                 MSloginpostHeader.Add("Host", "login.microsoftonline.com");
                 MSloginpostHeader.Add("Accept", "application/json");
-                Task<string> msLoginPostResponse = HttpClientHelper.PostAsync(StringConstants.AzureActivateUserStep2, MSloginpostData, "application/x-www-form-urlencoded", authorizeCookies, MSloginpostHeader);
+
+                Task<HttpResponseMessage> msLoginPostResponse = HttpClientHelper.PostAsyncFullResponse(StringConstants.AzureActivateUserStep2, MSloginpostData, "application/x-www-form-urlencoded", authorizeCookies, MSloginpostHeader);
                 msLoginPostResponse.Wait();
+                //LogManager.Verbose("Call 1 finished. 
+                Task<string> loginResponse = msLoginPostResponse.Result.Content.ReadAsStringAsync();
+                LoginConfig msPostConfig = renderConfig(loginResponse.Result);
 
-
-                LoginConfig msPostConfig = renderConfig(msLoginPostResponse.Result);
-                Authorizectx = msPostConfig.sCtx;
-                Authorizeflowtoken = msPostConfig.sFT;
-                msPostCanary = msPostConfig.canary;
-
-
-                //getting ready for KMSI post
-                string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
-                Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, MSloginpostHeader);
-                msKMSIPost.Wait();
-
-
-                if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                if (msPostConfig == null)
                 {
-                    string code = retrieveCodeFromMFA(msKMSIPost.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
-                    if (string.IsNullOrEmpty(code))
+                    LogManager.Info("Cloud Identity null");
+                    NameValueCollection postQueryCollection = HttpUtility.ParseQueryString(msLoginPostResponse.Result.RequestMessage.RequestUri.Query);
+                    if (postQueryCollection.Count > 0)
                     {
-                        ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
-                        if (remindLater)
-                            return "0";
-                        else
-                            return string.Empty;
+                        authCode = postQueryCollection[0];
                     }
-                    else
+
+                    // if we still didnt get, lets give a try for MFA
+                    if (string.IsNullOrEmpty(authCode))
                     {
-                        authCode = code;
+                        string code = retrieveCodeFromMFA(loginResponse.Result, authorizeCookies);
+                        return code;
                     }
                 }
                 else
                 {
-                    NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
-                    if (qscoll.Count > 0)
-                        authCode = qscoll[0];
+                    LogManager.Info("Cloud Identity not null");
+                    Authorizectx = msPostConfig.sCtx;
+                    Authorizeflowtoken = msPostConfig.sFT;
+                    msPostCanary = msPostConfig.canary;
+
+                    //getting ready for KMSI post
+                    string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
+                    Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, MSloginpostHeader);
+                    msKMSIPost.Wait();
+
+                    if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                    {
+                        string code = retrieveCodeFromMFA(msKMSIPost.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                        if (string.IsNullOrEmpty(code))
+                        {
+                            ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                            if (remindLater)
+                            {
+                                return "0";
+                            }
+                            else
+                            {
+                                code = retrieveCodeFromMFA(loginResponse.Result, authorizeCookies);
+                                if (string.IsNullOrEmpty(code))
+                                {
+                                    return code;
+                                }
+                                else
+                                {
+                                    return string.Empty;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            authCode = code;
+                        }
+                    }
+                    else
+                    {
+                        NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
+                        if (qscoll.Count > 0)
+                            authCode = qscoll[0];
+                    }
                 }
                 LogManager.Verbose("Call 2 finished");
                 LogManager.Verbose("Call 2 code:" + authCode);
@@ -291,7 +326,7 @@ namespace _365Drive.Office365.CloudConnector
 
             MFAConfig mfaConfig = renderMFAConfig(responseContent);
 
-          
+
             string flowToken = mfaConfig.sFT;
             string ctx = mfaConfig.sCtx;
             string canary = mfaConfig.canary;
@@ -341,31 +376,45 @@ namespace _365Drive.Office365.CloudConnector
                                 {
                                     SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, *";
                                     string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
-                                    Task<string> SASProcessAuth = HttpClientHelper.PostAsync(processAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
+                                    Task<HttpResponseMessage> SASProcessAuth = HttpClientHelper.PostAsyncFullResponse(processAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
                                     SASProcessAuth.Wait();
 
-                                    LoginConfig msPostConfig = renderConfig(SASProcessAuth.Result);
-                                    string Authorizectx = msPostConfig.sCtx;
-                                    string  Authorizeflowtoken = msPostConfig.sFT;
-                                    string msPostCanary = msPostConfig.canary;
+                                    Task<string> loginResponse = SASProcessAuth.Result.Content.ReadAsStringAsync();
+                                    LoginConfig msPostConfig = renderConfig(loginResponse.Result);
 
-                                    //getting ready for KMSI post
-                                    string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
-                                    Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
-                                    msKMSIPost.Wait();
-
-                                    if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                                    if (msPostConfig == null)
                                     {
-                                        //auth failed
-                                        return string.Empty;
+                                        NameValueCollection postQueryCollection = HttpUtility.ParseQueryString(SASProcessAuth.Result.RequestMessage.RequestUri.Query);
+                                        if (postQueryCollection.Count > 0)
+                                        {
+                                            return postQueryCollection[0];
+                                        }
                                     }
                                     else
                                     {
-                                        NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
-                                        if (qscoll.Count > 0)
-                                            return qscoll[0];
-                                    }
 
+
+                                        string Authorizectx = msPostConfig.sCtx;
+                                        string Authorizeflowtoken = msPostConfig.sFT;
+                                        string msPostCanary = msPostConfig.canary;
+
+                                        //getting ready for KMSI post
+                                        string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
+                                        Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
+                                        msKMSIPost.Wait();
+
+                                        if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                                        {
+                                            //auth failed
+                                            return string.Empty;
+                                        }
+                                        else
+                                        {
+                                            NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
+                                            if (qscoll.Count > 0)
+                                                return qscoll[0];
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -413,29 +462,46 @@ namespace _365Drive.Office365.CloudConnector
                                     {
                                         SASBeginAuthHeader["Accept"] = "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
                                         string SASProcessAuthBody = string.Format(StringConstants.SASProcessAuthPostBody, endAuthResponse.Ctx, endAuthResponse.FlowToken, LicenseManager.encode(canary), PollStart, PollEnd, rememberMFA.ToString().ToLower(), authMethodId);
-                                        Task<string> SASProcessAuth = HttpClientHelper.PostAsync(processAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
+                                        Task<HttpResponseMessage> SASProcessAuth = HttpClientHelper.PostAsyncFullResponse(processAuthUrl, SASProcessAuthBody, "application/x-www-form-urlencoded", authorizeCookies, SASBeginAuthHeader, true);
                                         SASProcessAuth.Wait();
 
-                                        LoginConfig msPostConfig = renderConfig(SASProcessAuth.Result);
-                                        string Authorizectx = msPostConfig.sCtx;
-                                        string Authorizeflowtoken = msPostConfig.sFT;
-                                        string msPostCanary = msPostConfig.canary;
+                                        Task<string> loginResponse = SASProcessAuth.Result.Content.ReadAsStringAsync();
+                                        LoginConfig msPostConfig = renderConfig(loginResponse.Result);
 
-                                        //getting ready for KMSI post
-                                        string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
-                                        Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
-                                        msKMSIPost.Wait();
-
-                                        if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                                        if (msPostConfig == null)
                                         {
-                                            //auth failed
-                                            return string.Empty;
+                                            NameValueCollection postQueryCollection = HttpUtility.ParseQueryString(SASProcessAuth.Result.RequestMessage.RequestUri.Query);
+                                            if (postQueryCollection.Count > 0)
+                                            {
+                                                return postQueryCollection[0];
+                                            }
+                                            else
+                                            {
+                                                return string.Empty;
+                                            }
                                         }
                                         else
                                         {
-                                            NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
-                                            if (qscoll.Count > 0)
-                                                return qscoll[0];
+                                            string Authorizectx = msPostConfig.sCtx;
+                                            string Authorizeflowtoken = msPostConfig.sFT;
+                                            string msPostCanary = msPostConfig.canary;
+
+                                            //getting ready for KMSI post
+                                            string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
+                                            Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
+                                            msKMSIPost.Wait();
+
+                                            if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                                            {
+                                                //auth failed
+                                                return string.Empty;
+                                            }
+                                            else
+                                            {
+                                                NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
+                                                if (qscoll.Count > 0)
+                                                    return qscoll[0];
+                                            }
                                         }
 
                                     }
@@ -492,28 +558,74 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static LoginConfig renderConfig(string html)
         {
-            //regex to parse the output
-            RegexOptions options = RegexOptions.None;
-            Regex regex = new Regex(@"<!\[CDATA\[\s*(?:.(?<!\]\]>)\s*)*\]\]>", RegexOptions.None);
-            string configVariableVal = @"\{(.|\s)*\}";
-
-            bool isMatch = regex.IsMatch(html);
-            LoginConfig config = null;
-            if (isMatch)
+            try
             {
-                Match match = regex.Match(html);
-                string HTMLtext = match.Groups[0].Value;
-                Match m = Regex.Match(HTMLtext, configVariableVal);
-                if (m.Success)
-                {
-                    string configJson = m.Value;
-                    config = JsonConvert.DeserializeObject<LoginConfig>(configJson);
+                //regex to parse the output
+                RegexOptions options = RegexOptions.None;
+                Regex regex = new Regex(@"<!\[CDATA\[\s*(?:.(?<!\]\]>)\s*)*\]\]>", RegexOptions.None);
+                string configVariableVal = @"\{(.|\s)*\}";
 
+                bool isMatch = regex.IsMatch(html);
+                LoginConfig config = null;
+                if (isMatch)
+                {
+                    Match match = regex.Match(html);
+                    string HTMLtext = match.Groups[0].Value;
+                    Match m = Regex.Match(HTMLtext, configVariableVal);
+                    if (m.Success)
+                    {
+                        string configJson = m.Value;
+                        config = JsonConvert.DeserializeObject<LoginConfig>(configJson);
+                        if (string.IsNullOrEmpty(config.canary) && string.IsNullOrEmpty(config.sCtx) && string.IsNullOrEmpty(config.sFT))
+                        {
+                            return null;
+                        }
+                    }
                 }
+                return config;
             }
-            return config;
+            catch
+            {
+                return null;
+            }
         }
 
+
+        /// <summary>
+        /// extract the config json from given html for desktop SSO
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static dSSOConfig renderdSSOConfig(string html)
+        {
+            try
+            {
+                //regex to parse the output
+                RegexOptions options = RegexOptions.None;
+                Regex regex = new Regex(@"<!\[CDATA\[\s*(?:.(?<!\]\]>)\s*)*\]\]>", RegexOptions.None);
+                string configVariableVal = @"\{(.|\s)*\}";
+
+                bool isMatch = regex.IsMatch(html);
+                dSSOConfig config = null;
+                if (isMatch)
+                {
+                    Match match = regex.Match(html);
+                    string HTMLtext = match.Groups[0].Value;
+                    Match m = Regex.Match(HTMLtext, configVariableVal);
+                    if (m.Success)
+                    {
+                        string configJson = m.Value;
+                        config = JsonConvert.DeserializeObject<dSSOConfig>(configJson);
+
+                    }
+                }
+                return config;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// extract the config json from given html
@@ -522,26 +634,31 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static MFAConfig renderMFAConfig(string html)
         {
-            //regex to parse the output
-            RegexOptions options = RegexOptions.None;
-            Regex regex = new Regex(@"<!\[CDATA\[\s*(?:.(?<!\]\]>)\s*)*\]\]>", RegexOptions.None);
-            string configVariableVal = @"\{(.|\s)*\}";
-
-            bool isMatch = regex.IsMatch(html);
-            MFAConfig config = null;
-            if (isMatch)
+            try
             {
-                Match match = regex.Match(html);
-                string HTMLtext = match.Groups[0].Value;
-                Match m = Regex.Match(HTMLtext, configVariableVal);
-                if (m.Success)
-                {
-                    string configJson = m.Value;
-                    config = JsonConvert.DeserializeObject<MFAConfig>(configJson);
+                //regex to parse the output
+                RegexOptions options = RegexOptions.None;
+                Regex regex = new Regex(@"<!\[CDATA\[\s*(?:.(?<!\]\]>)\s*)*\]\]>", RegexOptions.None);
+                string configVariableVal = @"\{(.|\s)*\}";
 
+                bool isMatch = regex.IsMatch(html);
+                MFAConfig config = null;
+                if (isMatch)
+                {
+                    Match match = regex.Match(html);
+                    string HTMLtext = match.Groups[0].Value;
+                    Match m = Regex.Match(HTMLtext, configVariableVal);
+                    if (m.Success)
+                    {
+                        string configJson = m.Value;
+                        config = JsonConvert.DeserializeObject<MFAConfig>(configJson);
+
+                    }
                 }
+                return config;
             }
-            return config;
+            catch
+            { return null; }
         }
 
         /// <summary>
@@ -732,7 +849,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 ///get other values of call 1
                 AuthorizeCanaryapi = getapiCanary(authorizeCall);
-              //  authorizeCanary = getCanary2(authorizeCall);
+                //  authorizeCanary = getCanary2(authorizeCall);
                 AuthorizeclientRequestID = getClientRequest(authorizeCall);
                 Authorizehpgact = getHPGact(authorizeCall);
                 Authorizehpgid = getHPGId(authorizeCall);
@@ -765,8 +882,9 @@ namespace _365Drive.Office365.CloudConnector
                 //if SSO, Its a shortcut, lets try it and try to finish from here
                 if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
                 {
-                    desktopSsoConfig = getDesktopSsoConfig(authorizeCall);
-                    desktopSsoConfig = string.Format(desktopSsoConfig, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
+                    //desktopSsoConfig = getDesktopSsoConfig(authorizeCall);
+                    dSSOConfig DSSOConfig = renderdSSOConfig(authorizeCall);
+                    desktopSsoConfig = string.Format(DSSOConfig.desktopSsoConfig.iwaEndpointUrlFormat, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
 
                     //render header
                     NameValueCollection AADConnectSSOGetHeader = new NameValueCollection();
@@ -818,159 +936,190 @@ namespace _365Drive.Office365.CloudConnector
                 Task<HttpResponseMessage> postCalresponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.loginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies, postCalHeader);
                 postCalresponse.Wait();
                 string postCalresponseString = postCalresponse.Result.Content.ReadAsStringAsync().Result;
-
                 LoginConfig msPostConfig = renderConfig(postCalresponseString);
-                Authorizectx = msPostConfig.sCtx;
-                Authorizeflowtoken = msPostConfig.sFT;
-                msPostCanary = msPostConfig.canary;
+                //LogManager.Info("3M AAD Connect");
 
-
-                //getting ready for KMSI post
-                string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
-                Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, postCalHeader);
-                msKMSIPost.Wait();
-
-                postCalresponseString = msKMSIPost.Result.Content.ReadAsStringAsync().Result;
-
-                if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                if (msPostConfig == null)
                 {
-                    CQ msPOSTcq = CQ.Create(postCalresponseString);
-
-                    string isPollingRequired = getpolingRequired(postCalresponseString);
-                    bool pollingRequired = false;
-                    bool.TryParse(isPollingRequired, out pollingRequired);
-
-                    if (pollingRequired)
+                    NameValueCollection postQueryCollection = HttpUtility.ParseQueryString(postCalresponse.Result.RequestMessage.RequestUri.Query);
+                    if (postQueryCollection.Count > 0)
                     {
-                        var msPOSTcqItems = msPOSTcq["input"];
-                        foreach (var li in msPOSTcqItems)
-                        {
-                            if (li.Name == "ctx")
-                            {
-                                if (!string.IsNullOrEmpty(li.Value))
-                                    msPostCtx = li.Value;
-                            }
-                            if (li.Name == "flowToken")
-                            {
-                                msPostFlow = li.Value;
-                            }
-                        }
-
-                        msPostHpgact = getHPGact(postCalresponseString);
-                        msPostHpgid = getHPGId(postCalresponseString);
-                        msPostCanary = getapiCanary(postCalresponseString);
-                        LogManager.Verbose("MS post call finished. Canary: " + msPostCanary);
-
-                        //preparing for call 4 which is poll start
-
-                        //poll start cookie container
-                        CookieContainer pollStartCookieContainer = new CookieContainer();
-                        Uri msLoginPosturi = new Uri(StringConstants.loginPost);
-                        IEnumerable<Cookie> responseCookies = msLoginPostCookies.GetCookies(msLoginPosturi).Cast<Cookie>();
-                        foreach (Cookie cookie in responseCookies)
-                        {
-                            pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
-                        }
-                        pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
-
-                        NameValueCollection pollStartHeader = new NameValueCollection();
-                        pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
-                        pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                        pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                        pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
-                        pollStartHeader.Add("Accept", "application/json");
-                        pollStartHeader.Add("X-Requested-With", "XMLHttpRequest");
-                        pollStartHeader.Add("hpgid", msPostHpgid);
-                        pollStartHeader.Add("hpgact", msPostHpgact);
-
-                        string pollStartData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
-
-                        //poll start heading
-                        Task<String> pollStartResponse = HttpClientHelper.PostAsync((StringConstants.AADPoll), pollStartData, "application/json", pollStartCookieContainer, pollStartHeader);
-                        pollStartResponse.Wait();
-
-                        pollStartFlowToken = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).flowToken;
-                        pollStartctx = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).ctx;
-                        LogManager.Verbose("Poll start call finished. FlowToken: " + pollStartFlowToken + ", ctx: " + pollStartctx);
-
-
-                        //poll end cookie container
-                        CookieContainer pollEndCookieContainer = new CookieContainer();
-                        foreach (Cookie cookie in responseCookies)
-                        {
-                            pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
-                        }
-                        pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
-
-                        NameValueCollection pollEndHeader = new NameValueCollection();
-                        pollEndHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
-                        pollEndHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                        pollEndHeader.Add("Accept", "application/json");
-                        pollEndHeader.Add("X-Requested-With", "XMLHttpRequest");
-
-                        string pollEndData = String.Format(StringConstants.AADPollEndBody, pollStartFlowToken, pollStartctx);
-
-                        //poll start heading
-                        Task<HttpResponseMessage> pollEndResponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
-                        pollEndResponse.Wait();
-                        if (pollEndResponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.AADFailedLoginUrl.ToLower())
-                        {
-                            string code = retrieveCodeFromMFA(pollEndResponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
-                            if (string.IsNullOrEmpty(code))
-                            {
-                                ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
-                                if (remindLater)
-                                    return "0";
-                                else
-                                    return string.Empty;
-                            }
-                            else
-                            {
-                                authCode = code;
-                            }
-                        }
-                        else
-                        {
-                            NameValueCollection qscoll = HttpUtility.ParseQueryString(pollEndResponse.Result.RequestMessage.RequestUri.Query);
-                            if (qscoll.Count > 0)
-                                authCode = qscoll[0];
-                        }
-                    }
-                    else
-                    {
-                        if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
-                        {
-                            string code = retrieveCodeFromMFA(msKMSIPost.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
-                            if (string.IsNullOrEmpty(code))
-                            {
-                                ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
-                                if (remindLater)
-                                    return "0";
-                                else
-                                    return string.Empty;
-                                //return string.Empty;
-                            }
-                            else
-                            {
-                                authCode = code;
-                            }
-                        }
-                        else
-                        {
-                            NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
-                            if (qscoll.Count > 0)
-                                authCode = qscoll[0];
-                        }
+                        authCode = postQueryCollection[0];
                     }
 
+                    // if we still didnt get, lets give a try for MFA
+                    if (string.IsNullOrEmpty(authCode))
+                    {
+                        string code = retrieveCodeFromMFA(postCalresponseString, authorizeCookies);
+                        return code;
+                    }
                 }
                 else
                 {
-                    NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
-                    if (qscoll.Count > 0)
-                        authCode = qscoll[0];
-                }
 
+                    Authorizectx = msPostConfig.sCtx;
+                    Authorizeflowtoken = msPostConfig.sFT;
+                    msPostCanary = msPostConfig.canary;
+
+                    //getting ready for KMSI post
+                    string MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(msPostCanary));
+                    Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, postCalHeader);
+                    msKMSIPost.Wait();
+
+                    postCalresponseString = msKMSIPost.Result.Content.ReadAsStringAsync().Result;
+
+                    if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                    {
+                        CQ msPOSTcq = CQ.Create(postCalresponseString);
+
+                        string isPollingRequired = getpolingRequired(postCalresponseString);
+                        bool pollingRequired = false;
+                        bool.TryParse(isPollingRequired, out pollingRequired);
+
+                        if (pollingRequired)
+                        {
+                            var msPOSTcqItems = msPOSTcq["input"];
+                            foreach (var li in msPOSTcqItems)
+                            {
+                                if (li.Name == "ctx")
+                                {
+                                    if (!string.IsNullOrEmpty(li.Value))
+                                        msPostCtx = li.Value;
+                                }
+                                if (li.Name == "flowToken")
+                                {
+                                    msPostFlow = li.Value;
+                                }
+                            }
+
+                            msPostHpgact = getHPGact(postCalresponseString);
+                            msPostHpgid = getHPGId(postCalresponseString);
+                            msPostCanary = getapiCanary(postCalresponseString);
+                            LogManager.Verbose("MS post call finished. Canary: " + msPostCanary);
+
+                            //preparing for call 4 which is poll start
+
+                            //poll start cookie container
+                            CookieContainer pollStartCookieContainer = new CookieContainer();
+                            Uri msLoginPosturi = new Uri(StringConstants.loginPost);
+                            IEnumerable<Cookie> responseCookies = msLoginPostCookies.GetCookies(msLoginPosturi).Cast<Cookie>();
+                            foreach (Cookie cookie in responseCookies)
+                            {
+                                pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPoll).Authority), new Cookie(cookie.Name, cookie.Value));
+                            }
+                            pollStartCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.dssoPoll).Authority), new Cookie("testcookie", "testcookie"));
+
+                            NameValueCollection pollStartHeader = new NameValueCollection();
+                            pollStartHeader.Add("canary", LicenseManager.encode(msPostCanary));
+                            pollStartHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
+                            pollStartHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                            pollStartHeader.Add("client-request-id", AuthorizeclientRequestID);
+                            pollStartHeader.Add("Accept", "application/json");
+                            pollStartHeader.Add("X-Requested-With", "XMLHttpRequest");
+                            pollStartHeader.Add("hpgid", msPostHpgid);
+                            pollStartHeader.Add("hpgact", msPostHpgact);
+
+                            string pollStartData = String.Format(StringConstants.AADPollBody, msPostFlow, msPostCtx);
+
+                            //poll start heading
+                            Task<String> pollStartResponse = HttpClientHelper.PostAsync((StringConstants.AADPoll), pollStartData, "application/json", pollStartCookieContainer, pollStartHeader);
+                            pollStartResponse.Wait();
+
+                            pollStartFlowToken = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).flowToken;
+                            pollStartctx = JsonConvert.DeserializeObject<pollResponse>(pollStartResponse.Result).ctx;
+                            LogManager.Verbose("Poll start call finished. FlowToken: " + pollStartFlowToken + ", ctx: " + pollStartctx);
+
+
+                            //poll end cookie container
+                            CookieContainer pollEndCookieContainer = new CookieContainer();
+                            foreach (Cookie cookie in responseCookies)
+                            {
+                                pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie(cookie.Name, cookie.Value));
+                            }
+                            pollEndCookieContainer.Add(new Uri("https://" + new Uri(StringConstants.AADPollEnd).Authority), new Cookie("testcookie", "testcookie"));
+
+                            NameValueCollection pollEndHeader = new NameValueCollection();
+                            pollEndHeader.Add("Referrer", "https://login.microsoftonline.com/common/login");
+                            pollEndHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                            pollEndHeader.Add("Accept", "application/json");
+                            pollEndHeader.Add("X-Requested-With", "XMLHttpRequest");
+
+                            string pollEndData = String.Format(StringConstants.AADPollEndBody, pollStartFlowToken, pollStartctx);
+
+                            //poll start heading
+                            Task<HttpResponseMessage> pollEndResponse = HttpClientHelper.PostAsyncFullResponse((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
+                            pollEndResponse.Wait();
+                            if (pollEndResponse.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.AADFailedLoginUrl.ToLower())
+                            {
+                                string code = retrieveCodeFromMFA(pollEndResponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                                if (string.IsNullOrEmpty(code))
+                                {
+                                    ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                                    if (remindLater)
+                                        return "0";
+                                    else
+                                    {
+                                        return string.Empty;
+                                    }
+                                }
+                                else
+                                {
+                                    authCode = code;
+                                }
+                            }
+                            else
+                            {
+                                NameValueCollection qscoll = HttpUtility.ParseQueryString(pollEndResponse.Result.RequestMessage.RequestUri.Query);
+                                if (qscoll.Count > 0)
+                                    authCode = qscoll[0];
+                            }
+                        }
+                        else
+                        {
+                            if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.FailedLoginUrl.ToLower())
+                            {
+                                string code = retrieveCodeFromMFA(msKMSIPost.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                                if (string.IsNullOrEmpty(code))
+                                {
+
+                                    ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                                    if (remindLater)
+                                        return "0";
+                                    else
+                                    {
+                                        code = retrieveCodeFromMFA(postCalresponse.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                                        if (string.IsNullOrEmpty(code))
+                                        {
+                                            return code;
+                                        }
+                                        else
+                                        {
+                                            return string.Empty;
+                                        }
+                                    }
+                                    //return string.Empty;
+                                }
+                                else
+                                {
+                                    authCode = code;
+                                }
+                            }
+                            else
+                            {
+                                NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
+                                if (qscoll.Count > 0)
+                                    authCode = qscoll[0];
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
+                        if (qscoll.Count > 0)
+                            authCode = qscoll[0];
+                    }
+                }
 
 
                 //NameValueCollection pollEndRedirect = HttpUtility.ParseQueryString(pollEndResponse.Result.RequestMessage.RequestUri.Query);
@@ -1159,46 +1308,83 @@ namespace _365Drive.Office365.CloudConnector
                 string authCode = string.Empty, accessToken = string.Empty;
                 //post rst to microsoft
                 string strrstPostBody = string.Format(StringConstants.ADFSrstPostBody, LicenseManager.encode(rst), MSctx);
-                Task<string> ADFSrstPostResult = HttpClientHelper.PostAsync(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
+                Task<HttpResponseMessage> ADFSrstPostResult = HttpClientHelper.PostAsyncFullResponse(StringConstants.ADFSrstPost, strrstPostBody, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
                 ADFSrstPostResult.Wait();
 
-                LoginConfig msPostConfig2 = renderConfig(ADFSrstPostResult.Result);
-                MSctx = msPostConfig2.sCtx;
-                flowToken = msPostConfig2.sFT;
-                canary = msPostConfig2.canary;
+                Task<string> loginResponse = ADFSrstPostResult.Result.Content.ReadAsStringAsync();
+                LoginConfig msPostConfig2 = renderConfig(loginResponse.Result);
 
-
-                //getting ready for KMSI post
-                string MSKMSIPostData = String.Format(StringConstants.KMSIPost, MSctx, flowToken, LicenseManager.encode(canary));
-                Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
-                msKMSIPost.Wait();
-
-
-                if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.ADFSailedLoginUrl.ToLower())
+                if (msPostConfig2 == null)
                 {
-                    string code = retrieveCodeFromMFA(msKMSIPost.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
-                    if (string.IsNullOrEmpty(code))
+                    NameValueCollection postQueryCollection = HttpUtility.ParseQueryString(ADFSrstPostResult.Result.RequestMessage.RequestUri.Query);
+                    if (postQueryCollection.Count > 0)
                     {
-                        ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
-                        if (remindLater)
-                            return "0";
-                        else
-                            return string.Empty;
-                        //return string.Empty;
+                        authCode = postQueryCollection[0];
                     }
-                    else
+                    // if we still didnt get, lets give a try for MFA
+                    if (string.IsNullOrEmpty(authCode))
                     {
-                        authCode = code;
+                        string code = retrieveCodeFromMFA(loginResponse.Result, authorizeCookies);
+                        return code;
                     }
                 }
                 else
                 {
-                    NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
-                    if (qscoll.Count > 0)
-                        authCode = qscoll[0];
+                    MSctx = msPostConfig2.sCtx;
+                    flowToken = msPostConfig2.sFT;
+                    canary = msPostConfig2.canary;
+
+                    //getting ready for KMSI post
+                    string MSKMSIPostData = String.Format(StringConstants.KMSIPost, MSctx, flowToken, LicenseManager.encode(canary));
+                    Task<HttpResponseMessage> msKMSIPost = HttpClientHelper.PostAsyncFullResponse(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", authorizeCookies, new NameValueCollection());
+                    msKMSIPost.Wait();
+
+
+                    if (msKMSIPost.Result.RequestMessage.RequestUri.ToString().ToLower() == StringConstants.ADFSailedLoginUrl.ToLower())
+                    {
+                        string code = retrieveCodeFromMFA(msKMSIPost.Result.Content.ReadAsStringAsync().Result, authorizeCookies);
+                        if (string.IsNullOrEmpty(code))
+                        {
+
+                            ///if user has opted for remind me later, lets not say credentials wrong and send some code to core service so it can understand the reason
+                            if (remindLater)
+                                return "0";
+                            else
+                            {
+                                //return string.Empty;
+                                code = retrieveCodeFromMFA(loginResponse.Result, authorizeCookies);
+                                if (string.IsNullOrEmpty(code))
+                                {
+                                    return code;
+                                }
+                                else
+                                {
+                                    code = retrieveCodeFromMFA(loginResponse.Result, authorizeCookies);
+                                    if (string.IsNullOrEmpty(code))
+                                    {
+                                        return code;
+                                    }
+                                    else
+                                    {
+                                        return string.Empty;
+                                    }
+                                }
+                            }
+                            //return string.Empty;
+                        }
+                        else
+                        {
+                            authCode = code;
+                        }
+                    }
+                    else
+                    {
+                        NameValueCollection qscoll = HttpUtility.ParseQueryString(msKMSIPost.Result.RequestMessage.RequestUri.Query);
+                        if (qscoll.Count > 0)
+                            authCode = qscoll[0];
+                    }
+
                 }
-
-
                 //NameValueCollection pollEndRedirect = HttpUtility.ParseQueryString(ADFSrstPostResult.Result.RequestMessage.RequestUri.Query);
                 //if (pollEndRedirect.Count > 0)
                 //    authCode = pollEndRedirect[0];

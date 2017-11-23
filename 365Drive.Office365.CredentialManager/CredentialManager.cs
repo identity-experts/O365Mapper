@@ -15,7 +15,8 @@ namespace _365Drive.Office365
     public enum CredentialState
     {
         Notpresent = 0,
-        Present = 1
+        Present = 1,
+        ServerNotConnectable = 2
     }
 
     public class ADDomainManager
@@ -108,6 +109,14 @@ namespace _365Drive.Office365
             CredentialState state = CredentialState.Notpresent;
             try
             {
+                Cred currentCreds = GetCredential();
+
+
+                // if there is already a username password, no need to overwrite it. Lets respect user pref..
+                if (currentCreds != null && !String.IsNullOrEmpty(currentCreds.UserName) && !string.IsNullOrEmpty(currentCreds.Password))
+                {
+                    return CredentialState.Present;
+                }
 
                 //Lets check auto sso first (smartSSO)
                 string autoSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
@@ -148,6 +157,11 @@ namespace _365Drive.Office365
             }
             catch (Exception ex)
             {
+
+                // probably the SSO server is not connetable. Lets switch back to credentials
+                disableAutoSSO();
+                state = CredentialState.ServerNotConnectable;
+
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);
             }

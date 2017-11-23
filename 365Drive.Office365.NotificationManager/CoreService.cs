@@ -229,6 +229,10 @@ namespace _365Drive.Office365
                     CheckForUpdates();
                 }
 
+                //lets delete cookies before we start our game to keep things simple
+                //in many cases, the internet explore is setting the FEDAUTH cookie which is conflicting with 3M cookie. Lets ensure everything is clearned before we set cookie
+                clearCookies();
+
                 //call tick now
                 await Task.Run(() => tick());
             }
@@ -239,6 +243,10 @@ namespace _365Drive.Office365
             }
         }
 
+        void clearCookies()
+        {
+            DriveManager.clearCookies();
+        }
 
         void CheckForUpdates()
         {
@@ -249,7 +257,7 @@ namespace _365Drive.Office365
             if (!string.IsNullOrEmpty(version.data.version) && !string.IsNullOrEmpty(version.data.x64) && !string.IsNullOrEmpty(version.data.x86))
             {
                 string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                if (currentVersion != version.data.version)
+                if (Versions.compareVersion(currentVersion, version.data.version))
                 {
                     Updates updatePrompt = new Updates();
                     updatePrompt.Show();
@@ -374,7 +382,8 @@ namespace _365Drive.Office365
                 {
                     Communications.updateStatus(Globalization.EnsuringCredential);
                 });
-                if (CredentialManager.ensureCredentials() == CredentialState.Notpresent)
+                CredentialState credState = CredentialManager.ensureCredentials();
+                if (credState == CredentialState.Notpresent)
                 {
                     currentDispatcher.Invoke(() =>
                     {
@@ -384,6 +393,27 @@ namespace _365Drive.Office365
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
                     NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication, true);
+                    Communications.CurrentState = States.UserAction;
+                    busy = false;
+                    //if (!alreadyNotified)
+                    //{
+                    //    currentDispatcher.Invoke(() =>
+                    //    {
+                    //        CommunicationCallBacks.AskAuthentication();
+                    //    });
+                    //}
+                    return;
+                }
+                else if (credState == CredentialState.ServerNotConnectable)
+                {
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.CouldNotRetrieveUPN);
+                    });
+                    LogManager.Verbose("credentials not present");
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
+                    NotificationManager.NotificationManager.notify(Globalization.CouldNotRetrieveUPN, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication, true);
                     Communications.CurrentState = States.UserAction;
                     busy = false;
                     //if (!alreadyNotified)
@@ -696,6 +726,8 @@ namespace _365Drive.Office365
 
 
                 #region setting cookies to IE (already retrieved above)
+
+
                 //set cookie in IE
                 LogManager.Verbose("setting cookies to IE");
                 DriveManager.setCookiestoIE(fedAuth, rtFA, DriveManager.rootSiteUrl);

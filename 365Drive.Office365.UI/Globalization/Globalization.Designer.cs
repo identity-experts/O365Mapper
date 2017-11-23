@@ -124,6 +124,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to We could not connect to Active Directory for fetching UPN to perform SSO.
+        /// </summary>
+        public static string CouldNotRetrieveUPN {
+            get {
+                return ResourceManager.GetString("CouldNotRetrieveUPN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Credentials (Default).
         /// </summary>
         public static string credential_page_header {
