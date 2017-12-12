@@ -124,7 +124,6 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
             LoginConfig msPostConfig;
             Task<string> msKMSIPost;
 
-
             CookieContainer ret = new CookieContainer();
             try
             {
@@ -158,38 +157,30 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
                 //get the ctx which is RST
                 string ADFSMScall1CTX = string.Empty;
-                //CQ ADFSMScall1Parser = CQ.Create(ADFSMSCall1Result.Result);
-                //var ADFSMScall1ParserInputs = ADFSMScall1Parser["input"];
-                //foreach (var li in ADFSMScall1ParserInputs)
-                //{
-                //    if (li.Name == "ctx")
-                //    {
-                //        if (!string.IsNullOrEmpty(li.Value))
-                //            ADFSMScall1CTX = li.Value;
-
-                //    }
-                //}
-
+                
                 msPostConfig = _365DriveTenancyURL.renderConfig(ADFSMSCall1Result.Result);
                 ADFSMScall1CTX = msPostConfig.sCtx;
                 //flowToken = msPostConfig.sFT;
                 //canary = msPostConfig.canary;
 
 
-
+                Task<string> response = AuthrequestResponse.Result.Content.ReadAsStringAsync();
+                response.Wait();
+                authorizeCall = response.Result;
+                AuthrequestCookies = wreplyCookies;
                 var Wreply = spSiteUrl.GetLeftPart(UriPartial.Authority) + "/_forms/default.aspx";
 
-                string WindowsoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep0, LicenseManager.encode(Wreply), nonce, clientRequestId);
-                Task<string> call0Result = HttpClientHelper.GetAsync(WindowsoAuthCallUrl, AuthrequestCookies);
-                call0Result.Wait();
+                //string WindowsoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep0, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                //Task<string> call0Result = HttpClientHelper.GetAsync(WindowsoAuthCallUrl, AuthrequestCookies);
+                //call0Result.Wait();
 
-                //first call to get flow token, ctx and canary
+                ////first call to get flow token, ctx and canary
                 string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
-                Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
-                call1Result.Wait();
+                //Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
+                //call1Result.Wait();
 
 
-                authorizeCall = call1Result.Result;
+               // authorizeCall = call1Result.Result;
 
                 ///Fetch the ctx and flow token and canary
                 //CQ htmlparser = CQ.Create(authorizeCall);

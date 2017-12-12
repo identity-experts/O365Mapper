@@ -33,7 +33,7 @@ namespace _365Drive.Office365.CloudConnector
         internal const string AzureActivateUserStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id={1}&redirect_uri={2}&resource={3}&nux=1&login_hint2={0}";
         internal const string AzureActivateUserStep2 = "https://login.microsoftonline.com/common/login";
         internal const string loginKMSI = "https://login.microsoftonline.com/kmsi";
-        internal const string KMSIPost = "LoginOptions=0&ctx={0}&flowToken={1}&canary={2}&i2=&i17=&i18=&i19=2519";
+        internal const string KMSIPost = "LoginOptions=1&ctx={0}&flowToken={1}&canary={2}&i2=&i17=&i18=&i19=2519";
         internal const string AzureActivationUserLogin = "login={0}&passwd={1}&ctx={2}&flowToken={3}&canary={4}";
         internal const string newMSloginPost = "i13=0&login={0}&loginfmt={0}&type=11&LoginOptions=3&lrt=&lrtPartition=&hisRegion=&hisScaleUnit=&passwd={1}&ps=2&psRNGCDefaultType=&psRNGCEntropy=&psRNGCSLK=&psFidoAllowList=&canary={2}&ctx={3}&flowToken={4}&NewUser=1&FoundMSAs=&fspost=0&i21=0&CookieDisclosure=0&i2=1&i17=&i18=&i19=33065";
         internal const string AzureActivateUserStep3 = "https://login.microsoftonline.com/common/oauth2/token";
@@ -71,7 +71,7 @@ namespace _365Drive.Office365.CloudConnector
         internal const string ADFSailedLoginUrl = "https://login.microsoftonline.com/login.srf";
         //internal const string AzureActivationUserToken = "grant_type=authorization_code&code={0}&redirect_uri=urn%3aietf%3awg%3aoauth%3a2.0%3aoob&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c";
         internal const string postCodeUrl = "{0}_forms/default.aspx";
-        internal const string postCodeBody = "code={0}&id_token={1}&state={2}&session_state={3}&correlation_id={4}";
+        internal const string postCodeBody = "code={0}&id_token={1}&session_state={3}&correlation_id={4}";
         internal const string AzureActivationUserToken = "client_id={1}&redirect_uri={3}&client_secret={2}&code={0}&grant_type=authorization_code&resource={4}";
         internal const string AzureActivateUserStep4 = "https://api.office.com/discovery/v2.0/me/services";
         internal const string rootUrlFinder = "rootsite@";
@@ -99,8 +99,8 @@ namespace _365Drive.Office365.CloudConnector
         ////////////////////////////Cloud Identity Cookie////////////////////////////
         //https://login.windows.net/common/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&response%5Ftype=code%20id%5Ftoken&scope=openid&nonce=09C0632AF08417E5E70CEA1F33C96FCB24C7EB0874E87004%2DD56B8D2C8A3E860CCB667ADB9D1DD555B55C57E21559C0CD225C020C29445980&redirect%5Furi={0}&state=0&client%2Drequest%2Did=bb27f19d%2D3022%2D3000%2Db8cd%2Db535a27a2569
 
-        internal const string getCloudCookieStep0 = "https://login.windows.net/common/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&response%5Ftype=code%20id%5Ftoken&scope=openid&nonce={1}&redirect%5Furi={0}&state=0&client%2Drequest%2Did={2}";
-        internal const string getCloudCookieStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&response%5Ftype=code%20id%5Ftoken&scope=openid&nonce={1}&redirect%5Furi={0}&state=0&client%2Drequest%2Did={2}";
+        internal const string getCloudCookieStep0 = "https://login.windows.net/common/oauth2/authorize?resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&response%5Ftype=code%20id%5Ftoken&scope=openid&nonce={1}&redirect%5Furi={0}&state=0&client%2Drequest%2Did={2}";
+        internal const string getCloudCookieStep1 = "https://login.microsoftonline.com/common/oauth2/authorize?resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&response%5Ftype=code%20id%5Ftoken&scope=openid&nonce={1}&redirect%5Furi={0}&state=0&client%2Drequest%2Did={2}";
         internal const string CloudloginPost = "https://login.microsoftonline.com/common/login";
         internal const string CloudloginPostData = "login={0}&passwd={1}&ctx={2}&flowToken={3}&canary={4}&n1=104502&n2=-1488344436000&n3=-1488344436000&n4=104502&n5=104502&n6=104502&n7=104502&n8=NaN&n9=104502&n10=104502&n11=104502&n12=104663&n13=104502&n14=104827&n15=60&n16=104897&n17=104898&n18=104904&n19=1109.2413112395688&n20=1&n21=0&n22=0&n23=1&n24=45.49044898147713&n25=2&n26=0&n27=0&n28=0&n29=23.89304877782797&n30=0.1526726045049145&n31=0&n32=1&n33=1&n34=48.88773517247546&n35=0&n36=0&n37=76.70878919505594&n38=1&n39=49.78367104484914&n40=0&n41=404.46821822517455&n42=352.2768531653051&n43=402.2914575615063&type=11&LoginOptions=2&NewUser=1&idsbho=1&PwdPad=&sso=&vv=&uiver=1&i12=1&i13=MSIE&i14=7.0&i15=604&i16=552&i20=";
 
@@ -119,6 +119,6 @@ namespace _365Drive.Office365.CloudConnector
         internal const string SASEndAuthPostBody = "{{\"Method\":\"EndAuth\",\"FlowToken\":\"{0}\",\"SessionId\":\"{1}\",\"Ctx\":\"{2}\",\"AuthMethodId\":\"{6}\",\"AdditionalAuthData\":\"{3}\",\"LastPollStart\":\"{4}\",\"LastPollEnd\":\"{5}\"}}";
         internal const string SASCallEndAuthPostBody = "{{\"Method\":\"EndAuth\",\"FlowToken\":\"{0}\",\"SessionId\":\"{1}\",\"Ctx\":\"{2}\",\"PollCount\":\"1\",\"LastPollStart\":\"{3}\",\"LastPollEnd\":\"{4}\",\"AuthMethodId\":\"{5}\"}}";
         internal const string SASProcessAuthPostBody = "request={0}&flowToken={1}&canary={2}&mfaAuthMethod={6}&rememberMFA={5}&mfaLastPollStart={3}&mfaLastPollEnd={4}";
-        internal const string SharePointFormPost = "code={0}&id_token={1}&state={2}&session_state={3}&correlation_id={4}";
+        internal const string SharePointFormPost = "code={0}&id_token={1}&session_state={3}&correlation_id={4}";
     }
 }

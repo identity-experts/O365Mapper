@@ -184,8 +184,15 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 CookieContainer wreplyCookies = new CookieContainer();
 
 
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies);
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true);
                 AuthrequestResponse.Wait();
+
+                //we need same cookies now
+                AuthrequestCookies = wreplyCookies;
+
+                Task<string> response = AuthrequestResponse.Result.Content.ReadAsStringAsync();
+                response.Wait();
+                authorizeCall = response.Result;
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
                 if (qscoll.Count > 0)
@@ -210,9 +217,9 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
 
 
-                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies, loginPostHeader);
-                call1Result.Wait();
-                authorizeCall = call1Result.Result;
+                //Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies, loginPostHeader);
+                //call1Result.Wait();
+                //authorizeCall = call1Result.Result;
 
                 /////Fetch the ctx and flow token
                 //CQ htmlparser = CQ.Create(authorizeCall);

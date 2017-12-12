@@ -218,6 +218,11 @@ namespace _365Drive.Office365.CloudConnector
                 Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true);
                 AuthrequestResponse.Wait();
 
+
+                AuthrequestCookies = wreplyCookies;
+                Task<string> response = AuthrequestResponse.Result.Content.ReadAsStringAsync();
+                response.Wait();
+                authorizeCall = response.Result;
                 //CookieCollection wReplies = wreplyCookies.GetCookies(_host);
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
@@ -240,12 +245,10 @@ namespace _365Drive.Office365.CloudConnector
 
                 //first call to get flow token, ctx and canary
                 //CookieContainer AuthrequestCookies = new CookieContainer();
-                string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
-                Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
-                call1Result.Wait();
-
-
-                authorizeCall = call1Result.Result;
+                //string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                //Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
+                //call1Result.Wait();
+                //authorizeCall = call0Result.Result;
 
 
                 //retrieve the ctx, flow and cannary
