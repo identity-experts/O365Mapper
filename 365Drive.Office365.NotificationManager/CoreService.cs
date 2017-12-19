@@ -245,7 +245,12 @@ namespace _365Drive.Office365
 
         void clearCookies()
         {
-            DriveManager.clearCookies();
+            //we need a piece here so lets not throw error and cause any issues
+            try
+            {
+                DriveManager.clearCookies();
+            }
+            catch { }
         }
 
         void CheckForUpdates()

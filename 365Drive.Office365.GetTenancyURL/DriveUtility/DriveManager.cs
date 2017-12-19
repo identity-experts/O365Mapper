@@ -479,15 +479,14 @@ namespace _365Drive.Office365.CloudConnector
         /// Clears the IE cache.
         /// </summary>
         /// <param name="url">The URL.</param>
-        public static void ClearIECache(string url)
+        public static void ClearIECache(string[] url)
         {
             try
             {
                 // No more items have been found.
                 const int ERROR_NO_MORE_ITEMS = 259;
 
-                string hostEntry = new Uri(url).Host;
-
+               
                 // Local variables
                 int cacheEntryInfoBufferSizeInitial = 0;
                 int cacheEntryInfoBufferSize = 0;
@@ -512,9 +511,14 @@ namespace _365Drive.Office365.CloudConnector
                     string sourceUrlName = Marshal.PtrToStringAnsi(internetCacheEntry.lpszSourceUrlName);
                     cacheEntryInfoBufferSizeInitial = cacheEntryInfoBufferSize;
 
-                    if (sourceUrlName.ToLower().Contains(hostEntry))
+
+                    // if its any of the sharepoint and microsoftonline, delete it as its creating conflicts.
+                    foreach (string hostEntry in url)
                     {
-                        DeleteUrlCacheEntry(internetCacheEntry.lpszSourceUrlName);
+                        if (sourceUrlName.ToLower().Contains(hostEntry))
+                        {
+                            DeleteUrlCacheEntry(internetCacheEntry.lpszSourceUrlName);
+                        }
                     }
 
                     returnValue = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
@@ -1016,6 +1020,11 @@ namespace _365Drive.Office365.CloudConnector
                 DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, mySitesiteUrl);
                 DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, "https://login.microsoftonline.com");
                 DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, "https://sharepoint.com");
+
+
+                //delete all other cookies and cache
+                string[] hosts = { "microsoftonline.com", "sharepoint.com" };
+                ClearIECache(hosts);
             }
             catch (Exception ex)
             {
