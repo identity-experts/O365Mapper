@@ -31,8 +31,7 @@
                        Text="We have sent you a text message with a verification code. Enter verification code here:" 
                    FontFamily="Lato" FontSize="14" Foreground="Gray" HorizontalAlignment="Left" >
             </TextBlock>
-
-            <TextBox Name="SMSCode" Width="100px" Height="30px" Margin="10,0,0,0" HorizontalAlignment="Left" />
+            <TextBox Name="SMSCode" Width="200px" Height="30px" Margin="0,10,0,0" Background="#797379" HorizontalAlignment="Left" />
             <TextBlock TextWrapping="Wrap" Name="validationSummary" Foreground="#FFB03030" />
         </StackPanel>
         <StackPanel Name="SASAuthCall" Visibility="Collapsed" Grid.RowSpan="2" Grid.Column="1" >
@@ -40,21 +39,21 @@
                        Text="We're calling your phone. Please answer it to continue. Click on Verify Now below once answered." 
                    FontFamily="Lato" FontSize="14" Foreground="Gray" HorizontalAlignment="Left" >
             </TextBlock>
-            <Button Name="VerifyNow" Content="Verify Now" Width="100px" Margin="10,0,0,0" HorizontalAlignment="Left"></Button>
+            <Button Name="VerifyNow" Content="Verify Now" Width="200px" Height="30px" Margin="0,10,0,0" Foreground="White" Background="#797379"  HorizontalAlignment="Left"></Button>
         </StackPanel>
         <StackPanel Name="SASPhoneAppNotification" Visibility="Collapsed" Grid.RowSpan="2" Grid.Column="1" >
             <TextBlock Name="SASPAN" Width="250px" TextWrapping="WrapWithOverflow" 
                        Text="We've sent a notification to your mobile device. Please respond and click Verify Now below to continue." 
-                   FontFamily="Lato" FontSize="14" Foreground="Gray" Margin="10,0,0,0" HorizontalAlignment="Left" >
+                   FontFamily="Lato" FontSize="14" Foreground="Gray"  HorizontalAlignment="Left" >
             </TextBlock>
-            <Button Name="VerifyNowPA" Content="Verify Now" Width="100px" HorizontalAlignment="Left"></Button>
+            <Button Name="VerifyNowPA" Content="Verify Now" Width="200px" Height="30px" Margin="0,10,0,0" Foreground="White" Background="#797379" HorizontalAlignment="Left"></Button>
         </StackPanel>
         <StackPanel Name="SASPhoneAppOTP" Visibility="Collapsed" Grid.RowSpan="2" Grid.Column="1" >
             <TextBlock Name="SASPAOTP" Width="250px" TextWrapping="WrapWithOverflow" 
-                       Text="Please enter the verification code from your mobile app. Enter verification code here:" 
+                       Text="Please enter the verification code from your mobile app here:" 
                    FontFamily="Lato" FontSize="14" Foreground="Gray" HorizontalAlignment="Left" >
             </TextBlock>
-            <TextBox Name="PAOTP" Width="100px" Height="30px" Margin="10,0,0,0" HorizontalAlignment="Left" />
+            <TextBox Name="PAOTP" Width="200px" Height="30px" Margin="0,10,0,0" Background="#797379" HorizontalAlignment="Left" />
             <TextBlock TextWrapping="Wrap" Name="PAvalidationSummary" Foreground="#FFB03030" />
         </StackPanel>
         <CheckBox Name="ckRememberMFA" Content="Remember for 14 days" Grid.Column="1" Visibility="Collapsed" Grid.Row="2"></CheckBox>

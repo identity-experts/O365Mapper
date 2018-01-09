@@ -66,6 +66,26 @@ namespace _365Drive.Office365.GetTenancyURL
                 return await request.GetAsync(url);
             }
         }
+
+        /// <summary>
+        /// General get call with NO parameter and will return simple response
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static async Task<HttpResponseMessage> GetAsyncFullResponse(string url, CookieContainer container, bool autoredirect, NameValueCollection header)
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+            using (var handler = new HttpClientHandler() { CookieContainer = container, AllowAutoRedirect = autoredirect })
+            using (HttpClient request = new HttpClient(handler))
+            {
+                ///set the header
+                if (header != null)
+                    SetHeader(request, header);
+
+                var responseMessage = await request.GetAsync(url);
+                return await request.GetAsync(url);
+            }
+        }
         /// <summary>
         /// Call with header preset
         /// </summary>

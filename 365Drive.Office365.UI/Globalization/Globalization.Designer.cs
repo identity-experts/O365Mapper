@@ -484,6 +484,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please wait....
+        /// </summary>
+        public static string PleaseWait {
+            get {
+                return ResourceManager.GetString("PleaseWait", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 365mapper.
         /// </summary>
         public static string ProductName {

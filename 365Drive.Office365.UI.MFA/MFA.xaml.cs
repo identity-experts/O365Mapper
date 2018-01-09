@@ -120,18 +120,22 @@ namespace _365Drive.Office365.UI.MFA
             if (sAuthContext_AuthMethodId.ToLower() == "onewaysms")
             {
                 SASAuth.Visibility = Visibility.Visible;
+                SMSCode.Focus();
             }
             else if (sAuthContext_AuthMethodId.ToLower() == "twowayvoicemobile" || sAuthContext_AuthMethodId.ToLower() == "twowayvoiceoffice")
             {
                 SASAuthCall.Visibility = Visibility.Visible;
+                VerifyNow.Focus();
             }
             else if (sAuthContext_AuthMethodId.ToLower() == "phoneappnotification")
             {
                 SASPhoneAppNotification.Visibility = Visibility.Visible;
+                VerifyNowPA.Focus();
             }
             else if (sAuthContext_AuthMethodId.ToLower() == "phoneappotp")
             {
                 SASPhoneAppOTP.Visibility = Visibility.Visible;
+                PAOTP.Focus();
             }
         }
 

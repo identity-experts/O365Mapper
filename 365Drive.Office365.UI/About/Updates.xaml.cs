@@ -67,6 +67,10 @@ namespace _365Drive.Office365.UI.About
         {
             try
             {
+                //disable current button
+                this.OkButton.IsEnabled = false;
+                this.OkButton.Content = Globalization.Globalization.PleaseWait;
+
                 if (dontAskCheckbox.IsChecked == true)
                 {
                     RegistryManager.Set(RegistryKeys.DontAskForUpdates, "1");
@@ -91,6 +95,10 @@ namespace _365Drive.Office365.UI.About
             }
             catch (Exception ex)
             {
+                //disable current button
+                this.OkButton.IsEnabled = true;
+                this.OkButton.Content = Globalization.Globalization.UpdateButton;
+
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
                 LogManager.Exception(method, ex);
                 this.Close();

@@ -183,8 +183,13 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 CookieContainer AuthrequestCookies = new CookieContainer();
                 CookieContainer wreplyCookies = new CookieContainer();
 
+                //render header
+                NameValueCollection loginPostHeader = new NameValueCollection();
+                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
+                loginPostHeader.Add("Accept", "*/*");
 
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true);
+
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true, loginPostHeader);
                 AuthrequestResponse.Wait();
 
                 //we need same cookies now
@@ -206,35 +211,9 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //string call1Url = String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.sharepointClientID, "http://office.microsoft.com/sharepoint", _host);
                 string call1Url = String.Format(StringConstants.getAADCookieStep1, _host, nonce);
 
-                //foreach (Cookie cookie in AuthrequestCookies.GetCookies(new Uri(AuthrequestUrl)))
-                //{
-                //    authorizeCookies.Add(new Uri("https://" + new Uri(call1Url).Authority), new Cookie(cookie.Name, cookie.Value));
-                //}
-
-                //render header
-                NameValueCollection loginPostHeader = new NameValueCollection();
-                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-
-
                 //Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies, loginPostHeader);
                 //call1Result.Wait();
                 //authorizeCall = call1Result.Result;
-
-                /////Fetch the ctx and flow token
-                //CQ htmlparser = CQ.Create(authorizeCall);
-                //var items = htmlparser["input"];
-                //foreach (var li in items)
-                //{
-                //    if (li.Name == "ctx")
-                //    {
-                //        Authorizectx = li.Value;
-                //    }
-                //    if (li.Name == "flowToken")
-                //    {
-                //        Authorizeflowtoken = li.Value;
-                //    }
-                //}
 
                 //retrieve the ctx, flow and cannary
                 LoginConfig config = _365DriveTenancyURL.renderConfig(authorizeCall);
@@ -266,7 +245,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     AADConnectSSOGetHeader.Add("Referrer", call1Url);
                     AADConnectSSOGetHeader.Add("Origin", "https://login.microsoftonline.com");
                     AADConnectSSOGetHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                    AADConnectSSOGetHeader.Add("Accept", "text/plain, */*; q=0.01");
+                    AADConnectSSOGetHeader.Add("Accept", "*/*");
 
 
                     Task<string> AADConnectloginPostBodyResult = HttpClientHelper.GetAsync(desktopSsoConfig, AADConnectSSOGetHeader, true);

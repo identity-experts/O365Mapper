@@ -17,6 +17,7 @@ using _365Drive.Office365.NotificationManager;
 using _365Drive.Office365.GetTenancyURL;
 using _365Drive.Office365.UpdateManager;
 using _365Drive.Office365.UI.About;
+using System.ComponentModel;
 
 namespace _365Drive.Office365
 {
@@ -248,25 +249,39 @@ namespace _365Drive.Office365
             //we need a piece here so lets not throw error and cause any issues
             try
             {
-                DriveManager.clearCookies();
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += new DoWorkEventHandler(
+                delegate (object o, DoWorkEventArgs args)
+                {
+                    DriveManager.clearCookies();
+                });
+                bw.RunWorkerAsync();
             }
             catch { }
         }
 
         void CheckForUpdates()
         {
-            //check for updates
-            VersionResponse version = Versions.LatestVersion();
-
-            //get current version
-            if (!string.IsNullOrEmpty(version.data.version) && !string.IsNullOrEmpty(version.data.x64) && !string.IsNullOrEmpty(version.data.x86))
+            try
             {
-                string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                if (Versions.compareVersion(currentVersion, version.data.version))
+                //check for updates
+                VersionResponse version = Versions.LatestVersion();
+
+                //get current version
+                if (!string.IsNullOrEmpty(version.data.version) && !string.IsNullOrEmpty(version.data.x64) && !string.IsNullOrEmpty(version.data.x86))
                 {
-                    Updates updatePrompt = new Updates();
-                    updatePrompt.Show();
+                    string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                    if (Versions.compareVersion(currentVersion, version.data.version))
+                    {
+                        Updates updatePrompt = new Updates();
+                        updatePrompt.Show();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
             }
         }
 
@@ -586,6 +601,7 @@ namespace _365Drive.Office365
                     }
                     else
                     {
+                        DriveManager.StopClearCache = true;
                         //lets make sure if we have autoSSO ON, lets make it off
                         bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
 
@@ -633,7 +649,7 @@ namespace _365Drive.Office365
                 }
                 else if (licenseValidationState == LicenseValidationState.ActivationFailed)
                 {
-                    string notificationMessage = string.Format(Globalization.LicenseActivationFailed, LicenseManager.lastActivationMessage);
+                    string notificationMessage = string.Format(Globalization.LicenseActivationFailed, CloudConnector.LicenseManager.lastActivationMessage);
                     currentDispatcher.Invoke(() =>
                     {
                         Communications.updateStatus(notificationMessage);
@@ -762,7 +778,7 @@ namespace _365Drive.Office365
                 #region Getting mappable drive details
                 LogManager.Verbose("Trying to get all drive details");
                 //get drive details
-                LicenseManager.populateDrives(userCookies);
+                CloudConnector.LicenseManager.populateDrives(userCookies);
                 currentDispatcher.Invoke(() =>
                 {
                     Communications.updateStatus(Globalization.DriveDetailsFound);

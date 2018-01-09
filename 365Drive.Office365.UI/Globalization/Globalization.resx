@@ -326,4 +326,7 @@
   <data name="CouldNotRetrieveUPN" xml:space="preserve">
     <value>We could not connect to Active Directory for fetching UPN to perform SSO</value>
   </data>
+  <data name="PleaseWait" xml:space="preserve">
+    <value>Please wait...</value>
+  </data>
 </root>
