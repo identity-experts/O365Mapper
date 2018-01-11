@@ -15,6 +15,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using _365Drive.Office365.NotificationManager;
 using _365Drive.Office365.GetTenancyURL;
+using _365Drive.Office365.UpdateManager;
+using _365Drive.Office365.UI.About;
+using System.ComponentModel;
 
 namespace _365Drive.Office365
 {
@@ -220,6 +223,17 @@ namespace _365Drive.Office365
                 LogManager.Verbose("Registering power mode change event to make sure the system is not in resume mode");
                 SystemEvents.PowerModeChanged += EnsurePowerMode;
 
+                string dontAskForUpdates = RegistryManager.Get(RegistryKeys.DontAskForUpdates);
+                if (dontAskForUpdates != "1")
+                {
+                    //check for updates
+                    CheckForUpdates();
+                }
+
+                //lets delete cookies before we start our game to keep things simple
+                //in many cases, the internet explore is setting the FEDAUTH cookie which is conflicting with 3M cookie. Lets ensure everything is clearned before we set cookie
+                clearCookies();
+
                 //call tick now
                 await Task.Run(() => tick());
             }
@@ -230,6 +244,46 @@ namespace _365Drive.Office365
             }
         }
 
+        void clearCookies()
+        {
+            //we need a piece here so lets not throw error and cause any issues
+            try
+            {
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += new DoWorkEventHandler(
+                delegate (object o, DoWorkEventArgs args)
+                {
+                    DriveManager.clearCookies();
+                });
+                bw.RunWorkerAsync();
+            }
+            catch { }
+        }
+
+        void CheckForUpdates()
+        {
+            try
+            {
+                //check for updates
+                VersionResponse version = Versions.LatestVersion();
+
+                //get current version
+                if (!string.IsNullOrEmpty(version.data.version) && !string.IsNullOrEmpty(version.data.x64) && !string.IsNullOrEmpty(version.data.x86))
+                {
+                    string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                    if (Versions.compareVersion(currentVersion, version.data.version))
+                    {
+                        Updates updatePrompt = new Updates();
+                        updatePrompt.Show();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+        }
 
         /// <summary>
         /// Make sure we are connected to internet
@@ -348,7 +402,8 @@ namespace _365Drive.Office365
                 {
                     Communications.updateStatus(Globalization.EnsuringCredential);
                 });
-                if (CredentialManager.ensureCredentials() == CredentialState.Notpresent)
+                CredentialState credState = CredentialManager.ensureCredentials();
+                if (credState == CredentialState.Notpresent)
                 {
                     currentDispatcher.Invoke(() =>
                     {
@@ -358,6 +413,27 @@ namespace _365Drive.Office365
                     Animation.Stop();
                     Animation.Animate(AnimationTheme.Warning);
                     NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication, true);
+                    Communications.CurrentState = States.UserAction;
+                    busy = false;
+                    //if (!alreadyNotified)
+                    //{
+                    //    currentDispatcher.Invoke(() =>
+                    //    {
+                    //        CommunicationCallBacks.AskAuthentication();
+                    //    });
+                    //}
+                    return;
+                }
+                else if (credState == CredentialState.ServerNotConnectable)
+                {
+                    currentDispatcher.Invoke(() =>
+                    {
+                        Communications.updateStatus(Globalization.CouldNotRetrieveUPN);
+                    });
+                    LogManager.Verbose("credentials not present");
+                    Animation.Stop();
+                    Animation.Animate(AnimationTheme.Warning);
+                    NotificationManager.NotificationManager.notify(Globalization.CouldNotRetrieveUPN, Globalization.NocredMessage, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication, true);
                     Communications.CurrentState = States.UserAction;
                     busy = false;
                     //if (!alreadyNotified)
@@ -525,6 +601,7 @@ namespace _365Drive.Office365
                     }
                     else
                     {
+                        DriveManager.StopClearCache = true;
                         //lets make sure if we have autoSSO ON, lets make it off
                         bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
 
@@ -572,7 +649,7 @@ namespace _365Drive.Office365
                 }
                 else if (licenseValidationState == LicenseValidationState.ActivationFailed)
                 {
-                    string notificationMessage = string.Format(Globalization.LicenseActivationFailed, LicenseManager.lastActivationMessage);
+                    string notificationMessage = string.Format(Globalization.LicenseActivationFailed, CloudConnector.LicenseManager.lastActivationMessage);
                     currentDispatcher.Invoke(() =>
                     {
                         Communications.updateStatus(notificationMessage);
@@ -670,6 +747,8 @@ namespace _365Drive.Office365
 
 
                 #region setting cookies to IE (already retrieved above)
+
+
                 //set cookie in IE
                 LogManager.Verbose("setting cookies to IE");
                 DriveManager.setCookiestoIE(fedAuth, rtFA, DriveManager.rootSiteUrl);
@@ -699,7 +778,7 @@ namespace _365Drive.Office365
                 #region Getting mappable drive details
                 LogManager.Verbose("Trying to get all drive details");
                 //get drive details
-                LicenseManager.populateDrives(userCookies);
+                CloudConnector.LicenseManager.populateDrives(userCookies);
                 currentDispatcher.Invoke(() =>
                 {
                     Communications.updateStatus(Globalization.DriveDetailsFound);

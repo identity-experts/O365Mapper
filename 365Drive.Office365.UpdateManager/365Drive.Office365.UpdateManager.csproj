@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,6 +45,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VersionResponse.cs" />
+    <Compile Include="Versions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\365Drive.Office365.Constants\365Drive.Office365.Constants.csproj">
+      <Project>{b837f0c6-f2c4-4cf0-96a9-05201a234995}</Project>
+      <Name>365Drive.Office365.Constants</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.GetTenancyURL\365Drive.Office365.CloudConnector.csproj">
+      <Project>{36dfecb8-5eb3-4f2c-9988-dcb8cb417f83}</Project>
+      <Name>365Drive.Office365.CloudConnector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\365Drive.Office365.LogManager\365Drive.Office365.LogManager.csproj">
+      <Project>{6e11fc57-7171-4860-b0d2-9bf5ec4e3d2e}</Project>
+      <Name>365Drive.Office365.LogManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

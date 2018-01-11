@@ -175,17 +175,29 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 string authCode = string.Empty;
                 string accessToken = string.Empty;
                 string nonce = string.Empty;
-                string code = string.Empty, id_token = string.Empty, session_state = string.Empty;
+                string code = string.Empty, id_token = string.Empty, session_state = string.Empty, state = string.Empty, correlation_id = string.Empty;
                 string desktopSsoConfig = string.Empty;
                 string dssoToken = string.Empty;
 
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
                 CookieContainer AuthrequestCookies = new CookieContainer();
+                CookieContainer wreplyCookies = new CookieContainer();
 
-            
+                //render header
+                NameValueCollection loginPostHeader = new NameValueCollection();
+                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
+                loginPostHeader.Add("Accept", "*/*");
 
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies);
+
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true, loginPostHeader);
                 AuthrequestResponse.Wait();
+
+                //we need same cookies now
+                AuthrequestCookies = wreplyCookies;
+
+                Task<string> response = AuthrequestResponse.Result.Content.ReadAsStringAsync();
+                response.Wait();
+                authorizeCall = response.Result;
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
                 if (qscoll.Count > 0)
@@ -199,39 +211,20 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //string call1Url = String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.sharepointClientID, "http://office.microsoft.com/sharepoint", _host);
                 string call1Url = String.Format(StringConstants.getAADCookieStep1, _host, nonce);
 
-                //foreach (Cookie cookie in AuthrequestCookies.GetCookies(new Uri(AuthrequestUrl)))
-                //{
-                //    authorizeCookies.Add(new Uri("https://" + new Uri(call1Url).Authority), new Cookie(cookie.Name, cookie.Value));
-                //}
+                //Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies, loginPostHeader);
+                //call1Result.Wait();
+                //authorizeCall = call1Result.Result;
 
-                //render header
-                NameValueCollection loginPostHeader = new NameValueCollection();
-                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+                //retrieve the ctx, flow and cannary
+                LoginConfig config = _365DriveTenancyURL.renderConfig(authorizeCall);
+                Authorizectx = config.sCtx;
+                Authorizeflowtoken = config.sFT;
+                authorizeCanary = config.canary;
 
-
-                Task<string> call1Result = HttpClientHelper.GetAsync(call1Url, AuthrequestCookies, loginPostHeader);
-                call1Result.Wait();
-                authorizeCall = call1Result.Result;
-
-                ///Fetch the ctx and flow token
-                CQ htmlparser = CQ.Create(authorizeCall);
-                var items = htmlparser["input"];
-                foreach (var li in items)
-                {
-                    if (li.Name == "ctx")
-                    {
-                        Authorizectx = li.Value;
-                    }
-                    if (li.Name == "flowToken")
-                    {
-                        Authorizeflowtoken = li.Value;
-                    }
-                }
 
                 ///get other values of call 1
                 AuthorizeCanaryapi = _365DriveTenancyURL.getapiCanary(authorizeCall);
-                authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
+                //authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
                 AuthorizeclientRequestID = _365DriveTenancyURL.getClientRequest(authorizeCall);
                 Authorizehpgact = _365DriveTenancyURL.getHPGact(authorizeCall);
                 Authorizehpgid = _365DriveTenancyURL.getHPGId(authorizeCall);
@@ -243,15 +236,16 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //if SSO, Its a shortcut, lets try it and try to finish from here
                 if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
                 {
-                    desktopSsoConfig = _365DriveTenancyURL.getDesktopSsoConfig(authorizeCall);
-                    desktopSsoConfig = string.Format(desktopSsoConfig, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
+                    //desktopSsoConfig = getDesktopSsoConfig(authorizeCall);
+                    dSSOConfig DSSOConfig = _365DriveTenancyURL.renderdSSOConfig(authorizeCall);
+                    desktopSsoConfig = string.Format(DSSOConfig.desktopSsoConfig.iwaEndpointUrlFormat, DriveManager.AADSSODomainName) + "&client-request-id=" + AuthorizeclientRequestID;
 
                     //render header
                     NameValueCollection AADConnectSSOGetHeader = new NameValueCollection();
                     AADConnectSSOGetHeader.Add("Referrer", call1Url);
                     AADConnectSSOGetHeader.Add("Origin", "https://login.microsoftonline.com");
                     AADConnectSSOGetHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                    AADConnectSSOGetHeader.Add("Accept", "text/plain, */*; q=0.01");
+                    AADConnectSSOGetHeader.Add("Accept", "*/*");
 
 
                     Task<string> AADConnectloginPostBodyResult = HttpClientHelper.GetAsync(desktopSsoConfig, AADConnectSSOGetHeader, true);
@@ -319,7 +313,31 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 Task<String> postCalresponse = HttpClientHelper.PostAsync((StringConstants.AADConnectCookieloginPost), msLoginPostData, "application/x-www-form-urlencoded", msLoginPostCookies);
                 postCalresponse.Wait();
 
-                CQ msPOSTcq = CQ.Create(postCalresponse.Result);
+
+                string outputControls = string.Empty;
+                string MSKMSIPostData = string.Empty;
+                LoginConfig msPostConfig;
+                Task<string> msKMSIPost;
+                msPostConfig = _365DriveTenancyURL.renderConfig(postCalresponse.Result);
+                if (msPostConfig == null)
+                {
+                    outputControls = postCalresponse.Result;
+                }
+                else
+                {
+
+                    Authorizectx = msPostConfig.sCtx;
+                    Authorizeflowtoken = msPostConfig.sFT;
+                    authorizeCanary = msPostConfig.canary;
+
+                    //getting ready for KMSI post
+                    MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                    msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies);
+                    msKMSIPost.Wait();
+                    outputControls = msKMSIPost.Result;
+                }
+
+                CQ msPOSTcq = CQ.Create(outputControls);
                 var msPOSTcqItems = msPOSTcq["input"];
 
                 foreach (var li in msPOSTcqItems)
@@ -336,12 +354,19 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     {
                         session_state = li.Value;
                     }
+                    if (li.Name == "state")
+                    {
+                        state = li.Value;
+                    }
+                    if (li.Name == "correlation_id")
+                    {
+                        correlation_id = li.Value;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(code))
                 {
-
-                    string isPollingRequired = _365DriveTenancyURL.getpolingRequired(postCalresponse.Result);
+                    string isPollingRequired = _365DriveTenancyURL.getpolingRequired(outputControls);
                     bool pollingRequired = false;
                     bool.TryParse(isPollingRequired, out pollingRequired);
 
@@ -419,8 +444,26 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                         Task<String> pollEndResponse = HttpClientHelper.PostAsync((StringConstants.AADPollEnd), pollEndData, "application/x-www-form-urlencoded", pollEndCookieContainer, pollEndHeader);
                         pollEndResponse.Wait();
 
+                        msPostConfig = _365DriveTenancyURL.renderConfig(pollEndResponse.Result);
+                        Authorizectx = msPostConfig.sCtx;
+                        Authorizeflowtoken = msPostConfig.sFT;
+                        authorizeCanary = msPostConfig.canary;
+
+                        if (string.IsNullOrEmpty(Authorizectx))
+                        {
+                            outputControls = postCalresponse.Result;
+                        }
+                        else
+                        {
+                            //getting ready for KMSI post
+                            MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                            msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies);
+                            msKMSIPost.Wait();
+                            outputControls = msKMSIPost.Result;
+                        }
+
                         //var pollendResponse = await pollEndResponse.Content.ReadAsStringAsync();
-                        CQ pollEndResponsecQ = CQ.Create(pollEndResponse.Result);
+                        CQ pollEndResponsecQ = CQ.Create(outputControls);
                         var pollEndResponses = pollEndResponsecQ["input"];
 
                         foreach (var li in pollEndResponses)
@@ -437,13 +480,21 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             {
                                 session_state = li.Value;
                             }
+                            if (li.Name == "state")
+                            {
+                                state = li.Value;
+                            }
+                            if (li.Name == "correlation_id")
+                            {
+                                correlation_id = li.Value;
+                            }
                         }
 
 
                         ///Check for MFA
                         if (string.IsNullOrEmpty(code))
                         {
-                            string postResponse = GlobalCookieManager.retrieveCodeFromMFA(pollEndResponse.Result, AuthrequestCookies);
+                            string postResponse = GlobalCookieManager.retrieveCodeFromMFA(outputControls, AuthrequestCookies);
                             pollEndResponsecQ = CQ.Create(postResponse);
                             pollEndResponses = pollEndResponsecQ["input"];
                             foreach (var li in pollEndResponses)
@@ -458,7 +509,11 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                                 }
                                 if (li.Name == "state")
                                 {
-                                    //state = li.Value;
+                                    state = li.Value;
+                                }
+                                if (li.Name == "correlation_id")
+                                {
+                                    correlation_id = li.Value;
                                 }
                                 if (li.Name == "session_state")
                                 {
@@ -469,7 +524,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                     else
                     {
-                        string postResponse = GlobalCookieManager.retrieveCodeFromMFA(postCalresponse.Result, AuthrequestCookies);
+                        string postResponse = GlobalCookieManager.retrieveCodeFromMFA(outputControls, AuthrequestCookies);
                         var pollEndResponsecQ = CQ.Create(postResponse);
                         var pollEndResponses = pollEndResponsecQ["input"];
                         foreach (var li in pollEndResponses)
@@ -484,7 +539,11 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             }
                             if (li.Name == "state")
                             {
-                                //state = li.Value;
+                                state = li.Value;
+                            }
+                            if (li.Name == "correlation_id")
+                            {
+                                correlation_id = li.Value;
                             }
                             if (li.Name == "session_state")
                             {
@@ -494,13 +553,13 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                     }
                 }
 
-                string postCodeBody = String.Format(StringConstants.postCodeBody, code, id_token, session_state);
-                Task<String> postCodeResponse = HttpClientHelper.PostAsync(String.Format(StringConstants.postCodeUrl, _host), postCodeBody, "application/x-www-form-urlencoded", AuthrequestCookies, false);
+                string postCodeBody = String.Format(StringConstants.postCodeBody, code, id_token, state, session_state, correlation_id);
+                Task<String> postCodeResponse = HttpClientHelper.PostAsync(String.Format(StringConstants.postCodeUrl, _host), postCodeBody, "application/x-www-form-urlencoded", wreplyCookies, false);
                 postCodeResponse.Wait();
 
                 LogManager.Verbose("cookies retrieved. Code: " + authCode);
                 MsoCookies ret = new MsoCookies();
-                CookieCollection spCookies = AuthrequestCookies.GetCookies(_host);
+                CookieCollection spCookies = wreplyCookies.GetCookies(_host);
 
                 ret.FedAuth = spCookies["FedAuth"].Value;
                 ret.rtFa = spCookies["rtFa"].Value;

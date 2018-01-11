@@ -124,6 +124,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to We could not connect to Active Directory for fetching UPN to perform SSO.
+        /// </summary>
+        public static string CouldNotRetrieveUPN {
+            get {
+                return ResourceManager.GetString("CouldNotRetrieveUPN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Manage Credentials (Default).
         /// </summary>
         public static string credential_page_header {
@@ -183,6 +192,15 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string CredentialsReceived {
             get {
                 return ResourceManager.GetString("CredentialsReceived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t ask next time.
+        /// </summary>
+        public static string DontAskForUpdates {
+            get {
+                return ResourceManager.GetString("DontAskForUpdates", resourceCulture);
             }
         }
         
@@ -466,6 +484,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please wait....
+        /// </summary>
+        public static string PleaseWait {
+            get {
+                return ResourceManager.GetString("PleaseWait", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 365mapper.
         /// </summary>
         public static string ProductName {
@@ -561,6 +588,42 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string TenancyNotRegistered {
             get {
                 return ResourceManager.GetString("TenancyNotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new 365mapper update is available. Please click &apos;Update&apos; below..
+        /// </summary>
+        public static string UpdateAvailable {
+            get {
+                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string UpdateButton {
+            get {
+                return ResourceManager.GetString("UpdateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updates.
+        /// </summary>
+        public static string UpdatePageTitle {
+            get {
+                return ResourceManager.GetString("UpdatePageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updates: .
+        /// </summary>
+        public static string Updates {
+            get {
+                return ResourceManager.GetString("Updates", resourceCulture);
             }
         }
         

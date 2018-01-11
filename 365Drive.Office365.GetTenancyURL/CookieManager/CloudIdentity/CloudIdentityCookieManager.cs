@@ -198,9 +198,11 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         private MsoCookies getIECookies()
         {
-
+            string outputControls = string.Empty;
+            string MSKMSIPostData = string.Empty;
+            LoginConfig msPostConfig;
+            Task<string> msKMSIPost;
             MsoCookies ret = new MsoCookies();
-
             try
             {
                 //are we ready?
@@ -211,12 +213,21 @@ namespace _365Drive.Office365.CloudConnector
                 string authorizeCall = string.Empty, Authorizectx = string.Empty, Authorizeflowtoken = string.Empty, authorizeCanary = string.Empty, nonce = string.Empty, clientRequestId = string.Empty;
                 string AuthrequestUrl = string.Format(StringConstants.AuthenticateRequestUrl, _host);
                 CookieContainer AuthrequestCookies = new CookieContainer();
-                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, AuthrequestCookies, true);
+                CookieContainer wreplyCookies = new CookieContainer();
+               
+                Task<HttpResponseMessage> AuthrequestResponse = HttpClientHelper.GetAsyncFullResponse(AuthrequestUrl, wreplyCookies, true);
                 AuthrequestResponse.Wait();
+
+
+                AuthrequestCookies = wreplyCookies;
+                Task<string> response = AuthrequestResponse.Result.Content.ReadAsStringAsync();
+                response.Wait();
+                authorizeCall = response.Result;
+                //CookieCollection wReplies = wreplyCookies.GetCookies(_host);
 
                 NameValueCollection qscoll = HttpUtility.ParseQueryString(AuthrequestResponse.Result.RequestMessage.RequestUri.Query);
                 if (qscoll.Count > 0)
-                { 
+                {
                     nonce = qscoll["nonce"];
                     clientRequestId = qscoll["client-request-id"];
                 }
@@ -234,43 +245,85 @@ namespace _365Drive.Office365.CloudConnector
 
                 //first call to get flow token, ctx and canary
                 //CookieContainer AuthrequestCookies = new CookieContainer();
-                string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
-                Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
-                call1Result.Wait();
+                //string MSOnlineoAuthCallUrl = String.Format(StringConstants.getCloudCookieStep1, LicenseManager.encode(Wreply), nonce, clientRequestId);
+                //Task<string> call1Result = HttpClientHelper.GetAsync(MSOnlineoAuthCallUrl, AuthrequestCookies);
+                //call1Result.Wait();
+                //authorizeCall = call0Result.Result;
 
 
-                authorizeCall = call1Result.Result;
+                //retrieve the ctx, flow and cannary
+                LoginConfig config = _365DriveTenancyURL.renderConfig(authorizeCall);
+                Authorizectx = config.sCtx;
+                Authorizeflowtoken = config.sFT;
+                authorizeCanary = config.canary;
 
-                ///Fetch the ctx and flow token and canary
-                CQ htmlparser = CQ.Create(authorizeCall);
-                var items = htmlparser["input"];
-                foreach (var li in items)
+
+                /////Fetch the ctx and flow token and canary
+                //CQ htmlparser = CQ.Create(authorizeCall);
+                //var items = htmlparser["input"];
+                //foreach (var li in items)
+                //{
+                //    if (li.Name == "ctx")
+                //    {
+                //        Authorizectx = li.Value;
+                //    }
+                //    if (li.Name == "flowToken")
+                //    {
+                //        Authorizeflowtoken = li.Value;
+                //    }
+                //}
+                //authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
+
+                //string loginPostBody = string.Format(StringConstants.CloudloginPostData, _username, _password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                //NameValueCollection loginPostHeader = new NameValueCollection();
+                //loginPostHeader.Add("Origin", "https://login.microsoftonline.com");
+                //loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
+                //loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                //loginPostHeader.Add("X-Requested-With", "XMLHttpRequest");
+                //loginPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+
+                //Task<string> call2Result = HttpClientHelper.PostAsync(StringConstants.CloudloginPost, loginPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, loginPostHeader);
+                //call2Result.Wait();
+
+
+                LogManager.Verbose("Call 1 finished. output: ctx=" + Authorizectx + " flow=" + Authorizeflowtoken + " cookie count: " + AuthrequestCookies.Count.ToString());
+
+                //getting ready for call 2
+                string MSloginpostData = String.Format(StringConstants.newMSloginPost, _username, _password, LicenseManager.encode(authorizeCanary), Authorizectx, Authorizeflowtoken);
+                NameValueCollection MSloginpostHeader = new NameValueCollection();
+                MSloginpostHeader.Add("Accept", "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*");
+                MSloginpostHeader.Add("Referer", String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri));
+                MSloginpostHeader.Add("Accept-Language", "en-US");
+                //request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
+                //MSloginpostHeader.Add("Accept-Encoding", "gzip, deflate");
+                MSloginpostHeader.Add("User-Agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729)");
+                MSloginpostHeader.Add("Host", "login.microsoftonline.com");
+                MSloginpostHeader.Add("Accept", "application/json");
+                Task<string> msLoginPostResponse = HttpClientHelper.PostAsync(StringConstants.AzureActivateUserStep2, MSloginpostData, "application/x-www-form-urlencoded", AuthrequestCookies, MSloginpostHeader);
+                msLoginPostResponse.Wait();
+
+                msPostConfig = _365DriveTenancyURL.renderConfig(msLoginPostResponse.Result);
+                if (msPostConfig == null)
                 {
-                    if (li.Name == "ctx")
-                    {
-                        Authorizectx = li.Value;
-                    }
-                    if (li.Name == "flowToken")
-                    {
-                        Authorizeflowtoken = li.Value;
-                    }
+                    outputControls = msLoginPostResponse.Result;
                 }
-                authorizeCanary = _365DriveTenancyURL.getCanary2(authorizeCall);
+                else
+                {
 
-                string loginPostBody = string.Format(StringConstants.CloudloginPostData, _username, _password, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
-                NameValueCollection loginPostHeader = new NameValueCollection();
-                loginPostHeader.Add("Origin", "https://login.microsoftonline.com");
-                loginPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
-                loginPostHeader.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-                loginPostHeader.Add("X-Requested-With", "XMLHttpRequest");
-                loginPostHeader.Add("Referer", "https://login.microsoftonline.com/common/login");
+                    Authorizectx = msPostConfig.sCtx;
+                    Authorizeflowtoken = msPostConfig.sFT;
+                    authorizeCanary = msPostConfig.canary;
 
-                Task<string> call2Result = HttpClientHelper.PostAsync(StringConstants.CloudloginPost, loginPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, loginPostHeader);
-                call2Result.Wait();
+                    //getting ready for KMSI post
+                    MSKMSIPostData = String.Format(StringConstants.KMSIPost, Authorizectx, Authorizeflowtoken, LicenseManager.encode(authorizeCanary));
+                    msKMSIPost = HttpClientHelper.PostAsync(StringConstants.loginKMSI, MSKMSIPostData, "application/x-www-form-urlencoded", AuthrequestCookies);
+                    msKMSIPost.Wait();
+                    outputControls = msKMSIPost.Result;
+                }
 
-                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty;
+                string code = string.Empty, id_token = string.Empty, state = string.Empty, session_state = string.Empty, correlation_id = string.Empty;
                 ///Fetch the ctx and flow token and canary
-                CQ postBodyResponseParser = CQ.Create(call2Result.Result);
+                CQ postBodyResponseParser = CQ.Create(outputControls);
                 var postBodyResponseInputs = postBodyResponseParser["input"];
                 foreach (var li in postBodyResponseInputs)
                 {
@@ -290,12 +343,16 @@ namespace _365Drive.Office365.CloudConnector
                     {
                         session_state = li.Value;
                     }
+                    if (li.Name == "correlation_id")
+                    {
+                        correlation_id = li.Value;
+                    }
                 }
 
                 ///Check for MFA
-                if(string.IsNullOrEmpty(code))
+                if (string.IsNullOrEmpty(code))
                 {
-                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(call2Result.Result, AuthrequestCookies);
+                    string postResponse = GlobalCookieManager.retrieveCodeFromMFA(outputControls, AuthrequestCookies);
                     postBodyResponseParser = CQ.Create(postResponse);
                     postBodyResponseInputs = postBodyResponseParser["input"];
                     foreach (var li in postBodyResponseInputs)
@@ -316,11 +373,15 @@ namespace _365Drive.Office365.CloudConnector
                         {
                             session_state = li.Value;
                         }
+                        if (li.Name == "correlation_id")
+                        {
+                            correlation_id = li.Value;
+                        }
                     }
                 }
 
                 //post everyhing to sharepoint
-                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state);
+                string SharePointPostBody = string.Format(StringConstants.SharePointFormPost, code, id_token, state, session_state, correlation_id);
                 NameValueCollection SharePointPostHeader = new NameValueCollection();
                 SharePointPostHeader.Add("Origin", "https://login.microsoftonline.com");
                 SharePointPostHeader.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko");
@@ -338,12 +399,12 @@ namespace _365Drive.Office365.CloudConnector
 
                 try
                 {
-                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, SharePointPostHeader);
+                    SharePointPostResult = HttpClientHelper.PostAsyncFullResponse(Wreply, SharePointPostBody, "application/x-www-form-urlencoded", wreplyCookies, SharePointPostHeader);
                     SharePointPostResult.Wait();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    if(SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
+                    if (SharePointPostResult.Result.StatusCode == HttpStatusCode.Forbidden)
                     {
 
                     }
@@ -352,7 +413,7 @@ namespace _365Drive.Office365.CloudConnector
                         throw ex;
                     }
                 }
-                foreach (Cookie SPCookie in AuthrequestCookies.GetCookies(new Uri(Wreply)))
+                foreach (Cookie SPCookie in wreplyCookies.GetCookies(new Uri(Wreply)))
                 {
                     if (SPCookie.Name.ToLower() == "fedauth")
                     {

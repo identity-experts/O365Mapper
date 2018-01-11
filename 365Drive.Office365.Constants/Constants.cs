@@ -35,15 +35,17 @@ namespace _365Drive.Office365
         public const string activationUrl = "{0}?wc-api={1}&email={2}&licence_key={3}&request={4}&product_id={5}&instance={6}&platform={7}&software_version={8}&tenancy={9}";
         public const string activationApiCode = "am-software-api";
         public const string ieUserMappingApiCode = "user-key-mapping-api";
+        public const string ieLatestVersion = "mapper-updates";
         public const string ieDriveDetailsApiCode = "ie-drive-mapping-details";
         public const string activationRequestName = "activation";
         public const string statusRequestName = "status";
         public const string ie365MapperProductName = "365Mapper";
+        public const string latestVersionUrl = "{0}?wc-api={1}";
         public const string licenseuserMappingUrl = "{0}?wc-api={1}&tenancy={2}&user={3}";
         public const string retrieveDriveMappingsUrl = "{0}?wc-api={1}&tenancy={2}";
 
         //beta
-        public const string softwareVersion = "0.7.0";
+        //public const string softwareVersion = "0.8.0";
 
         public const int licenseCheckInterval = 120;
         public const int localLicenseCheckLimit = 24;

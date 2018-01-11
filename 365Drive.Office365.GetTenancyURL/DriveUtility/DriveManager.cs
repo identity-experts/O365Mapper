@@ -22,21 +22,157 @@ namespace _365Drive.Office365.CloudConnector
         #region to set cookies to ie
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool InternetSetCookie(string lpszUrlName, string lbszCookieName, string lpszCookieData);
-        [DllImport("wininet.dll", SetLastError = true)]
-        public static extern bool InternetGetCookie(string lpszUrl, string lpszCookieName, StringBuilder lpszCookieData, ref int lpdwSize);
+
 
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool InternetSetOption(
-     int hInternet,
-     int dwOption,
-     string lpBuffer,
-     int dwBufferLength
- );
+             int hInternet,
+             int dwOption,
+             string lpBuffer,
+             int dwBufferLength
+         );
+
+        /// <summary>
+        /// Struct INTERNET_CACHE_ENTRY_INFOA
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit, Size = 80)]
+        public struct INTERNET_CACHE_ENTRY_INFOA
+        {
+            [FieldOffset(0)]
+            public uint dwStructSize;
+            [FieldOffset(4)]
+            public IntPtr lpszSourceUrlName;
+            [FieldOffset(8)]
+            public IntPtr lpszLocalFileName;
+            [FieldOffset(12)]
+            public uint CacheEntryType;
+            [FieldOffset(16)]
+            public uint dwUseCount;
+            [FieldOffset(20)]
+            public uint dwHitRate;
+            [FieldOffset(24)]
+            public uint dwSizeLow;
+            [FieldOffset(28)]
+            public uint dwSizeHigh;
+            [FieldOffset(32)]
+            public System.Runtime.InteropServices.ComTypes.FILETIME LastModifiedTime;
+            [FieldOffset(40)]
+            public System.Runtime.InteropServices.ComTypes.FILETIME ExpireTime;
+            [FieldOffset(48)]
+            public System.Runtime.InteropServices.ComTypes.FILETIME LastAccessTime;
+            [FieldOffset(56)]
+            public System.Runtime.InteropServices.ComTypes.FILETIME LastSyncTime;
+            [FieldOffset(64)]
+            public IntPtr lpHeaderInfo;
+            [FieldOffset(68)]
+            public uint dwHeaderInfoSize;
+            [FieldOffset(72)]
+            public IntPtr lpszFileExtension;
+            [FieldOffset(76)]
+            public uint dwReserved;
+            [FieldOffset(76)]
+            public uint dwExemptDelta;
+        }
 
         [DllImport("kernel32.dll")]
-        #endregion
+
         public static extern uint GetLastError();
 
+        /// <summary>
+        /// Internets the get cookie.
+        /// </summary>
+        /// <param name="lpszUrl">The LPSZ URL.</param>
+        /// <param name="lpszCookieName">Name of the LPSZ cookie.</param>
+        /// <param name="lpszCookieData">The LPSZ cookie data.</param>
+        /// <param name="lpdwSize">Size of the LPDW.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise</returns>
+        [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern bool InternetGetCookie(string lpszUrl, string lpszCookieName, StringBuilder lpszCookieData, ref int lpdwSize);
+
+        // For PInvoke: Releases the specified GROUPID and any associated state in the cache index file
+        [DllImport(@"wininet",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            EntryPoint = "DeleteUrlCacheGroup",
+            CallingConvention = CallingConvention.StdCall)]
+        public static extern bool DeleteUrlCacheGroup(
+            long GroupId,
+            int dwFlags,
+            IntPtr lpReserved);
+        /// <summary>
+        /// Finds the first URL cache entry.
+        /// </summary>
+        /// <param name="lpszUrlSearchPattern">The LPSZ URL search pattern.</param>
+        /// <param name="lpFirstCacheEntryInfo">The lp first cache entry info.</param>
+        /// <param name="lpdwFirstCacheEntryInfoBufferSize">Size of the LPDW first cache entry info buffer.</param>
+        /// <returns>IntPtr.</returns>
+        [DllImport(@"wininet",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            EntryPoint = "FindFirstUrlCacheEntryA",
+            CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr FindFirstUrlCacheEntry(
+            [MarshalAs(UnmanagedType.LPTStr)] string lpszUrlSearchPattern,
+            IntPtr lpFirstCacheEntryInfo,
+            ref int lpdwFirstCacheEntryInfoBufferSize);
+
+        // For PInvoke: Initiates the enumeration of the cache groups in the Internet cache
+        [DllImport(@"wininet",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            EntryPoint = "FindFirstUrlCacheGroup",
+            CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr FindFirstUrlCacheGroup(
+            int dwFlags,
+            int dwFilter,
+            IntPtr lpSearchCondition,
+        int dwSearchCondition,
+        ref long lpGroupId,
+        IntPtr lpReserved);
+
+        // For PInvoke: Retrieves the next cache group in a cache group enumeration
+        [DllImport(@"wininet",
+        SetLastError = true,
+            CharSet = CharSet.Auto,
+        EntryPoint = "FindNextUrlCacheGroup",
+            CallingConvention = CallingConvention.StdCall)]
+        public static extern bool FindNextUrlCacheGroup(
+            IntPtr hFind,
+            ref long lpGroupId,
+            IntPtr lpReserved);
+
+
+        /// <summary>
+        /// Finds the next URL cache entry.
+        /// </summary>
+        /// <param name="hFind">The h find.</param>
+        /// <param name="lpNextCacheEntryInfo">The lp next cache entry info.</param>
+        /// <param name="lpdwNextCacheEntryInfoBufferSize">Size of the LPDW next cache entry info buffer.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise</returns>
+        [DllImport(@"wininet",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            EntryPoint = "FindNextUrlCacheEntryA",
+            CallingConvention = CallingConvention.StdCall)]
+        public static extern bool FindNextUrlCacheEntry(
+            IntPtr hFind,
+            IntPtr lpNextCacheEntryInfo,
+            ref int lpdwNextCacheEntryInfoBufferSize);
+
+        /// <summary>
+        /// Deletes the URL cache entry.
+        /// </summary>
+        /// <param name="lpszUrlName">Name of the LPSZ URL.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise</returns>
+        [DllImport(@"wininet",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            EntryPoint = "DeleteUrlCacheEntryA",
+            CallingConvention = CallingConvention.StdCall)]
+        public static extern bool DeleteUrlCacheEntry(
+            IntPtr lpszUrlName);
+
+        #endregion
 
         ///Allowed federation types
         /// 
@@ -217,6 +353,7 @@ namespace _365Drive.Office365.CloudConnector
 
         }
 
+        public static bool StopClearCache;
         /// <summary>
         /// Add a new drive to mappable drive
         /// </summary>
@@ -372,6 +509,206 @@ namespace _365Drive.Office365.CloudConnector
                 LogManager.Exception(method, ex);
             }
         }
+
+
+
+        /// <summary>
+        /// Clears the IE cache.
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        public static void ClearIECache(string[] url)
+        {
+            try
+            {
+                LogManager.Info("Inside ClearIECache");
+                // No more items have been found.
+                const int ERROR_NO_MORE_ITEMS = 259;
+
+                // Local variables
+                int cacheEntryInfoBufferSizeInitial = 0;
+                int cacheEntryInfoBufferSize = 0;
+                IntPtr cacheEntryInfoBuffer = IntPtr.Zero;
+                INTERNET_CACHE_ENTRY_INFOA internetCacheEntry;
+                IntPtr enumHandle = IntPtr.Zero;
+                bool returnValue = false;
+
+                // Start to delete URLs that do not belong to any group.
+                enumHandle = FindFirstUrlCacheEntry(null, IntPtr.Zero, ref cacheEntryInfoBufferSizeInitial);
+                if (enumHandle == IntPtr.Zero && ERROR_NO_MORE_ITEMS == Marshal.GetLastWin32Error())
+                    return;
+
+                cacheEntryInfoBufferSize = cacheEntryInfoBufferSizeInitial;
+                cacheEntryInfoBuffer = Marshal.AllocHGlobal(cacheEntryInfoBufferSize);
+                enumHandle = FindFirstUrlCacheEntry(null, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                LogManager.Info("Before While");
+                while (true)
+                {
+
+                    internetCacheEntry = (INTERNET_CACHE_ENTRY_INFOA)Marshal.PtrToStructure(cacheEntryInfoBuffer, typeof(INTERNET_CACHE_ENTRY_INFOA));
+
+                    string sourceUrlName = Marshal.PtrToStringAnsi(internetCacheEntry.lpszSourceUrlName);
+                    cacheEntryInfoBufferSizeInitial = cacheEntryInfoBufferSize;
+
+
+                    // if its any of the sharepoint and microsoftonline, delete it as its creating conflicts.
+                    foreach (string hostEntry in url)
+                    {
+                        LogManager.Info("sourceUrlName: " + sourceUrlName);
+                        if (sourceUrlName.ToLower().Contains(hostEntry))
+                        {
+                            DeleteUrlCacheEntry(internetCacheEntry.lpszSourceUrlName);
+                        }
+                    }
+                    LogManager.Info("Deleted!");
+                    returnValue = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+
+                    if (!returnValue && ERROR_NO_MORE_ITEMS == Marshal.GetLastWin32Error())
+                    {
+                        LogManager.Info("Breaking as got issue");
+                        break;
+                    }
+                    if (!returnValue && cacheEntryInfoBufferSizeInitial > cacheEntryInfoBufferSize)
+                    {
+                        cacheEntryInfoBufferSize = cacheEntryInfoBufferSizeInitial;
+                        cacheEntryInfoBuffer = Marshal.ReAllocHGlobal(cacheEntryInfoBuffer, (IntPtr)cacheEntryInfoBufferSize);
+                        returnValue = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                    }
+                }
+
+                LogManager.Info("FreeHGlobal");
+                Marshal.FreeHGlobal(cacheEntryInfoBuffer);
+                LogManager.Info("FreeHGlobal finished");
+            }
+            catch
+            {
+                //error
+            }
+        }
+
+        public static void ClearCache(string[] url)
+        {
+
+            //half minute max
+            int msLimit = 30000;
+            //int nEntries = 500000;
+            // bool cancel = false;
+
+            System.Timers.Timer t = new System.Timers.Timer();
+            t.Interval = msLimit;
+            t.Elapsed += (s, e) => StopClearCache = true;
+            t.Start();
+
+            // Indicates that all of the cache groups in the user's system should be enumerated
+            const int CACHEGROUP_SEARCH_ALL = 0x0;
+            // Indicates that all the cache entries that are associated with the cache group
+            // should be deleted, unless the entry belongs to another cache group.
+            const int CACHEGROUP_FLAG_FLUSHURL_ONDELETE = 0x2;
+            const int ERROR_INSUFFICIENT_BUFFER = 0x7A;
+            const int ERROR_NO_MORE_ITEMS = 259;
+
+            // Delete the groups first.
+            // Groups may not always exist on the system.
+            // For more information, visit the following Microsoft Web site:
+            // http://msdn.microsoft.com/library/?url=/workshop/networking/wininet/overview/cache.asp            
+            // By default, a URL does not belong to any group. Therefore, that cache may become
+            // empty even when the CacheGroup APIs are not used because the existing URL does not belong to any group.            
+            long groupId = 0;
+            IntPtr enumHandle = FindFirstUrlCacheGroup(0, CACHEGROUP_SEARCH_ALL, IntPtr.Zero, 0, ref groupId, IntPtr.Zero);
+            INTERNET_CACHE_ENTRY_INFOA internetCacheEntry;
+            bool returnValue = false;
+
+            if (enumHandle != IntPtr.Zero && ERROR_NO_MORE_ITEMS == Marshal.GetLastWin32Error())
+            {
+                return;
+                //bool more;
+                //do
+                //{
+                //    // Delete a particular Cache Group.
+                //    DeleteUrlCacheGroup(groupId, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, IntPtr.Zero);
+                //    more = FindNextUrlCacheGroup(enumHandle, ref groupId, IntPtr.Zero);
+                //} while (more);
+            }
+
+            // Start to delete URLs that do not belong to any group.
+            int cacheEntryInfoBufferSizeInitial = 0;
+            FindFirstUrlCacheEntry(null, IntPtr.Zero, ref cacheEntryInfoBufferSizeInitial);  // should always fail because buffer is too small
+            if (Marshal.GetLastWin32Error() == ERROR_INSUFFICIENT_BUFFER)
+            {
+                int cacheEntryInfoBufferSize = cacheEntryInfoBufferSizeInitial;
+                IntPtr cacheEntryInfoBuffer = Marshal.AllocHGlobal(cacheEntryInfoBufferSize);
+                enumHandle = FindFirstUrlCacheEntry(null, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                if (enumHandle != IntPtr.Zero)
+                {
+                    //bool more;
+
+
+                    while (true)
+                    {
+                        internetCacheEntry = (INTERNET_CACHE_ENTRY_INFOA)Marshal.PtrToStructure(cacheEntryInfoBuffer, typeof(INTERNET_CACHE_ENTRY_INFOA));
+
+                        if (ERROR_NO_MORE_ITEMS == Marshal.GetLastWin32Error()) { break; }
+                        string sourceUrlName = Marshal.PtrToStringAnsi(internetCacheEntry.lpszSourceUrlName);
+
+                        cacheEntryInfoBufferSizeInitial = cacheEntryInfoBufferSize;
+                        //returnValue = DeleteUrlCacheEntry(internetCacheEntry.lpszSourceUrlName);
+
+                        // if its any of the sharepoint and microsoftonline, delete it as its creating conflicts.
+                        foreach (string hostEntry in url)
+                        {
+                            LogManager.Info("sourceUrlName: " + sourceUrlName);
+                            if (sourceUrlName.ToLower().Contains(hostEntry))
+                            {
+                                DeleteUrlCacheEntry(internetCacheEntry.lpszSourceUrlName);
+                            }
+                        }
+                        //if (!returnValue)
+                        //{
+                        returnValue = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                        //}
+                        if ((!returnValue && ERROR_NO_MORE_ITEMS == Marshal.GetLastWin32Error()) || StopClearCache)
+                        {
+                            break;
+                        }
+                        if (!returnValue && cacheEntryInfoBufferSizeInitial > cacheEntryInfoBufferSize)
+                        {
+                            cacheEntryInfoBufferSize = cacheEntryInfoBufferSizeInitial;
+                            cacheEntryInfoBuffer = Marshal.ReAllocHGlobal(cacheEntryInfoBuffer, (IntPtr)cacheEntryInfoBufferSize);
+                            returnValue = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                        }
+                    }
+
+                    //do
+                    //{
+                    //    INTERNET_CACHE_ENTRY_INFOA internetCacheEntry = (INTERNET_CACHE_ENTRY_INFOA)Marshal.PtrToStructure(cacheEntryInfoBuffer, typeof(INTERNET_CACHE_ENTRY_INFOA));
+                    //    cacheEntryInfoBufferSizeInitial = cacheEntryInfoBufferSize;
+
+                    //    string sourceUrlName = Marshal.PtrToStringAnsi(internetCacheEntry.lpszSourceUrlName);
+
+                    //    // if its any of the sharepoint and microsoftonline, delete it as its creating conflicts.
+                    //    foreach (string hostEntry in url)
+                    //    {
+                    //        LogManager.Info("sourceUrlName: " + sourceUrlName);
+                    //        if (sourceUrlName.ToLower().Contains(hostEntry))
+                    //        {
+                    //            DeleteUrlCacheEntry(internetCacheEntry.lpszSourceUrlName);
+                    //        }
+                    //    }
+
+
+                    //    more = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                    //    if (!more && Marshal.GetLastWin32Error() == ERROR_INSUFFICIENT_BUFFER)
+                    //    {
+                    //        cacheEntryInfoBufferSize = cacheEntryInfoBufferSizeInitial;
+                    //        cacheEntryInfoBuffer = Marshal.ReAllocHGlobal(cacheEntryInfoBuffer, (IntPtr)cacheEntryInfoBufferSize);
+                    //        more = FindNextUrlCacheEntry(enumHandle, cacheEntryInfoBuffer, ref cacheEntryInfoBufferSizeInitial);
+                    //    }
+                    //} while (more);
+
+                }
+                Marshal.FreeHGlobal(cacheEntryInfoBuffer);
+            }
+        }
+
         /// <summary>
         /// Set the cookies in IE to keep them persistant and used by drive mapper
         /// </summary>
@@ -464,6 +801,7 @@ namespace _365Drive.Office365.CloudConnector
                     return;
 
 
+
                 //as many times this method is called WITHOUT URL (Probably user is signing out before the tenancy name is get, it puts unnecessary errors in event. Lets handle it!
                 Uri host;
                 if (!String.IsNullOrEmpty(strUrl) && Uri.TryCreate(strUrl, UriKind.Absolute, out host))
@@ -481,6 +819,8 @@ namespace _365Drive.Office365.CloudConnector
                     InternetSetOption(0, 42, null, 0);
 
                     LogManager.Verbose("rtFA cookie setIE result: " + rtFAcookiesetresult);
+
+                    //  ClearIECache(strUrl);
 
                     if (!FedAuthcookiesetresult)
                     {
@@ -770,6 +1110,56 @@ namespace _365Drive.Office365.CloudConnector
         /// <summary>
         /// Incase of exit, we need to remove cookies so noone else can use it
         /// </summary>
+        public static void resetCookies()
+        {
+            try
+            {
+                if (!Utility.ready())
+                    return;
+
+
+                bool fRtn = false;
+                string strPath, strCookie;
+                StreamReader r;
+                int idx;
+
+                //string[] InterNetCache = System.IO.Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Cookies));
+                string[] fp = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Cookies), "*.txt");
+                foreach (string currentFile in fp)
+                {
+                    idx = -1;
+                    r = File.OpenText(currentFile);
+                    strCookie = r.ReadToEnd();
+                    r.Close();
+
+                    try
+                    {
+                        if (System.Text.RegularExpressions.Regex.IsMatch(strCookie, "microsoftonline.com") || System.Text.RegularExpressions.Regex.IsMatch(strCookie, "sharepoint.com"))
+                        {
+                            System.IO.File.Delete(currentFile);
+                        }
+                    }
+
+                    catch (Exception ex)
+                    {
+                    }
+                }
+
+                //ClearIECache("login.microsoftonline.com");
+                //ClearIECache("sharepoint.com");
+                //DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, "login.microsoftonline.com");
+                //DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, "sharepoint.com");
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+        }
+
+        /// <summary>
+        /// Incase of exit, we need to remove cookies so noone else can use it
+        /// </summary>
         public static void clearCookies()
         {
             try
@@ -777,8 +1167,29 @@ namespace _365Drive.Office365.CloudConnector
                 if (!Utility.ready())
                     return;
 
-                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, DriveManager.rootSiteUrl);
-                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, DriveManager.oneDriveHostSiteUrl);
+                string rootsiteUrl = string.Empty;
+                string mySitesiteUrl = string.Empty;
+                if (string.IsNullOrEmpty(DriveManager.rootSiteUrl))
+                {
+                    rootsiteUrl = RegistryManager.Get(RegistryKeys.RootSiteUrl);
+                    mySitesiteUrl = RegistryManager.Get(RegistryKeys.MySiteUrl);
+                }
+                else
+                {
+                    rootsiteUrl = DriveManager.rootSiteUrl;
+                    mySitesiteUrl = DriveManager.oneDriveHostSiteUrl;
+                }
+
+                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, rootsiteUrl);
+                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, mySitesiteUrl);
+                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, "https://login.microsoftonline.com");
+                DriveManager.deleteCookiesFromIE(string.Empty, string.Empty, "https://sharepoint.com");
+
+
+                //delete all other cookies and cache
+                string[] hosts = { "microsoftonline.com", "sharepoint.com" };
+                //ClearIECache(hosts);
+                ClearCache(hosts);
             }
             catch (Exception ex)
             {
