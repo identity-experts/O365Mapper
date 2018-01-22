@@ -25,6 +25,32 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
     {
         string currentUser;
 
+
+
+        /// <summary>
+        /// if its SSO, we dont need password column
+        /// </summary>
+        void EnableDisableSSO()
+        {
+
+            var bc = new BrushConverter();
+            if (ckSSO.IsChecked == true)
+            {
+                password.IsEnabled = false;
+
+                password.Background = (Brush)bc.ConvertFrom("#3e3e42");
+                //password.BorderBrush = (Brush)bc.ConvertFrom("#3e3e42");
+                lblPassword.Foreground = (Brush)bc.ConvertFrom("#3e3e42");
+            }
+            else
+            {
+                password.IsEnabled = true;
+                password.Background = (Brush)bc.ConvertFrom("#808080");
+                //password.BorderBrush = (Brush)bc.ConvertFrom("#3e3e42");
+                lblPassword.Foreground = (Brush)bc.ConvertFrom("#c1c1c1");
+            }
+        }
+
         public Authenticate()
         {
             InitializeComponent();
@@ -48,11 +74,13 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             //ShowPass.PreviewMouseUp += ShowPass_MouseUp;
 
 
-            ShowPass.AddHandler(UIElement.MouseDownEvent, new MouseButtonEventHandler(ShowPass_MouseDown), true);
+            // ShowPass.AddHandler(UIElement.MouseDownEvent, new MouseButtonEventHandler(ShowPass_MouseDown), true);
             //AddHandler(FrameworkElement.MouseDownEvent, new MouseButtonEventHandler(ShowPass_MouseUp), true);
 
             //set existing 
             setExistingCredentials();
+
+            //ckSSO.Checked += ckSSO_Checked;
 
             //Bring to front
             if (this.WindowState == WindowState.Minimized)
@@ -66,8 +94,11 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 logo.Source = LicenseManager.partnerLogoBM;
             }
 
+
+
             this.Activate();
         }
+
 
         private void ShowPass_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -126,7 +157,6 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
 
                 if (currentUser != newuser)
                 {
-
                     //To clear things, we fist need to signout existing user
                     SignOut.appSignOut();
                 }
@@ -135,12 +165,27 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 _365Drive.Office365.CredentialManager.SetCredentials(userName.Text, password.Password);
                 if (currentUser != newuser)
                 {
+                    //Reset SSO
+                    if (ckSSO.IsChecked == true)
+                    {
+                        RegistryManager.Set(RegistryKeys.AutoSSO, "1");
+                    }
+                    else
+                    {
+                        RegistryManager.Set(RegistryKeys.AutoSSO, "0");
+                    }
+
                     //set the password changed first time for the matter of MFA
                     _365Drive.Office365.CloudConnector.LicenseManager.hasPasswordChangedOrFirstTime = true;
+
+
 
                     //Notify the user that we will attempt the credentials shortly
                     CommunicationManager.Communications.queueNotification(Globalization.Globalization.SignInPageheader, Globalization.Globalization.CredentialsReceived);
                 }
+
+                //reset the SSO Counter to make a new beginning
+                _365Drive.Office365.CredentialManager.ResetSSOCounter();
 
                 SignInprogress.Visibility = Visibility.Hidden;
                 this.Close();
@@ -150,6 +195,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 //this.DialogResult = false;
             }
         }
+
 
         /// <summary>
         /// Fetch current credentials 
@@ -162,6 +208,42 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 this.userName.Text = currentCreds.UserName;
                 this.password.Password = currentCreds.Password;
             }
+
+            var creds = _365Drive.Office365.CredentialManager.GetCredential();
+
+            if (creds != null && !String.IsNullOrEmpty(creds.UserName))
+            {
+                Task<bool> run = Task.Run(() => DriveManager.isAllowedSSOFedType(creds.UserName));
+                run.Wait();
+
+                if (run.Result)
+                {
+                    ckSSO.Visibility = Visibility.Visible;
+                    helpIcon.Visibility = Visibility.Visible;
+                    //tick / untick SSO checkbox
+                    string autoSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
+                    if (!string.IsNullOrEmpty(autoSSO) && Convert.ToString(autoSSO) != "0")
+                    {
+                        ckSSO.IsChecked = true;
+                    }
+                    //enable / disable password as per SSO selection
+                    EnableDisableSSO();
+
+                }
+                else
+                {
+                    ckSSO.Visibility = Visibility.Hidden;
+                    helpIcon.Visibility = Visibility.Hidden;
+                }
+            }
+            else
+            {
+                ckSSO.Visibility = Visibility.Hidden;
+                helpIcon.Visibility = Visibility.Hidden;
+            }
+
+
+
 
             //set current username and password to local variable
             currentUser = (this.userName.Text + ";!" + this.password.Password).ToLower();
@@ -203,6 +285,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         bool ValidateEmailandPassword(bool bottonclick)
         {
             LogManager.Verbose("validating username and password");
+            string autoSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
 
             //email validation
             bool result = ValidatorExtensions.IsValidEmailAddress(userName.Text);
@@ -221,15 +304,20 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
 
             if (bottonclick)
             {
-                //password validation
-                if (string.IsNullOrEmpty(password.Password))
+                //incase of SSO, password will be blank so dont validate it.
+                //if (!(string.IsNullOrEmpty(autoSSO) && Convert.ToString(autoSSO) != "0"))
+                if (ckSSO.IsChecked != true)
                 {
-                    result = false;
-                    validationSummary.Text += Environment.NewLine + Globalization.Globalization.passwordcannotbeblank;
-                }
-                else
-                {
-                    //validationSummary.Content += string.Empty;
+                    //password validation
+                    if (string.IsNullOrEmpty(password.Password))
+                    {
+                        result = false;
+                        validationSummary.Text += Environment.NewLine + Globalization.Globalization.passwordcannotbeblank;
+                    }
+                    else
+                    {
+                        //validationSummary.Content += string.Empty;
+                    }
                 }
             }
             LogManager.Verbose("credential validation result: " + result.ToString());
@@ -256,6 +344,18 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
         private void password_TextInput(object sender, TextCompositionEventArgs e)
         {
             ValidateEmailandPassword(false);
+        }
+
+
+        /// <summary>
+        /// If its enabled, we dont need password!
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ckSSO_Checked(object sender, RoutedEventArgs e)
+        {
+            //enable / disable password as per SSO selection
+            EnableDisableSSO();
         }
     }
 }

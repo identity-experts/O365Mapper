@@ -136,6 +136,12 @@ namespace _365Drive.Office365.CloudConnector
         /// </summary>
         public static DateTime? lastLicenseChecked { get; set; }
 
+
+        /// <summary>
+        /// Last concent Asked
+        /// </summary>
+        public static DateTime? lastConsentGranted { get; set; }
+
         public static bool licenseCheckTimeNow
         {
             get
@@ -171,12 +177,31 @@ namespace _365Drive.Office365.CloudConnector
             {
                 bool consentRequired = true;
 
+                bool consentTimedOut = false;
+                if (lastConsentGranted != null)
+                {
+                    TimeSpan diff = DateTime.Now - Convert.ToDateTime(lastConsentGranted);
+                    double hours = diff.TotalHours;
+                    if (hours >= Constants.ConsentGrantLimit)
+                    {
+                        consentTimedOut = true;
+                    }
+                }
+                else
+                {
+                    consentTimedOut = true;
+                }
                 //if this is first time user typed in credential, they would deffo expect the MFA so no need for user consent. And finally set it off.
                 if (hasPasswordChangedOrFirstTime)
                 {
                     consentRequired = false;
                     hasPasswordChangedOrFirstTime = false;
                 }
+                else if(!consentTimedOut)
+                {
+                    consentRequired = false;
+                }
+
                 //if during tenancy name fetching user has already said yes, there is NO need to ask for it again in cookies get. However set it off next time.
                 if (MFAConsent)
                 {
@@ -186,6 +211,8 @@ namespace _365Drive.Office365.CloudConnector
                 return consentRequired;
             }
         }
+
+
 
         public static LicenseValidationState? lastLicenseState
         {
@@ -564,7 +591,7 @@ namespace _365Drive.Office365.CloudConnector
 
                             if (!string.IsNullOrEmpty(_365DriveTenancyURL.exceptionDomain(strUser)))
                             {
-                                if(_365DriveTenancyURL.exceptionDomain(strUser).ToLower() == "sharepoint.onmicrosoft.com")
+                                if (_365DriveTenancyURL.exceptionDomain(strUser).ToLower() == "sharepoint.onmicrosoft.com")
                                 {
                                     LogManager.Verbose("Adding default microsoft drives (hard coded)");
                                     DriveManager.addDrive("I", "India Learning", "https://microsoft.sharepoint.com/sites/infopedia/indialearning/Documents");
@@ -572,7 +599,7 @@ namespace _365Drive.Office365.CloudConnector
                                     DriveManager.addDrive("M", "MSW", "https://microsoft.sharepoint.com/sites/msw/documents");
                                     DriveManager.addDrive("N", "Dining", "https://microsoft.sharepoint.com/sites/refweb/na/Redmond/dining/Documents");
                                     DriveManager.addDrive("H", "Sharepoint Hosting Options", "https://microsoft.sharepoint.com/sites/SharePoint/Documents");
-                                    
+
                                     DriveManager.addDrive("O", "OneDrive for Business", string.Empty, driveType.OneDrive);
 
                                 }

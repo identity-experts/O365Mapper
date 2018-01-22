@@ -6,18 +6,18 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
                   mc:Ignorable="d" 
-                  d:DesignHeight="300" d:DesignWidth="300"
-                  Title="{x:Static p:Globalization.SignInPageheader}" Width="400px" >
+                  d:DesignHeight="300" d:DesignWidth="400"
+                  Title="{x:Static p:Globalization.SignInPageheader}" Width="500px" >
 
     <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
 
-    <Grid Width="400px">
+    <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type Image}">
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="125" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -28,12 +28,21 @@
             <RowDefinition Height="Auto"  />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Name="logo"  Grid.RowSpan="3" Grid.Column="0" Source="../images/3mxs.png" Width="110" Height="111" />
+        <Image Name="logo" Grid.RowSpan="6" Grid.Column="0" VerticalAlignment="Center" Source="../images/3mxs.png" Width="110" Height="111" />
         <Label Content="{x:Static p:Globalization.credential_signinname}" Grid.Row="0" Grid.Column="1"  />
-        <TextBox Grid.Row="1" Name="userName" Grid.Column="1" TextChanged="userName_TextChanged" Width="280px" Height="30px" />
-        <Label Grid.Row="2" Content="{x:Static p:Globalization.credential_password}" Grid.Column="1" />
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" >
+            <TextBox Name="userName"  TextChanged="userName_TextChanged" Width="280px" Height="30px" />
+            <CheckBox Name="ckSSO" Margin="10" Content="{x:Static p:Globalization.SSO}" Click="ckSSO_Checked"></CheckBox>
+            <Image Name="helpIcon" VerticalAlignment="Center" Source="../images/help.png"  >
+                <Image.ToolTip>
+                    <ToolTip Content="{x:Static p:Globalization.SSOHelp}"
+                     />
+                </Image.ToolTip>
+            </Image>
+        </StackPanel>
+        <Label Grid.Row="2" Name="lblPassword" Content="{x:Static p:Globalization.credential_password}" Grid.Column="1" />
         <!--<TextBox Grid.Row="2" Name="password" Grid.Column="1" Margin="0,0,0,10" TextChanged="password_TextChanged"  />-->
-        <PasswordBox Grid.Row="3" Name="password" Grid.Column="1" PasswordChar="*" TextInput="password_TextInput" Height="30px" 
+        <PasswordBox Grid.Row="3" Name="password" Grid.Column="1" HorizontalAlignment="Left" PasswordChar="*" Width="280px" TextInput="password_TextInput" Height="30px" 
                       />
         <TextBox x:Name="MyTextBox" Grid.Row="3" Height="30px" Grid.Column="1" Visibility="Collapsed" />
         <!--<CheckBox x:Name="ShowPasswordCharsCheckBox"  Grid.Row="4" Grid.Column="1" Content="Show password" Checked="ShowPasswordCharsCheckBox_Checked" 

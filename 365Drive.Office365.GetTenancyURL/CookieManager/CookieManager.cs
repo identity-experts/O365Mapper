@@ -117,6 +117,10 @@ namespace _365Drive.Office365.GetTenancyURL
                         catch { }
                     }
                 });
+                if(userConsent)
+                {
+                    LicenseManager.lastConsentGranted = DateTime.Now;
+                }
                 return userConsent;
             }
             else

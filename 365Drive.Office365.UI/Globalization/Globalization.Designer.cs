@@ -313,6 +313,15 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatic Single sign-on (SSO) failed, retrying....
+        /// </summary>
+        public static string InformAutoSSORetry {
+            get {
+                return ResourceManager.GetString("InformAutoSSORetry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Intializing 365mapper.
         /// </summary>
         public static string Initializing {
@@ -570,6 +579,24 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string SMSReceivedMesSage {
             get {
                 return ResourceManager.GetString("SMSReceivedMesSage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SSO.
+        /// </summary>
+        public static string SSO {
+            get {
+                return ResourceManager.GetString("SSO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you keep it enabled without changing username, we will try SSO again..
+        /// </summary>
+        public static string SSOHelp {
+            get {
+                return ResourceManager.GetString("SSOHelp", resourceCulture);
             }
         }
         

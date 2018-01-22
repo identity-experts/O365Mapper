@@ -329,4 +329,13 @@
   <data name="PleaseWait" xml:space="preserve">
     <value>Please wait...</value>
   </data>
+  <data name="SSO" xml:space="preserve">
+    <value>SSO</value>
+  </data>
+  <data name="InformAutoSSORetry" xml:space="preserve">
+    <value>Automatic Single sign-on (SSO) failed, retrying...</value>
+  </data>
+  <data name="SSOHelp" xml:space="preserve">
+    <value>If you keep it enabled without changing username, we will try SSO again.</value>
+  </data>
 </root>

@@ -48,6 +48,9 @@ namespace _365Drive.Office365
         static bool busy = false;
         static int busyCounter = 0;
 
+
+
+
         public Core()
         {
             //this.NotificationManager = new Notifications(notifyIcon);
@@ -61,6 +64,16 @@ namespace _365Drive.Office365
         {
             try
             {
+                //initialize icon timer
+                iconTimer = new DispatcherTimer();
+
+                //starting animation
+                Animation.animatedIcontimer = iconTimer;
+                Animation.notifyIcon = notifyIcon;
+
+                ///start the inprogress
+                Animation.Animate(AnimationTheme.Inprogress);
+
                 //If the internet is not there, its exiting from here without notification which is creating confusion
                 //if (!Utility.ready())
                 //    return;
@@ -73,8 +86,7 @@ namespace _365Drive.Office365
                 dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
 
-                //initialize icon timer
-                iconTimer = new DispatcherTimer();
+
                 currentDispatcher = Dispatcher.CurrentDispatcher;
 
                 //initiate notification timer
@@ -83,6 +95,8 @@ namespace _365Drive.Office365
 
                 //set the static variable to this
                 coreInstance = this;
+
+
 
             }
             catch (Exception ex)
@@ -223,6 +237,10 @@ namespace _365Drive.Office365
                 LogManager.Verbose("Registering power mode change event to make sure the system is not in resume mode");
                 SystemEvents.PowerModeChanged += EnsurePowerMode;
 
+
+                //Write version number to registry
+                WriteVersionToRegistry();
+
                 string dontAskForUpdates = RegistryManager.Get(RegistryKeys.DontAskForUpdates);
                 if (dontAskForUpdates != "1")
                 {
@@ -258,6 +276,25 @@ namespace _365Drive.Office365
                 bw.RunWorkerAsync();
             }
             catch { }
+        }
+
+
+        /// <summary>
+        /// write version number to registry
+        /// </summary>
+        void WriteVersionToRegistry()
+        {
+            try
+            {
+                string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                //put the version number to registry 
+                RegistryManager.Set(RegistryKeys.Version, currentVersion);
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
         }
 
         void CheckForUpdates()
@@ -343,17 +380,14 @@ namespace _365Drive.Office365
 
             try
             {
+                //if incase SSO fails, the execution will restart form here
                 start:
-                //starting animation
-                Animation.animatedIcontimer = iconTimer;
-                Animation.notifyIcon = notifyIcon;
 
                 //first stop animation to clear all previous steps
                 Animation.Stop();
 
                 ///start the inprogress
                 Animation.Animate(AnimationTheme.Inprogress);
-
 
                 #region Ensuring Internet
                 currentDispatcher.Invoke(() =>
@@ -476,7 +510,6 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
-
                 #region Ensuring SSO authentication type
                 //Mare sure the user authentication type is supported
                 LogManager.Verbose("Checking, if we have SSO and the auth type is allowed for SSO");
@@ -505,27 +538,38 @@ namespace _365Drive.Office365
                 LicenseValidationState tenancyNameState = DriveMapper.retrieveTenancyName(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 if (tenancyNameState == LicenseValidationState.LoginFailed)
                 {
-                    //lets make sure if we have autoSSO ON, lets make it off
-                    bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
+                    //lets make inform our engine that SSO failed
+                    bool blwasAutoSSOOn = CredentialManager.isItSSOTry();
+                    bool blRetryAgain = false;
+                    if (blwasAutoSSOOn)
+                    {
+                        SSOFailed();
+                        int iPendingRetries = CredentialManager.SSOPendingRetries();
+                        blRetryAgain = iPendingRetries > 0;
+                    }
 
                     currentDispatcher.Invoke(() =>
                     {
-                        if (blwasAutoSSOOn)
+                        if (blwasAutoSSOOn && blRetryAgain)
+                            Communications.updateStatus(Globalization.InformAutoSSORetry);
+                        else if(blwasAutoSSOOn && !blRetryAgain)
+                        {
                             Communications.updateStatus(Globalization.InformAutoSSOFailed);
+                        }
                         else
                             Communications.updateStatus(Globalization.LoginFailed);
                     });
                     LogManager.Verbose("credentials not valid or app isnt registered");
 
                     ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn)
+                    if (!blwasAutoSSOOn && !blRetryAgain)
                         NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                     //reset the current state
                     Communications.CurrentState = States.UserAction;
                     Animation.Stop();
 
                     ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn)
+                    if (!blwasAutoSSOOn && !blRetryAgain)
                         Animation.Animate(AnimationTheme.Warning);
                     busy = false;
                     return;
@@ -568,8 +612,6 @@ namespace _365Drive.Office365
                 }
                 #endregion;
 
-
-
                 #region getting cookies (used to setting in IE and authenticating for licensing)
                 //Get fedauth and rtfa cookies
                 LogManager.Verbose("getting cookies manager");
@@ -601,24 +643,40 @@ namespace _365Drive.Office365
                     }
                     else
                     {
+
+
+                        //lets make inform our engine that SSO failed
+                        bool blwasAutoSSOOn = CredentialManager.isItSSOTry();
+                        bool blRetryAgain = false;
+                        if (blwasAutoSSOOn)
+                        {
+                            SSOFailed();
+                            int iPendingRetries = CredentialManager.SSOPendingRetries();
+                            blRetryAgain = iPendingRetries > 0;
+                        }
+
                         DriveManager.StopClearCache = true;
                         //lets make sure if we have autoSSO ON, lets make it off
-                        bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
+                        //bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
 
                         currentDispatcher.Invoke(() =>
                         {
-                            if (blwasAutoSSOOn)
+                            if (blwasAutoSSOOn && blRetryAgain)
+                                Communications.updateStatus(Globalization.InformAutoSSORetry);
+                            else if (blwasAutoSSOOn && !blRetryAgain)
+                            {
                                 Communications.updateStatus(Globalization.InformAutoSSOFailed);
+                            }
                             else
                                 Communications.updateStatus(Globalization.LoginFailed);
                         });
                         LogManager.Verbose("credentials not valid or app isnt registered");
-                        if (!blwasAutoSSOOn)
+                        if (!blwasAutoSSOOn && !blRetryAgain)
                             NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
                         //reset the current state
                         Communications.CurrentState = States.UserAction;
                         Animation.Stop();
-                        if (!blwasAutoSSOOn)
+                        if (!blwasAutoSSOOn && !blRetryAgain)
                             Animation.Animate(AnimationTheme.Warning);
                         busy = false;
                         return;
@@ -676,20 +734,31 @@ namespace _365Drive.Office365
                 }
                 else if (licenseValidationState == LicenseValidationState.LoginFailed)
                 {
-                    //lets make sure if we have autoSSO ON, lets make it off
-                    bool blwasAutoSSOOn = CredentialManager.disableAutoSSO();
+                    //lets make inform our engine that SSO failed
+                    bool blwasAutoSSOOn = CredentialManager.isItSSOTry();
+                    bool blRetryAgain = false;
+                    if (blwasAutoSSOOn)
+                    {
+                        SSOFailed();
+                        int iPendingRetries = CredentialManager.SSOPendingRetries();
+                        blRetryAgain = iPendingRetries > 0;
+                    }
 
                     currentDispatcher.Invoke(() =>
                     {
-                        if (blwasAutoSSOOn)
+                        if (blwasAutoSSOOn && blRetryAgain)
+                            Communications.updateStatus(Globalization.InformAutoSSORetry);
+                        else if (blwasAutoSSOOn && !blRetryAgain)
+                        {
                             Communications.updateStatus(Globalization.InformAutoSSOFailed);
+                        }
                         else
                             Communications.updateStatus(Globalization.LoginFailed);
                     });
                     LogManager.Verbose("credentials not valid or app isnt registered");
 
                     ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn)
+                    if (!blwasAutoSSOOn && !blRetryAgain)
                         NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
 
                     //reset the current state
@@ -697,7 +766,7 @@ namespace _365Drive.Office365
                     Animation.Stop();
 
                     ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn)
+                    if (!blwasAutoSSOOn && !blRetryAgain)
                         Animation.Animate(AnimationTheme.Warning);
                     busy = false;
                     return;
@@ -745,7 +814,6 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
-
                 #region setting cookies to IE (already retrieved above)
 
 
@@ -758,7 +826,7 @@ namespace _365Drive.Office365
                 DriveManager.setCookiestoIE(fedAuth, rtFA, DriveManager.oneDriveHostSiteUrl);
                 #endregion
 
-                //IPUT
+                #region IPUT SPECIFIC
                 DriveManager.setCookiestoIE(fedAuth, rtFA, "https://sharepoint.com");
                 try
                 {
@@ -775,6 +843,9 @@ namespace _365Drive.Office365
                     LogManager.Error(ex.Message);
                     LogManager.Error(ex.StackTrace);
                 }
+
+                #endregion
+
                 #region Getting mappable drive details
                 LogManager.Verbose("Trying to get all drive details");
                 //get drive details
@@ -810,7 +881,6 @@ namespace _365Drive.Office365
                 });
                 #endregion
 
-
                 Animation.Stop();
                 busy = false;
             }
@@ -819,10 +889,22 @@ namespace _365Drive.Office365
                 Animation.Stop();
                 busy = false;
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
-                LogManager.Exception(method, ex);
+
+                //LogManager.Exception(method, ex);
+                LogManager.Exception(method + " UNEXPECTED ERROR FROM CORE :(", ex);
             }
         }
 
+
+
+
+        /// <summary>
+        /// SSO failed which means increase SSO counter and do all other tasks
+        /// </summary>
+        static void SSOFailed()
+        {
+            CredentialManager.ssoCounter++;
+        }
 
         /// <summary>
         /// If user prompts for later in MFA, enable menu item now

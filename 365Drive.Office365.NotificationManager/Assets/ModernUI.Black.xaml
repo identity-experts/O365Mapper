@@ -19,4 +19,24 @@
             </LinearGradientBrush>
         </Rectangle.Fill>
     </Rectangle>
+
+    <Style x:Key="TextBoxStyleToApply" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" >
+        <!--Extend the aero style here-->
+        <Setter Property="Background" Value="#797379"></Setter>
+    </Style>
+
+    <Style x:Key="PasswordBoxStyleToApply" TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}" >
+        <!--Extend the aero style here-->
+        <Setter Property="Background" Value="#797379"></Setter>
+    </Style>
+
+
+    <Style x:Key="CheckBoxStyleToApply" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}" >
+        <!--Extend the aero style here-->
+        <Setter Property="Background" Value="#797379"></Setter>
+    </Style>
+
+    <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxStyleToApply}"/>
+    <Style TargetType="PasswordBox" BasedOn="{StaticResource PasswordBoxStyleToApply}"/>
+    <Style TargetType="CheckBox" BasedOn="{StaticResource CheckBoxStyleToApply}"/>
 </ResourceDictionary>
