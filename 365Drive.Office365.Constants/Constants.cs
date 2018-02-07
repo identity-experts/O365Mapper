@@ -50,9 +50,14 @@ namespace _365Drive.Office365
         public const int licenseCheckInterval = 120;
         public const int localLicenseCheckLimit = 24;
         public const int localDriveFetchLimit = 24;
+        public const int ConsentGrantLimit = 10;
         #endregion
 
         //cookie expiry
-        public const int AuthcookieExpiryHours = 10;
+        public const int AuthcookieExpiryHours = 24;
+
+        ///SSO retries
+        public const int SSOFirstTimeRetry = 2;
+        public const int SSORetry = 5;
     }
 }

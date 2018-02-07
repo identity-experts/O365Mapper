@@ -68,6 +68,34 @@ namespace _365Drive.Office365
 
         public const string _credentialStoreName = "365drive.credential";
 
+        /// <summary>
+        /// the counter for SSO retries
+        /// </summary>
+        public static int ssoCounter = 0;
+
+        // is it SSO
+        public static bool isItSSOTry()
+        {
+            bool isAutoSSOEnabled = false;
+            try
+            {
+                string autoSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
+                if (autoSSO == "1")
+                {
+                    isAutoSSOEnabled = true;
+                }
+                else
+                {
+                    isAutoSSOEnabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
+                LogManager.Exception(method, ex);
+            }
+            return isAutoSSOEnabled;
+        }
 
         /// <summary>
         /// since autoSSO failed, we will ahve to make sure it doesnts keep trying all times so lets set registry to indicate that its failed :(
@@ -85,7 +113,7 @@ namespace _365Drive.Office365
 
                     ///We need to undo EVERTHING and set AutoSSO to 0 which means dont try SSO here now for this user..
                     RegistryManager.Set(RegistryKeys.AutoSSO, "0");
-                    RegistryManager.Set(RegistryKeys.SSO, "0");
+                    //RegistryManager.Set(RegistryKeys.SSO, "0");
                     RemoveCredentials();
                 }
             }
@@ -99,6 +127,13 @@ namespace _365Drive.Office365
 
 
 
+        /// <summary>
+        /// reset the SSO counter to make a new beginning!
+        /// </summary>
+        public static void ResetSSOCounter()
+        {
+            ssoCounter = 0;
+        }
 
         /// <summary>
         /// Make sure if the credential exist, set them
@@ -110,7 +145,6 @@ namespace _365Drive.Office365
             try
             {
                 Cred currentCreds = GetCredential();
-
 
                 // if there is already a username password, no need to overwrite it. Lets respect user pref..
                 if (currentCreds != null && !String.IsNullOrEmpty(currentCreds.UserName) && !string.IsNullOrEmpty(currentCreds.Password))
@@ -126,9 +160,13 @@ namespace _365Drive.Office365
                     if (isMachineDomainJoined)
                     {
 
+                        //set the credentials as current user UPN
+                        string UPN = System.DirectoryServices.AccountManagement.UserPrincipal.Current.UserPrincipalName;
+                        SetCredentials(UPN, string.Empty);
+
                         //found out that machine is domain joined so lets attempt auto sso - fingers crossed
                         LogManager.Info("Attempting auto SSO");
-                        RegistryManager.Set(RegistryKeys.SSO, "1");
+                        //RegistryManager.Set(RegistryKeys.SSO, "1");
                         RegistryManager.Set(RegistryKeys.AutoSSO, "1");
                     }
                 }
@@ -136,15 +174,33 @@ namespace _365Drive.Office365
 
                 //If there is an SSO setting, we need to fetch it and ignore the credential check
                 LogManager.Info("Ensuring SSO");
-                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
-                LogManager.Info("SSO Value: " + isSSO);
+                //string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+
+                //lets make inform our engine that SSO failed
+                bool blwasAutoSSOOn = CredentialManager.isItSSOTry();
+                bool blRetryAgain = false;
+                if (blwasAutoSSOOn)
+                {
+                    int iPendingRetries = CredentialManager.SSOPendingRetries();
+                    blRetryAgain = iPendingRetries > 0;
+                }
+
+
+                LogManager.Info("SSO retry ON: " + blRetryAgain.ToString());
                 //If its 1, ignore rest of credential checks
-                if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
+                if (blwasAutoSSOOn && blRetryAgain)
                 {
                     state = CredentialState.Present;
-                    //set the credentials as current user UPN
-                    string UPN = System.DirectoryServices.AccountManagement.UserPrincipal.Current.UserPrincipalName;
-                    SetCredentials(UPN, string.Empty);
+                    if (currentCreds == null || String.IsNullOrEmpty(currentCreds.UserName))
+                    {
+                        //set the credentials as current user UPN
+                        string UPN = System.DirectoryServices.AccountManagement.UserPrincipal.Current.UserPrincipalName;
+                        SetCredentials(UPN, string.Empty);
+                    }
+                }
+                else if (blwasAutoSSOOn && !blRetryAgain)
+                {
+                    state = CredentialState.Notpresent;
                 }
                 else if (GetCredential() == null)
                 {
@@ -168,6 +224,26 @@ namespace _365Drive.Office365
             return state;
         }
 
+
+        /// <summary>
+        /// If its first time attempt (VERY first - i.e. we cant find the last license check details)
+        /// </summary>
+        public static int SSOPendingRetries()
+        {
+            string lastLicenseChecked = RegistryManager.Get(RegistryKeys.LastLicenseChecked);
+            int retryPendings = 0;
+            //if its blank / null which means its a first attempt
+            if (string.IsNullOrEmpty(lastLicenseChecked))
+            {
+                retryPendings = Constants.SSOFirstTimeRetry - CredentialManager.ssoCounter;
+            }
+            else
+            {
+                retryPendings = Constants.SSORetry - CredentialManager.ssoCounter;
+            }
+
+            return retryPendings;
+        }
 
         public static Cred GetCredential()
         {

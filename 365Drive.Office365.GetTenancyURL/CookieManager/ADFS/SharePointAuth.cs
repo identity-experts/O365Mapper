@@ -215,7 +215,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
 
                 //is SSO
-                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+                string isSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
 
                 CQ adfsPostResponse = null;
                 //if SSO, then do different set of calls

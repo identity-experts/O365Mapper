@@ -231,7 +231,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 LogManager.Verbose("Call 1 finished. output: ctx=" + Authorizectx + " flow=" + Authorizeflowtoken + " cookie count: " + authorizeCookies.Count.ToString());
 
                 //is SSO
-                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+                string isSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
 
                 //if SSO, Its a shortcut, lets try it and try to finish from here
                 if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")

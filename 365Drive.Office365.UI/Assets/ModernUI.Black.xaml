@@ -19,4 +19,8 @@
             </LinearGradientBrush>
         </Rectangle.Fill>
     </Rectangle>
+
+    <!-- custom textbox style-->
+    
+
 </ResourceDictionary>

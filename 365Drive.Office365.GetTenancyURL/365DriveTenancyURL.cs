@@ -765,6 +765,7 @@ namespace _365Drive.Office365.CloudConnector
 
                             if (userConsent)
                             {
+                                LicenseManager.lastConsentGranted = DateTime.Now;
                                 LicenseManager.MFAConsent = true;
                             }
                         }
@@ -786,6 +787,7 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static string aadConnectTenancy(string upn, string password)
         {
+
             string tenancyUniqueName = string.Empty;
             try
             {
@@ -877,7 +879,7 @@ namespace _365Drive.Office365.CloudConnector
 
 
                 //is SSO
-                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+                string isSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
 
                 //if SSO, Its a shortcut, lets try it and try to finish from here
                 if (!string.IsNullOrEmpty(isSSO) && isSSO == "1")
@@ -1253,7 +1255,7 @@ namespace _365Drive.Office365.CloudConnector
                 CQ adfsPostResponse = null;
                 string rst = string.Empty;
                 //is SSO
-                string isSSO = RegistryManager.Get(RegistryKeys.SSO);
+                string isSSO = RegistryManager.Get(RegistryKeys.AutoSSO);
 
 
                 //if SSO, then do different set of calls

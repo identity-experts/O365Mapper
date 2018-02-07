@@ -25,7 +25,8 @@ namespace _365Drive.Office365
         PartnerLogo = 6,
         SSO = 7,
         AutoSSO = 8,
-        DontAskForUpdates = 9
+        DontAskForUpdates = 9,
+        Version = 10
     }
 
 
@@ -165,7 +166,7 @@ namespace _365Drive.Office365
             Set(RegistryKeys.MySiteUrl, string.Empty);
             Set(RegistryKeys.LastLicenseChecked, string.Empty);
             Set(RegistryKeys.PartnerLogo, string.Empty);
-            Set(RegistryKeys.SSO, string.Empty);
+            //Set(RegistryKeys.SSO, string.Empty);
             Set(RegistryKeys.AutoSSO, string.Empty);
         }
 
