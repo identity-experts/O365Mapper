@@ -246,9 +246,40 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 else
                 {
                     //post to ADFS now
-                    string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
-                    Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
-                    adfsloginPostBodyResult.Wait();
+                    //string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
+                    //Task<string> adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                    //adfsloginPostBodyResult.Wait();
+
+
+                    //Lets first try to do a get on the given ADFS URL to see any other service is not in use
+                    Task<HttpResponseMessage> adfsloginGetResult = HttpClientHelper.GetAsyncFullResponse(strADFSPostUrl, AuthrequestCookies);
+                    adfsloginGetResult.Wait();
+
+                    Task<string> adfsloginPostBodyResult = null;
+                    IEnumerable<string> ServerValues = null;
+                    if (adfsloginGetResult.Result.Headers.TryGetValues("Server", out ServerValues) && ServerValues.FirstOrDefault().ToLower() == Constants.bigIP)
+                    {
+                        var redirectUri = adfsloginGetResult.Result.RequestMessage.RequestUri.ToString();
+                        NameValueCollection bigIPPostHeader = new NameValueCollection();
+                        bigIPPostHeader.Add("Accept", "text/html, application/xhtml+xml, image/jxr, */*");
+                        bigIPPostHeader.Add("Referer", redirectUri);
+                        bigIPPostHeader.Add("User-Agent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; WOW64; Trident/7.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729)");
+
+                        var bigIPPostBody = string.Format(Constants.bigIPPostBody, username, password);
+                        Task<HttpResponseMessage> adfsloginFullPostBodyResult = HttpClientHelper.PostAsyncFullResponse(redirectUri, bigIPPostBody, "application/x-www-form-urlencoded", AuthrequestCookies, bigIPPostHeader);
+                        adfsloginFullPostBodyResult.Wait();
+
+                        var ADFSPostUrl = adfsloginFullPostBodyResult.Result.RequestMessage.RequestUri.ToString() + Constants.bigIPRequestParameter;
+                        string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, Constants.bigIPSSOPassword);
+                        adfsloginPostBodyResult = HttpClientHelper.PostAsync(ADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                        adfsloginPostBodyResult.Wait();
+                    }
+                    else
+                    {
+                        string adfsPostBody = string.Format(StringConstants.AdfsPostBody, username, password);
+                        adfsloginPostBodyResult = HttpClientHelper.PostAsync(strADFSPostUrl, adfsPostBody, "application/x-www-form-urlencoded", AuthrequestCookies);
+                        adfsloginPostBodyResult.Wait();
+                    }
 
                     //retrieving rst
                     adfsPostResponse = CQ.Create(adfsloginPostBodyResult.Result);

@@ -59,5 +59,11 @@ namespace _365Drive.Office365
         ///SSO retries
         public const int SSOFirstTimeRetry = 2;
         public const int SSORetry = 5;
+
+        //BigIP related values
+        public const string bigIP = "bigip";
+        public const string bigIPSSOPassword = "f5-sso-token";
+        public const string bigIPRequestParameter = "&f5-sso-form=adfs_ls_endpoint_form";
+        public const string bigIPPostBody = "username={0}&password={1}&vhost=standard";
     }
 }

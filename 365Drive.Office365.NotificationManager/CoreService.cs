@@ -413,7 +413,10 @@ namespace _365Drive.Office365
                 {
                     Communications.updateStatus(Globalization.EnsuringwebClient);
                 });
-                if (!Utility.webClientServiceRunning())
+
+                //Only until we do development on IDE-MSS-01 as its OS doesnt allow WebClient
+                //if (!Utility.webClientServiceRunning())
+                if(false)
                 {
                     currentDispatcher.Invoke(() =>
                     {
