@@ -277,6 +277,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 string licenseUserMappingResult = call1Result.Result;
 
+
                 LicenseUserMappingResult userLicenseMapresult = JsonConvert.DeserializeObject<LicenseUserMappingResult>(licenseUserMappingResult);
 
                 ///set the last checked time 

@@ -415,8 +415,8 @@ namespace _365Drive.Office365
                 });
 
                 //Only until we do development on IDE-MSS-01 as its OS doesnt allow WebClient
-                //if (!Utility.webClientServiceRunning())
-                if(false)
+                if (!Utility.webClientServiceRunning())
+                // if(false)
                 {
                     currentDispatcher.Invoke(() =>
                     {
@@ -555,7 +555,7 @@ namespace _365Drive.Office365
                     {
                         if (blwasAutoSSOOn && blRetryAgain)
                             Communications.updateStatus(Globalization.InformAutoSSORetry);
-                        else if(blwasAutoSSOOn && !blRetryAgain)
+                        else if (blwasAutoSSOOn && !blRetryAgain)
                         {
                             Communications.updateStatus(Globalization.InformAutoSSOFailed);
                         }
@@ -894,7 +894,7 @@ namespace _365Drive.Office365
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
 
                 //LogManager.Exception(method, ex);
-                LogManager.Exception(method + " UNEXPECTED ERROR FROM CORE :(", ex);
+                LogManager.Exception(method + " UNEXPECTED ERROR FROM CODE :(", ex);
             }
         }
 

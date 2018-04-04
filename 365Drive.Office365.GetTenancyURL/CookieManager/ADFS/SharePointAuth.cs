@@ -157,7 +157,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
 
                 //get the ctx which is RST
                 string ADFSMScall1CTX = string.Empty;
-                
+
                 msPostConfig = _365DriveTenancyURL.renderConfig(ADFSMSCall1Result.Result);
                 ADFSMScall1CTX = msPostConfig.sCtx;
                 //flowToken = msPostConfig.sFT;
@@ -180,7 +180,7 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 //call1Result.Wait();
 
 
-               // authorizeCall = call1Result.Result;
+                // authorizeCall = call1Result.Result;
 
                 ///Fetch the ctx and flow token and canary
                 //CQ htmlparser = CQ.Create(authorizeCall);
