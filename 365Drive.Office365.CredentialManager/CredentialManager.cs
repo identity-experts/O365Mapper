@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -262,7 +263,8 @@ namespace _365Drive.Office365
                 LogManager.Exception(method, ex);
             }
             //Cred is just a class with two string properties for user and pass
-            return new Cred(cm.Username, cm.Password);
+            // Send the password in encode format to handle & and ? which are considered differently in URL
+            return new Cred(cm.Username, WebUtility.UrlEncode(cm.Password));
         }
 
         public static bool SetCredentials(
