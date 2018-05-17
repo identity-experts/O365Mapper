@@ -380,8 +380,8 @@ namespace _365Drive.Office365
 
             try
             {
-                //if incase SSO fails, the execution will restart form here
-                start:
+            //if incase SSO fails, the execution will restart form here
+            start:
 
                 //first stop animation to clear all previous steps
                 Animation.Stop();
@@ -916,24 +916,28 @@ namespace _365Drive.Office365
         {
             System.Windows.Controls.ContextMenu ctxMenu = (System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu");
             System.Windows.Controls.ItemCollection items = ctxMenu.Items;
+            bool alreadyExist = false;
 
-            //foreach (var item in items)
-            //{
-            //    if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
-            //    {
-            //        // do your work with the item 
-            //        if (((System.Windows.Controls.MenuItem)item).Name == "MFA")
-            //        {
+            // make sure it should not be exist already
+            foreach (System.Windows.Controls.MenuItem currentItem in items)
+            {
+                if (currentItem.Name.ToLower() == "mfa")
+                {
+                    alreadyExist = true;
+                    break;
+                }
+            }
 
-            //  Add to main menu
-            System.Windows.Controls.MenuItem promptMFA = new System.Windows.Controls.MenuItem();
-            promptMFA.Name = "MFA";
-            promptMFA.Header = "Prompt MFA";
-            promptMFA.Click += PromptMFA_Click;
-            ((System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu")).Items.Add(promptMFA);
-            //        }
-            //    }
-            //}
+            // if it isnt exist already, add it!
+            if (!alreadyExist)
+            {
+                // Add to main menu
+                System.Windows.Controls.MenuItem promptMFA = new System.Windows.Controls.MenuItem();
+                promptMFA.Name = "MFA";
+                promptMFA.Header = "Prompt MFA";
+                promptMFA.Click += PromptMFA_Click;
+                ctxMenu.Items.Add(promptMFA);
+            }
         }
 
 
