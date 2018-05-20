@@ -919,12 +919,16 @@ namespace _365Drive.Office365
             bool alreadyExist = false;
 
             // make sure it should not be exist already
-            foreach (System.Windows.Controls.MenuItem currentItem in items)
+            foreach (object currentItem in items)
             {
-                if (currentItem.Name.ToLower() == "mfa")
+                if (typeof(System.Windows.Controls.MenuItem) == currentItem.GetType())
                 {
-                    alreadyExist = true;
-                    break;
+                    System.Windows.Controls.MenuItem menuItem = (System.Windows.Controls.MenuItem)currentItem;
+                    if (!string.IsNullOrEmpty(Convert.ToString(menuItem.Header)) && Convert.ToString(menuItem.Header) == "prompt mfa")
+                    {
+                        alreadyExist = true;
+                        break;
+                    }
                 }
             }
 
@@ -936,7 +940,7 @@ namespace _365Drive.Office365
                 promptMFA.Name = "MFA";
                 promptMFA.Header = "Prompt MFA";
                 promptMFA.Click += PromptMFA_Click;
-                ctxMenu.Items.Add(promptMFA);
+                ctxMenu.Items.Insert(3,promptMFA);
             }
         }
 
