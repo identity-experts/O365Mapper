@@ -142,7 +142,8 @@ namespace _365Drive.Office365.CloudConnector
                             };
                             cc.Add(rtFa);
                         }
-
+                        try
+                        { 
                         // Set the buid cookie
                         Cookie buid = new Cookie("buid", cookies.build)
                         {
@@ -164,7 +165,12 @@ namespace _365Drive.Office365.CloudConnector
                             Domain = cookies.Host.Host
                         };
                         cc.Add(estsauthpersistent);
-
+                        }
+                        catch (Exception ex)
+                        {
+                            // dont do anything loud, as its ok to break here and continue silent
+                            LogManager.Exception("getCookieContainer", ex);
+                        }
                         _cachedCookieContainer = cc;
                         return cc;
                     }
