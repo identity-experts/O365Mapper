@@ -413,10 +413,7 @@ namespace _365Drive.Office365
                 {
                     Communications.updateStatus(Globalization.EnsuringwebClient);
                 });
-
-                //Only until we do development on IDE-MSS-01 as its OS doesnt allow WebClient
                 if (!Utility.webClientServiceRunning())
-                // if(false)
                 {
                     currentDispatcher.Invoke(() =>
                     {
@@ -837,7 +834,14 @@ namespace _365Drive.Office365
                     {
                         string buid = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["buid"].Value;
                         string estsauthpersistent = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["estsauthpersistent"].Value;
-                        DriveManager.setIPUTCookiestoIE(buid, estsauthpersistent);
+                        try
+                        {
+                            DriveManager.setIPUTCookiestoIE(buid, estsauthpersistent);
+                        }
+                        catch
+                        {
+                            // do nothing, this is edge case
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -894,7 +898,7 @@ namespace _365Drive.Office365
                 string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
 
                 //LogManager.Exception(method, ex);
-                LogManager.Exception(method + " UNEXPECTED ERROR FROM CODE :(", ex);
+                LogManager.Exception(method + " UNEXPECTED ERROR FROM CORE :(", ex);
             }
         }
 
@@ -916,32 +920,24 @@ namespace _365Drive.Office365
         {
             System.Windows.Controls.ContextMenu ctxMenu = (System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu");
             System.Windows.Controls.ItemCollection items = ctxMenu.Items;
-            bool alreadyExist = false;
 
-            // make sure it should not be exist already
-            foreach (object currentItem in items)
-            {
-                if (typeof(System.Windows.Controls.MenuItem) == currentItem.GetType())
-                {
-                    System.Windows.Controls.MenuItem menuItem = (System.Windows.Controls.MenuItem)currentItem;
-                    if (!string.IsNullOrEmpty(Convert.ToString(menuItem.Header)) && Convert.ToString(menuItem.Header) == "prompt mfa")
-                    {
-                        alreadyExist = true;
-                        break;
-                    }
-                }
-            }
+            //foreach (var item in items)
+            //{
+            //    if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
+            //    {
+            //        // do your work with the item 
+            //        if (((System.Windows.Controls.MenuItem)item).Name == "MFA")
+            //        {
 
-            // if it isnt exist already, add it!
-            if (!alreadyExist)
-            {
-                // Add to main menu
-                System.Windows.Controls.MenuItem promptMFA = new System.Windows.Controls.MenuItem();
-                promptMFA.Name = "MFA";
-                promptMFA.Header = "Prompt MFA";
-                promptMFA.Click += PromptMFA_Click;
-                ctxMenu.Items.Insert(3,promptMFA);
-            }
+            //  Add to main menu
+            System.Windows.Controls.MenuItem promptMFA = new System.Windows.Controls.MenuItem();
+            promptMFA.Name = "MFA";
+            promptMFA.Header = "Prompt MFA";
+            promptMFA.Click += PromptMFA_Click;
+            ((System.Windows.Controls.ContextMenu)System.Windows.Application.Current.FindResource("SysTrayMenu")).Items.Add(promptMFA);
+            //        }
+            //    }
+            //}
         }
 
 
