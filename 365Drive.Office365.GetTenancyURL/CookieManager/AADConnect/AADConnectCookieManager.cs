@@ -490,7 +490,6 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                             }
                         }
 
-
                         ///Check for MFA
                         if (string.IsNullOrEmpty(code))
                         {
@@ -566,9 +565,15 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                 ret.Host = _host;
 
                 //IPUT
-                ret.build = AuthrequestCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["buid"].Value;
-                ret.estsauthpersistent = msLoginPostCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["ESTSAUTHPERSISTENT"].Value;
-
+                try
+                {
+                    ret.build = AuthrequestCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["buid"].Value;
+                    ret.estsauthpersistent = AuthrequestCookies.GetCookies(new Uri("https://login.microsoftonline.com"))["ESTSAUTHPERSISTENT"].Value;
+                }
+                catch
+                {
+                    // do nothing! its an edge case for IPUT but its crashing for everyone now
+                }
                 //setting expiry
                 ret.Expires = DateTime.Now.AddHours(Constants.AuthcookieExpiryHours);
 
