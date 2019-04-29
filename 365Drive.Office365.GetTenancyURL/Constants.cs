@@ -83,8 +83,8 @@ namespace _365Drive.Office365.CloudConnector
 
         internal const string clientID = "925aa176-2ab1-4806-aeff-dc98260f23a3";
         // This is expired secret
-        internal const string clientSecret = "UVVTEHBosIRqiIsOswtzKK/L+QQx9H0gfYIdmrQUpwI=";
-        
+        //internal const string clientSecret = "UVVTEHBosIRqiIsOswtzKK/L+QQx9H0gfYIdmrQUpwI=";
+        internal const string clientSecret = "npt6cF.=/.0A58j1AxrpVT_JClB@U-D0";
         //internal const string appRedirectURL = "http://identityexperts.co.uk";
         internal const string appRedirectURL = "https://store.identityexperts.co.uk/365mapperar";
         internal const string appResourceUri = "https://api.office.com/discovery/";
