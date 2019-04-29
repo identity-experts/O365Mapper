@@ -155,16 +155,19 @@ namespace _365Drive.Office365.CloudConnector
                         };
                         cc.Add(buid);
 
-                        // Set the buid cookie
-                        Cookie estsauthpersistent = new Cookie("ESTSAUTHPERSISTENT", cookies.estsauthpersistent)
-                        {
-                            Expires = cookies.Expires,
-                            Path = "/",
-                            Secure = cookies.Host.Scheme == "https",
-                            HttpOnly = true,
-                            Domain = cookies.Host.Host
-                        };
-                        cc.Add(estsauthpersistent);
+                            // Set the buid cookie
+                            if (cookies.estsauthpersistent != null)
+                            {
+                                Cookie estsauthpersistent = new Cookie("ESTSAUTHPERSISTENT", cookies.estsauthpersistent)
+                                {
+                                    Expires = cookies.Expires,
+                                    Path = "/",
+                                    Secure = cookies.Host.Scheme == "https",
+                                    HttpOnly = true,
+                                    Domain = cookies.Host.Host
+                                };
+                                cc.Add(estsauthpersistent);
+                            }
                         }
                         catch (Exception ex)
                         {

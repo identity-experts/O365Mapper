@@ -125,16 +125,18 @@ namespace _365Drive.Office365.GetTenancyURL.CookieManager
                         cc.Add(buid);
 
                         // Set the buid cookie
-                        Cookie estsauthpersistent = new Cookie("ESTSAUTHPERSISTENT", cookies.estsauthpersistent)
+                        if (cookies.estsauthpersistent != null)
                         {
-                            Expires = cookies.Expires,
-                            Path = "/",
-                            Secure = cookies.Host.Scheme == "https",
-                            HttpOnly = true,
-                            Domain = cookies.Host.Host
-                        };
-                        cc.Add(estsauthpersistent);
-
+                            Cookie estsauthpersistent = new Cookie("ESTSAUTHPERSISTENT", cookies.estsauthpersistent)
+                            {
+                                Expires = cookies.Expires,
+                                Path = "/",
+                                Secure = cookies.Host.Scheme == "https",
+                                HttpOnly = true,
+                                Domain = cookies.Host.Host
+                            };
+                            cc.Add(estsauthpersistent);
+                        }
                         _cachedCookieContainer = cc;
                         return cc;
                     }
