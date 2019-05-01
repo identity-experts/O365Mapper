@@ -130,11 +130,24 @@
   <data name="credential_signinname" xml:space="preserve">
     <value>Username (Office 365 Logon)</value>
   </data>
+  <data name="credential_rootsiteurl" xml:space="preserve">
+    <value>Company tenant domain</value>
+  </data>
+  <data name="sample_rootsiteurl" xml:space="preserve">
+    <value>Enter your company tenant domain (mycompany.sharepoint.com)</value>
+  </data>
   <data name="emailvalidation" xml:space="preserve">
     <value>Please enter a valid email address</value>
   </data>
+  <data name="RootSiteURLValidation" xml:space="preserve">
+    <value>Tenant domain is invalid</value>
+  </data>
+
   <data name="passwordcannotbeblank" xml:space="preserve">
     <value>Please enter your password</value>
+  </data>
+  <data name="rootsiteurlcannotbeblank" xml:space="preserve">
+    <value>Please enter your company tenant domain</value>
   </data>
   <data name="ProductName" xml:space="preserve">
     <value>365mapper</value>

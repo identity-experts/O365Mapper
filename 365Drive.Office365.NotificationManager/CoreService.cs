@@ -486,6 +486,9 @@ namespace _365Drive.Office365
                     {
                         Communications.updateStatus(Globalization.CredentialsPresent);
                     });
+                    // set the site urls in Drive Manager for further use in the code
+                    DriveManager.SetSharePointUrls();
+
                     //reset the current state
                     Communications.CurrentState = States.Running;
                 }
@@ -526,95 +529,9 @@ namespace _365Drive.Office365
                 }
                 #endregion
 
-                #region get and set tenancy name and urls
-
-                //if the Prompt mfa is enabled, disable it first and restart
-                currentDispatcher.Invoke(() =>
-                {
-                    DisableMFAMenuitem();
-                });
-
-                //as this is must in next calls, lets fetch the tenancy name here
-                LicenseValidationState tenancyNameState = DriveMapper.retrieveTenancyName(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
-                if (tenancyNameState == LicenseValidationState.LoginFailed)
-                {
-                    //lets make inform our engine that SSO failed
-                    bool blwasAutoSSOOn = CredentialManager.isItSSOTry();
-                    bool blRetryAgain = false;
-                    if (blwasAutoSSOOn)
-                    {
-                        SSOFailed();
-                        int iPendingRetries = CredentialManager.SSOPendingRetries();
-                        blRetryAgain = iPendingRetries > 0;
-                    }
-
-                    currentDispatcher.Invoke(() =>
-                    {
-                        if (blwasAutoSSOOn && blRetryAgain)
-                            Communications.updateStatus(Globalization.InformAutoSSORetry);
-                        else if (blwasAutoSSOOn && !blRetryAgain)
-                        {
-                            Communications.updateStatus(Globalization.InformAutoSSOFailed);
-                        }
-                        else
-                            Communications.updateStatus(Globalization.LoginFailed);
-                    });
-                    LogManager.Verbose("credentials not valid or app isnt registered");
-
-                    ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn && !blRetryAgain)
-                        NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.UserAction;
-                    Animation.Stop();
-
-                    ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn && !blRetryAgain)
-                        Animation.Animate(AnimationTheme.Warning);
-                    busy = false;
-                    return;
-                }
-                else if (tenancyNameState == LicenseValidationState.MFARemindLater)
-                {
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(Globalization.RemindMeLaterStatus);
-                    });
-                    LogManager.Verbose("User opted for remind later (MFA)");
-                    NotificationManager.NotificationManager.notify(Globalization.SignInPageheader, Globalization.RemindMeLaterNotification, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.UserAction;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Warning);
-                    busy = false;
-                    currentDispatcher.Invoke(() =>
-                    {
-                        EnableMFAMenuitem();
-
-                    });
-
-                    return;
-                }
-                else if (tenancyNameState == LicenseValidationState.CouldNotVerify)
-                {
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(Globalization.LicenseValidationFailed);
-                    });
-                    LogManager.Verbose("License could not be verified");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.Stopped;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Error);
-                    busy = false;
-                    return;
-                }
-                #endregion;
-
                 #region getting cookies (used to setting in IE and authenticating for licensing)
                 //Get fedauth and rtfa cookies
-                LogManager.Verbose("getting cookies manager");
+               LogManager.Verbose("getting cookies manager");
                 GlobalCookieManager cookieManager = new GlobalCookieManager(DriveManager.rootSiteUrl, CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password);
                 CookieContainer userCookies = cookieManager.getCookieContainer();
 
@@ -686,134 +603,7 @@ namespace _365Drive.Office365
                 string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedauth"].Value;
                 string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["rtfa"].Value;
                 #endregion
-
-                #region Ensuring License
-                //make sure we have valid license
-                LicenseValidationState licenseValidationState = DriveMapper.EnsureLicense(CredentialManager.GetCredential().UserName, CredentialManager.GetCredential().Password, userCookies);
-                if (licenseValidationState == LicenseValidationState.CouldNotVerify)
-                {
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(Globalization.LicenseValidationFailed);
-                    });
-                    LogManager.Verbose("License could not be verified");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, Globalization.LicenseValidationFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.Stopped;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Error);
-                    busy = false;
-                    return;
-                }
-                else if (licenseValidationState == LicenseValidationState.ActivationFailed)
-                {
-                    string notificationMessage = string.Format(Globalization.LicenseActivationFailed, CloudConnector.LicenseManager.lastActivationMessage);
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(notificationMessage);
-                    });
-                    LogManager.Verbose("License could not be verified");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, notificationMessage, ToolTipIcon.Error);
-                    //reset the current state
-                    Communications.CurrentState = States.Stopped;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Error);
-                    busy = false;
-                    return;
-                }
-                else if (licenseValidationState == LicenseValidationState.ActivatedFirstTime)
-                {
-                    LogManager.Verbose("License first time activated");
-                    currentDispatcher.Invoke(() =>
-                    {
-                        //Communications.updateStatus(Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage);
-                    });
-                    //NotificationManager.NotificationManager.notify(Globalization.License, Globalization.LicenseActivatedFirstTime + ". " + LicenseManager.lastActivationMessage, ToolTipIcon.Info);
-                    //set it to running
-                    Communications.CurrentState = States.Running;
-                }
-                else if (licenseValidationState == LicenseValidationState.LoginFailed)
-                {
-                    //lets make inform our engine that SSO failed
-                    bool blwasAutoSSOOn = CredentialManager.isItSSOTry();
-                    bool blRetryAgain = false;
-                    if (blwasAutoSSOOn)
-                    {
-                        SSOFailed();
-                        int iPendingRetries = CredentialManager.SSOPendingRetries();
-                        blRetryAgain = iPendingRetries > 0;
-                    }
-
-                    currentDispatcher.Invoke(() =>
-                    {
-                        if (blwasAutoSSOOn && blRetryAgain)
-                            Communications.updateStatus(Globalization.InformAutoSSORetry);
-                        else if (blwasAutoSSOOn && !blRetryAgain)
-                        {
-                            Communications.updateStatus(Globalization.InformAutoSSOFailed);
-                        }
-                        else
-                            Communications.updateStatus(Globalization.LoginFailed);
-                    });
-                    LogManager.Verbose("credentials not valid or app isnt registered");
-
-                    ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn && !blRetryAgain)
-                        NotificationManager.NotificationManager.notify(Globalization.credentials, Globalization.LoginFailed, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-
-                    //reset the current state
-                    Communications.CurrentState = States.UserAction;
-                    Animation.Stop();
-
-                    ///Only show if really credential faied and its not autoSSO
-                    if (!blwasAutoSSOOn && !blRetryAgain)
-                        Animation.Animate(AnimationTheme.Warning);
-                    busy = false;
-                    return;
-                }
-                else if (licenseValidationState == LicenseValidationState.Expired || licenseValidationState == LicenseValidationState.Exceeded)
-                {
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(Globalization.LicenseExpired);
-                    });
-                    LogManager.Verbose("License has been expired or exceeded limit");
-                    NotificationManager.NotificationManager.notify(Globalization.License, Globalization.LicenseExpired, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.Hold;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Error);
-                    busy = false;
-                    return;
-                }
-                else if (licenseValidationState == LicenseValidationState.TenancyNotExist)
-                {
-                    string TenancyNotRegistered = String.Format(Globalization.TenancyNotRegistered, Constants.licensingBaseDomain);
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(TenancyNotRegistered);
-                    });
-                    LogManager.Verbose("Tenancy has not been signed up with us");
-                    NotificationManager.NotificationManager.notify(Globalization.LicenseValidationFailedHeading, TenancyNotRegistered, ToolTipIcon.Warning, CommunicationCallBacks.AskAuthentication);
-                    //reset the current state
-                    Communications.CurrentState = States.Hold;
-                    Animation.Stop();
-                    Animation.Animate(AnimationTheme.Error);
-                    busy = false;
-                    return;
-                }
-                else
-                {
-                    LogManager.Verbose("License present");
-                    currentDispatcher.Invoke(() =>
-                    {
-                        Communications.updateStatus(Globalization.LicenseFoundOK);
-                    });
-                    //set it to running
-                    Communications.CurrentState = States.Running;
-                }
-                #endregion
-
+                
                 #region setting cookies to IE (already retrieved above)
 
 

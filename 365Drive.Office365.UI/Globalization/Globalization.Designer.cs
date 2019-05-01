@@ -19,7 +19,7 @@ namespace _365Drive.Office365.UI.Globalization {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Globalization {
@@ -147,6 +147,15 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string credential_password {
             get {
                 return ResourceManager.GetString("credential_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Company tenant domain.
+        /// </summary>
+        public static string credential_rootsiteurl {
+            get {
+                return ResourceManager.GetString("credential_rootsiteurl", resourceCulture);
             }
         }
         
@@ -525,6 +534,33 @@ namespace _365Drive.Office365.UI.Globalization {
         public static string RemindMeLaterStatus {
             get {
                 return ResourceManager.GetString("RemindMeLaterStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter your company tenant domain.
+        /// </summary>
+        public static string rootsiteurlcannotbeblank {
+            get {
+                return ResourceManager.GetString("rootsiteurlcannotbeblank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tenant domain is invalid.
+        /// </summary>
+        public static string RootSiteURLValidation {
+            get {
+                return ResourceManager.GetString("RootSiteURLValidation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter your company tenant domain (mycompany.sharepoint.com).
+        /// </summary>
+        public static string sample_rootsiteurl {
+            get {
+                return ResourceManager.GetString("sample_rootsiteurl", resourceCulture);
             }
         }
         

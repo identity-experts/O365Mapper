@@ -22,7 +22,7 @@ namespace _365Drive.Office365.CloudConnector
         /// <returns></returns>
         public static LicenseValidationState EnsureLicense(string userName, string password, CookieContainer userCookies)
         {
-
+            
 
             var licenseMode = LicenseValidationState.CouldNotVerify;
 

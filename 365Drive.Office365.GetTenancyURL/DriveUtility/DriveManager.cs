@@ -510,6 +510,17 @@ namespace _365Drive.Office365.CloudConnector
             }
         }
 
+        /// <summary>
+        /// Set the URL to DriveManager class from registry
+        /// </summary>
+        public static void SetSharePointUrls()
+        {
+            if(!string.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.RootSiteUrl)))
+            DriveManager.rootSiteUrl = RegistryManager.Get(RegistryKeys.RootSiteUrl);
+
+            if (!string.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.MySiteUrl)))
+                DriveManager.oneDriveHostSiteUrl = RegistryManager.Get(RegistryKeys.MySiteUrl);
+        }
 
 
         /// <summary>

@@ -24,7 +24,9 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
     public partial class Authenticate : ModernDialog
     {
         string currentUser;
-
+        string mySiteURL;
+        string tenancy;
+        string tenancyUniqueName;
 
 
         /// <summary>
@@ -184,6 +186,46 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                     CommunicationManager.Communications.queueNotification(Globalization.Globalization.SignInPageheader, Globalization.Globalization.CredentialsReceived);
                 }
 
+
+                //Set the root root site url at registry for next time use
+                if (!string.IsNullOrEmpty(this.rootsiteurl.Text))
+                {
+                    tenancyUniqueName = this.rootsiteurl.Text.ToLower().Replace(StringConstants.https, "").Replace(StringConstants.http, "").Replace(StringConstants.rootUrltobeRemoved, "");
+                    DriveManager.rootSiteUrl = StringConstants.https + this.rootsiteurl.Text.ToLower().Replace(StringConstants.https, "").Replace(StringConstants.http,"");
+                    RegistryManager.Set(RegistryKeys.RootSiteUrl, DriveManager.rootSiteUrl);
+                    //Uri url = new Uri(this.rootsiteurl.Text);
+                    
+                }
+
+
+
+                //Set the tennacy name at registry for next time use
+
+                if (!string.IsNullOrEmpty(tenancy))
+                    RegistryManager.Set(RegistryKeys.TenancyName, tenancy);
+                else
+                {
+                    if (!string.IsNullOrEmpty(tenancyUniqueName))
+                    {
+                        tenancy = tenancyUniqueName + StringConstants.rootUrltobeReplacedWith;
+                        RegistryManager.Set(RegistryKeys.TenancyName, tenancy);
+                    }
+                }
+
+
+                //Set the my site url at registry for next time use
+                if (!string.IsNullOrEmpty(mySiteURL))
+                    RegistryManager.Set(RegistryKeys.MySiteUrl, mySiteURL);
+                else
+                {
+                    if (!string.IsNullOrEmpty(tenancyUniqueName))
+                    {
+                        DriveManager.oneDriveHostSiteUrl = "https://" + tenancyUniqueName + "-my.sharepoint.com";
+                        RegistryManager.Set(RegistryKeys.MySiteUrl, DriveManager.oneDriveHostSiteUrl);
+                    }
+                }
+
+
                 //reset the SSO Counter to make a new beginning
                 _365Drive.Office365.CredentialManager.ResetSSOCounter();
 
@@ -209,6 +251,24 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                 this.password.Password = currentCreds.Password;
             }
 
+            // get tenancy name from registry
+            if (!String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.RootSiteUrl)))
+            {
+                if(RegistryManager.Get(RegistryKeys.RootSiteUrl).Contains(StringConstants.https))
+                this.rootsiteurl.Text = RegistryManager.Get(RegistryKeys.RootSiteUrl).Replace(StringConstants.https,"");
+                else
+                    this.rootsiteurl.Text = RegistryManager.Get(RegistryKeys.RootSiteUrl);
+            }
+            // get my site url from registry
+            if (!String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.MySiteUrl)))
+            {
+                mySiteURL = RegistryManager.Get(RegistryKeys.MySiteUrl);
+            }
+            // get root site url from registry
+            if (!String.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.TenancyName)))
+            {
+                tenancy = RegistryManager.Get(RegistryKeys.TenancyName);
+            }
             var creds = _365Drive.Office365.CredentialManager.GetCredential();
 
             if (creds != null && !String.IsNullOrEmpty(creds.UserName))
@@ -247,6 +307,9 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
 
             //set current username and password to local variable
             currentUser = (this.userName.Text + ";!" + this.password.Password).ToLower();
+
+         
+
         }
 
         ///// <summary>
@@ -291,6 +354,7 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             bool result = ValidatorExtensions.IsValidEmailAddress(userName.Text);
             if (string.IsNullOrEmpty(userName.Text))
                 result = false;
+            
 
             //email validation failed
             if (!result)
@@ -301,6 +365,29 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
             {
                 validationSummary.Text = string.Empty;
             }
+
+            if (string.IsNullOrEmpty(rootsiteurl.Text))
+            {
+                result = false;
+                validationSummary.Text += Environment.NewLine + Globalization.Globalization.rootsiteurlcannotbeblank;
+            }
+            else
+            {
+                validationSummary.Text += string.Empty;
+            }
+            if (!string.IsNullOrEmpty(rootsiteurl.Text))
+            {
+                result = ValidatorExtensions.IsValidRootSiteURL(rootsiteurl.Text);
+                if (!result)
+                {
+                    validationSummary.Text += Environment.NewLine +  Globalization.Globalization.RootSiteURLValidation;
+                }
+                else
+                {
+                    validationSummary.Text += string.Empty;
+                }
+            }
+
 
             if (bottonclick)
             {
@@ -318,7 +405,10 @@ namespace _365Drive.Office365.UI.CredentialManager.UI
                     {
                         //validationSummary.Content += string.Empty;
                     }
+                    
+                    
                 }
+
             }
             LogManager.Verbose("credential validation result: " + result.ToString());
             return result;

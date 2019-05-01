@@ -6,12 +6,11 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:p="clr-namespace:_365Drive.Office365.UI.Globalization"
                   mc:Ignorable="d" 
-                  d:DesignHeight="300" d:DesignWidth="400"
                   Title="{x:Static p:Globalization.SignInPageheader}" Width="500px" >
 
     <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
 
-    <Grid>
+    <Grid Height="250px">
         <Grid.Resources>
             <Style TargetType="{x:Type Image}">
             </Style>
@@ -25,10 +24,15 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"  />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"  />
+            <RowDefinition Height="Auto"  />
+            <RowDefinition Height="Auto"  />
+                        <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Name="logo" Grid.RowSpan="6" Grid.Column="0" VerticalAlignment="Center" Source="../images/3mxs.png" Width="110" Height="111" />
+        <Image Name="logo" Grid.RowSpan="8" Grid.Column="0" VerticalAlignment="Center" Source="../images/3mxs.png" Width="110" Height="111" />
         <Label Content="{x:Static p:Globalization.credential_signinname}" Grid.Row="0" Grid.Column="1"  />
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" >
             <TextBox Name="userName"  TextChanged="userName_TextChanged" Width="280px" Height="30px" />
@@ -47,17 +51,21 @@
         <TextBox x:Name="MyTextBox" Grid.Row="3" Height="30px" Grid.Column="1" Visibility="Collapsed" />
         <!--<CheckBox x:Name="ShowPasswordCharsCheckBox"  Grid.Row="4" Grid.Column="1" Content="Show password" Checked="ShowPasswordCharsCheckBox_Checked" 
                   Unchecked="ShowPasswordCharsCheckBox_Unchecked" Visibility="Collapsed" />-->
-        <DockPanel Grid.Row="4" Grid.Column="1" >
-            <Button Name="ShowPass" Grid.Row="4" Grid.Column="1" Width="150px" Background="Transparent"
+        <Label Content="{x:Static p:Globalization.credential_rootsiteurl}" Grid.Row="5" Grid.Column="1"  />
+        <TextBox Name="rootsiteurl"   Width="280px" Height="30px" Grid.Row="6"  Grid.Column="1" HorizontalAlignment="Left"/>
+        <Label Content="{x:Static p:Globalization.sample_rootsiteurl}" Grid.Row="7" Grid.Column="1"  />
+        <DockPanel Grid.Row="8" Grid.Column="1" >
+            <Button Name="ShowPass" Grid.Row="8" Grid.Column="1" Width="150px" Background="Transparent"
         BorderBrush="Transparent" 
         BorderThickness="0" Cursor="Hand"
         Padding="-4" FontStyle="Oblique" Height="30px" >
                 <Image Source="../images/ShowPassword.png" Visibility="Hidden" />
             </Button>
-            <TextBlock TextWrapping="Wrap" Grid.Row="5" Grid.Column="1" Name="validationSummary" Foreground="#FFB03030" />
+            
             <ProgressBar Name="SignInprogress" Minimum="0" Visibility="Hidden" Grid.Row="5" Grid.ColumnSpan="2"  Maximum="20" Height="16" IsIndeterminate="True" />
         </DockPanel>
-        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
+        <TextBlock Grid.Row="8" TextAlignment="Left" TextWrapping="Wrap" HorizontalAlignment="Left" Grid.Column="1" Name="validationSummary" Foreground="#FFB03030" />
+        <Label Grid.Row="10" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Content="{x:Static p:Globalization.Copyright}" Grid.Column="1" 
                Grid.ColumnSpan="2"
                FontFamily="Lato" FontSize="13" Foreground="Gray" />
     </Grid>

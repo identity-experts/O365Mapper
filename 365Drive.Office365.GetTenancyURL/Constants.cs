@@ -20,7 +20,7 @@ namespace _365Drive.Office365.CloudConnector
         ActivatedFirstTime = 6,
         ActivationFailed = 7
     }
-    internal class StringConstants
+    public class StringConstants
     {
         internal const string UserrealMrequest = "https://login.microsoftonline.com/common/userrealm?user={0}&api-version=2.1&checkForMicrosoftAccount=true";
         internal const string AzureADSTSURL = "https://login.windows.net/common/oauth2/token?api-version=1.0";
@@ -73,15 +73,19 @@ namespace _365Drive.Office365.CloudConnector
         internal const string postCodeUrl = "{0}_forms/default.aspx";
         internal const string postCodeBody = "code={0}&id_token={1}&session_state={3}&correlation_id={4}";
         internal const string AzureActivationUserToken = "client_id={1}&redirect_uri={3}&client_secret={2}&code={0}&grant_type=authorization_code&resource={4}";
+        
         internal const string AzureActivateUserStep4 = "https://api.office.com/discovery/v2.0/me/services";
         internal const string rootUrlFinder = "rootsite@";
-        internal const string rootUrltobeRemoved = ".sharepoint.com";
-        internal const string rootUrltobeReplacedWith = ".onmicrosoft.com";
+        public const string rootUrltobeRemoved = ".sharepoint.com";
+        public const string https = "https://";
+        public const string http = "http://";
+        public const string rootUrltobeReplacedWith = ".onmicrosoft.com";
         internal const string sharepointClientID = "00000003-0000-0ff1-ce00-000000000000";
         //internal const string clientID = "df166692-81e3-404b-97ae-d09038e90d8c";
         //internal const string clientSecret = "nIEIuEyhATgLdFqhcHCMTJKky3QiXDQ7eYcQjkjhmPc=";
-
         internal const string clientID = "925aa176-2ab1-4806-aeff-dc98260f23a3";
+        //internal const string clientID = "925aa176-2ab1-4806-aeff-dc98260f23a3";
+        
         // This is expired secret
         //internal const string clientSecret = "UVVTEHBosIRqiIsOswtzKK/L+QQx9H0gfYIdmrQUpwI=";
         internal const string clientSecret = "npt6cF.=/.0A58j1AxrpVT_JClB@U-D0";

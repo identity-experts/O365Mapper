@@ -522,103 +522,39 @@ namespace _365Drive.Office365.CloudConnector
                 }
                 //Prio 2:
                 //Prio 3: from portal
+                //Last: Get value from users' profile and Priority 3: get from app value
                 else
                 {
 
-                    //is it time to re-populate? lets see
-                    if (driveFetchTimeNow || DriveManager.mappableDrives == null || DriveManager.mappableDrives.Count == 0)
+                    string strUser = _365Drive.Office365.CredentialManager.GetCredential().UserName;
+
+                    if (!string.IsNullOrEmpty(_365DriveTenancyURL.exceptionDomain(strUser)))
                     {
-                        ///Get the license key, email and status of license for given user
-
-                        string tenancyName = RegistryManager.Get(RegistryKeys.TenancyName);
-                        string licensingusermappingUrl = String.Format(Constants.retrieveDriveMappingsUrl, Constants.licensingBaseDomain, Constants.ieDriveDetailsApiCode, tenancyName);
-                        LogManager.Verbose("Get the details about license : " + licensingusermappingUrl);
-
-                        //poll end cookie container
-                        CookieContainer userMappingCookieContainer = new CookieContainer();
-                        string fedAuth = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["fedauth"].Value;
-                        string rtFA = userCookies.GetCookies(new Uri(DriveManager.rootSiteUrl))["rtfa"].Value;
-                        userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("FedAuth", encode(fedAuth)));
-                        userMappingCookieContainer.Add(new Uri("http://" + new Uri(Constants.licensingBaseDomain).Authority), new Cookie("rtFA", encode(rtFA)));
-
-
-                        //get the initial license details
-                        Task<string> call1Result = HttpClientHelper.GetAsync(licensingusermappingUrl, userMappingCookieContainer);
-                        call1Result.Wait();
-
-                        string licenseUserMappingResult = call1Result.Result;
-
-                        DriveMappingDetailsResult userLicenseMapresult = JsonConvert.DeserializeObject<DriveMappingDetailsResult>(licenseUserMappingResult);
-                        if (userLicenseMapresult.data.Count > 0)
+                        if (_365DriveTenancyURL.exceptionDomain(strUser).ToLower() == "sharepoint.onmicrosoft.com")
                         {
-                            foreach (DriveMappingDetail drive in userLicenseMapresult.data)
-                            {
-                                string driveLetter = drive.drive_letter;
-                                string driveUrl = drive.drive_url;
-                                string driveName = drive.drive_label;
-                                driveState driveState = driveState.Active;
-                                if (drive.drive_deleted == "1")
-                                    driveState = driveState.Deleted;
-                                driveType driveType = getDriveType(driveUrl);
+                            LogManager.Verbose("Adding default microsoft drives (hard coded)");
+                            DriveManager.addDrive("I", "India Learning", "https://microsoft.sharepoint.com/sites/infopedia/indialearning/Documents");
+                            DriveManager.addDrive("T", "ITWeb", "https://microsoft.sharepoint.com/sites/itweb/Documents");
+                            DriveManager.addDrive("M", "MSW", "https://microsoft.sharepoint.com/sites/msw/documents");
+                            DriveManager.addDrive("N", "Dining", "https://microsoft.sharepoint.com/sites/refweb/na/Redmond/dining/Documents");
+                            DriveManager.addDrive("H", "Sharepoint Hosting Options", "https://microsoft.sharepoint.com/sites/SharePoint/Documents");
 
+                            DriveManager.addDrive("O", "OneDrive for Business", string.Empty, driveType.OneDrive);
 
-                                if (driveType == driveType.DocLib)
-                                {
-                                    Uri uriResult;
-                                    bool isValidUrl = Uri.TryCreate(driveUrl, UriKind.Absolute, out uriResult)
-                                        && uriResult.Scheme == Uri.UriSchemeHttps;
-                                    if (isValidUrl)
-                                    {
-                                        DriveManager.addDrive(driveLetter, driveName, uriResult.ToString(), driveState, driveType);
-                                    }
-                                }
-                                else if (driveType == driveType.OneDrive)
-                                {
-                                    DriveManager.addDrive(driveLetter, driveName, string.Empty, driveState, driveType);
-                                }
-                                else if (driveType == driveType.SharePoint)
-                                {
-                                    string rootSitedocLibUrl = DriveManager.rootSiteUrl.EndsWith("/") ? DriveManager.rootSiteUrl + "Shared Documents" : DriveManager.rootSiteUrl + "/Shared Documents";
-                                    DriveManager.addDrive(driveLetter, driveName, rootSitedocLibUrl, driveState, driveType);
-                                }
-                            }
                         }
-
-                        //Last: Get value from users' profile and Priority 3: get from app value
                         else
                         {
-
-                            string strUser = _365Drive.Office365.CredentialManager.GetCredential().UserName;
-
-                            if (!string.IsNullOrEmpty(_365DriveTenancyURL.exceptionDomain(strUser)))
-                            {
-                                if (_365DriveTenancyURL.exceptionDomain(strUser).ToLower() == "sharepoint.onmicrosoft.com")
-                                {
-                                    LogManager.Verbose("Adding default microsoft drives (hard coded)");
-                                    DriveManager.addDrive("I", "India Learning", "https://microsoft.sharepoint.com/sites/infopedia/indialearning/Documents");
-                                    DriveManager.addDrive("T", "ITWeb", "https://microsoft.sharepoint.com/sites/itweb/Documents");
-                                    DriveManager.addDrive("M", "MSW", "https://microsoft.sharepoint.com/sites/msw/documents");
-                                    DriveManager.addDrive("N", "Dining", "https://microsoft.sharepoint.com/sites/refweb/na/Redmond/dining/Documents");
-                                    DriveManager.addDrive("H", "Sharepoint Hosting Options", "https://microsoft.sharepoint.com/sites/SharePoint/Documents");
-
-                                    DriveManager.addDrive("O", "OneDrive for Business", string.Empty, driveType.OneDrive);
-
-                                }
-                                else
-                                {
-                                    addDefaultDrives();
-                                }
-                            }
-                            else
-                            {
-                                //Call to Azure AD, user profile and registry to fetch and populate drive
-                                addDefaultDrives();
-                            }
-
+                            addDefaultDrives();
                         }
-                        lastDriveFetched = DateTime.Now;
                     }
+                    else
+                    {
+                        //Call to Azure AD, user profile and registry to fetch and populate drive
+                        addDefaultDrives();
+                    }
+                    lastDriveFetched = DateTime.Now;
                 }
+              
             }
             catch (Exception ex)
             {

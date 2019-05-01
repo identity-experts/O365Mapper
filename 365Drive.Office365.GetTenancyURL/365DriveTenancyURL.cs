@@ -62,19 +62,7 @@ namespace _365Drive.Office365.CloudConnector
             }
             else
             {
-                //if not found in registry, we need to go and try gettting online
-                if (DriveManager.FederationType == FedType.Cloud)
-                {
-                    TenancyName = cloudItentityTenancy(upn, password);
-                }
-                else if (DriveManager.FederationType == FedType.AAD)
-                {
-                    TenancyName = aadConnectTenancy(upn, password);
-                }
-                else if (DriveManager.FederationType == FedType.ADFS)
-                {
-                    TenancyName = adfsConnectTenancy(upn, password);
-                }
+                TenancyName = null;
             }
 
             //Set the tennacy name at registry for next time use
@@ -429,6 +417,7 @@ namespace _365Drive.Office365.CloudConnector
                                 return string.Empty;
                             }
                         }
+
                         else if (authMethodId.ToLower() == "twowayvoicemobile" || authMethodId.ToLower() == "phoneappnotification" || authMethodId.ToLower() == "twowayvoiceoffice")
                         {
 
@@ -523,6 +512,7 @@ namespace _365Drive.Office365.CloudConnector
                                 return string.Empty;
                             }
                         }
+
                         else
                         {
                             //Its not MFA but probably wrong password or something else
@@ -851,6 +841,7 @@ namespace _365Drive.Office365.CloudConnector
 
                 ///get other values of call 1
                 AuthorizeCanaryapi = getapiCanary(authorizeCall);
+
                 //  authorizeCanary = getCanary2(authorizeCall);
                 AuthorizeclientRequestID = getClientRequest(authorizeCall);
                 Authorizehpgact = getHPGact(authorizeCall);

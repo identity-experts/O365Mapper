@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _365Drive.Office365.CloudConnector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,13 @@ namespace _365Drive.Office365.UI
             return regex.IsMatch(s);
         }
 
+        public static bool IsValidRootSiteURL(this string s)
+        {
+            if (s.ToLower().Contains(StringConstants.rootUrltobeRemoved))
+                return true;
+            else
+                return false;
+        }
         /// <summary>
         /// Get the resouce string value by passing resource key as a parameter
         /// </summary>

@@ -148,8 +148,9 @@ namespace _365Drive.Office365
                 Cred currentCreds = GetCredential();
 
                 // if there is already a username password, no need to overwrite it. Lets respect user pref..
-                if (currentCreds != null && !String.IsNullOrEmpty(currentCreds.UserName) && !string.IsNullOrEmpty(currentCreds.Password))
+                if (currentCreds != null && !String.IsNullOrEmpty(currentCreds.UserName) && !string.IsNullOrEmpty(currentCreds.Password)&& !string.IsNullOrEmpty(RegistryManager.Get(RegistryKeys.RootSiteUrl)))
                 {
+                    
                     return CredentialState.Present;
                 }
 
