@@ -301,7 +301,7 @@ namespace _365Drive.Office365.CloudConnector
                 string MSloginpostData = String.Format(StringConstants.newMSloginPost, _username, _password, LicenseManager.encode(authorizeCanary), Authorizectx, Authorizeflowtoken);
                 NameValueCollection MSloginpostHeader = new NameValueCollection();
                 MSloginpostHeader.Add("Accept", "image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*");
-                MSloginpostHeader.Add("Referer", String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.clientID, StringConstants.appRedirectURL, StringConstants.appResourceUri));
+                MSloginpostHeader.Add("Referer", String.Format(StringConstants.AzureActivateUserStep1, _username, StringConstants.sharepointClientID, StringConstants.appRedirectURL, StringConstants.appResourceUri));
                 MSloginpostHeader.Add("Accept-Language", "en-US");
                 //request.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
                 //MSloginpostHeader.Add("Accept-Encoding", "gzip, deflate");

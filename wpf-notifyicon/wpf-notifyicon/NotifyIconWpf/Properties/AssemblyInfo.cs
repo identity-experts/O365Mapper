@@ -18,8 +18,8 @@ using System.Windows.Markup;
 [assembly: AssemblyCulture("")]
 
 
-[assembly: AssemblyVersion("1.0.0.4")]
-[assembly: AssemblyFileVersion("1.0.0.4")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 
 
 //provides simplified declaration in XAML

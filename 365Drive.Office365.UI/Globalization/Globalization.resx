@@ -162,7 +162,7 @@
     <value>Please sign in to continue</value>
   </data>
   <data name="CredentialsPresent" xml:space="preserve">
-    <value>Verifying licence</value>
+    <value>Mapping drives...</value>
   </data>
   <data name="EnsuringCredential" xml:space="preserve">
     <value>Validating credentials</value>
@@ -174,8 +174,8 @@
     <value>Intializing 365mapper</value>
   </data>
   <data name="LoginFailed" xml:space="preserve">
-    <value>Either credentials not valid or your IT admin has not granted 365 Access to 365mapper app</value>
-    <comment>Message1: Sign In failed    Message 2: Tenancy access failed, please contact your IT department</comment>
+    <value>Credentials are invalid</value>
+    <comment>Message1: Sign In failed</comment>
   </data>
   <data name="About" xml:space="preserve">
     <value>About: </value>

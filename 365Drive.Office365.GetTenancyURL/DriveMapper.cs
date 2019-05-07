@@ -14,58 +14,6 @@ namespace _365Drive.Office365.CloudConnector
 {
     public static class DriveMapper
     {
-        /// <summary>
-        /// Ensures whether user has valid license or not
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public static LicenseValidationState EnsureLicense(string userName, string password, CookieContainer userCookies)
-        {
-            
-
-            var licenseMode = LicenseValidationState.CouldNotVerify;
-
-            ///ONLY FOR TESTING STOP ICON
-            /// 
-            //return licenseMode;
-            try
-            {
-                if (!Utility.ready())
-                    return LicenseValidationState.CouldNotVerify;
-
-                LogManager.Verbose("ensuring license");
-
-                //get the tenancy name
-                string tenancyName = _365DriveTenancyURL.Get365TenancyName(userName, password);
-                if (!string.IsNullOrEmpty(tenancyName))
-                {
-                    LogManager.Verbose("call to license valid");
-                    if (LicenseManager.licenseCheckTimeNow && LicenseManager.lastLicenseState == null)
-                    {
-                        LicenseValidationState state = LicenseManager.isLicenseValid(tenancyName, userName, userCookies);
-                        LogManager.Verbose("license validation result: " + Convert.ToString(state));
-                        licenseMode = state;
-                        LicenseManager.lastLicenseState = state;
-                    }
-                    else
-                    {
-                        licenseMode = (LicenseValidationState)LicenseManager.lastLicenseState;
-                    }
-                }
-                else
-                {
-                    licenseMode = LicenseValidationState.LoginFailed;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                string method = string.Format("{0}.{1}", MethodBase.GetCurrentMethod().DeclaringType.FullName, MethodBase.GetCurrentMethod().Name);
-                LogManager.Exception(method, ex);
-            }
-            return licenseMode;
-        }
 
 
         /// <summary>

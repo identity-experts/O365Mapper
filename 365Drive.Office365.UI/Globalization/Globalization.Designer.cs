@@ -187,7 +187,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Verifying licence.
+        ///   Looks up a localized string similar to Mapping drives....
         /// </summary>
         public static string CredentialsPresent {
             get {
@@ -421,7 +421,7 @@ namespace _365Drive.Office365.UI.Globalization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Either credentials not valid or your IT admin has not granted 365 Access to 365mapper app.
+        ///   Looks up a localized string similar to Credentials are invalid.
         /// </summary>
         public static string LoginFailed {
             get {

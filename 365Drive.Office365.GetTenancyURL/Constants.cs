@@ -80,15 +80,7 @@ namespace _365Drive.Office365.CloudConnector
         public const string https = "https://";
         public const string http = "http://";
         public const string rootUrltobeReplacedWith = ".onmicrosoft.com";
-        internal const string sharepointClientID = "00000003-0000-0ff1-ce00-000000000000";
-        //internal const string clientID = "df166692-81e3-404b-97ae-d09038e90d8c";
-        //internal const string clientSecret = "nIEIuEyhATgLdFqhcHCMTJKky3QiXDQ7eYcQjkjhmPc=";
-        internal const string clientID = "925aa176-2ab1-4806-aeff-dc98260f23a3";
-        //internal const string clientID = "925aa176-2ab1-4806-aeff-dc98260f23a3";
         
-        // This is expired secret
-        //internal const string clientSecret = "UVVTEHBosIRqiIsOswtzKK/L+QQx9H0gfYIdmrQUpwI=";
-        internal const string clientSecret = "npt6cF.=/.0A58j1AxrpVT_JClB@U-D0";
         //internal const string appRedirectURL = "http://identityexperts.co.uk";
         internal const string appRedirectURL = "https://store.identityexperts.co.uk/365mapperar";
         internal const string appResourceUri = "https://api.office.com/discovery/";
@@ -101,6 +93,7 @@ namespace _365Drive.Office365.CloudConnector
         internal const string GraphServiceVersion = "2013-04-05";
         internal const string CreateUserBody = "{{\"accountEnabled\": \"true\",\"displayName\": \"{0}\",\"mailNickname\": \"{1}\",\"usageLocation\": \"GB\",\"passwordProfile\": {{ \"password\" : \"{2}\", \"forceChangePasswordNextLogin\": \"false\" }},\"userPrincipalName\": \"{3}\",\"immutableId\": \"{4}\"}}";
         internal const string AssignLicenseBody = "{{ \"addLicenses\": [ {{ \"disabledPlans\": [], \"skuId\": \"{0}\" }} ], \"removeLicenses\": []}}";
+        internal const string sharepointClientID = "00000003-0000-0ff1-ce00-000000000000";
 
         ////////////////////////////Cloud Identity Cookie////////////////////////////
         //https://login.windows.net/common/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&response%5Ftype=code%20id%5Ftoken&scope=openid&nonce=09C0632AF08417E5E70CEA1F33C96FCB24C7EB0874E87004%2DD56B8D2C8A3E860CCB667ADB9D1DD555B55C57E21559C0CD225C020C29445980&redirect%5Furi={0}&state=0&client%2Drequest%2Did=bb27f19d%2D3022%2D3000%2Db8cd%2Db535a27a2569
