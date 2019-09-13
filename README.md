@@ -65,7 +65,7 @@ The following steps detail the process needed to upgrade from a previous version
 ## 3.	365Mapper Client Installation  
 
 ### 3.1	Installation  
-Run the 365Mapper MSI for the appropriate architecture (x86 or x64) from the ZIP file provided in the releases.
+Run the 365Mapper MSI for the appropriate architecture (x86 or x64) from the [ZIP](https://github.com/identity-experts/O365Mapper/releases/download/v2.0.0.0/365Mapper_2.0.0.0.zip) file provided in the [releases](https://github.com/identity-experts/O365Mapper/releases).
    
 #### 3.1.1 MSI Exec Options  
 The MSI installer can be run with the ‘quiet’ option. To do this, run the following:  
